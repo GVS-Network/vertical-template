@@ -1,8 +1,9 @@
 import type { Express } from 'express';
 import type { SiteConfig } from '../../types/site-config';
+import { createPaymentsRouter } from './router';
 
 export const packKey = 'payments' as const;
 
-export function register(_app: Express, _siteConfig: SiteConfig): void {
-  // Prompt 2.7+
+export function register(app: Express, _siteConfig: SiteConfig): void {
+  app.use('/api/payments', createPaymentsRouter());
 }

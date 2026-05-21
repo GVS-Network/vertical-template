@@ -7,7 +7,7 @@ export const defaultSiteConfig: SiteConfig = {
     catalog: true,
     content: true,
     intake: true,
-    payments: false,
+    payments: true,
     auth: false,
   },
   payment: {

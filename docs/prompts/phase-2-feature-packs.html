@@ -202,8 +202,8 @@ Commit: <span class="hl">"phase-2: features/intake (no email-out yet)"</span>.</
 
     <h3>Prompt 2.7 — features/payments (scaffold only)</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 2.7</span>
-Scaffold features/payments per the pack pattern, but WITHOUT any provider implementation. That is Phase 3.
+<span class="prompt-label">Prompt 2.7 · closed</span>
+Payments scaffold — Order + checkout intent 501 + webhook stub; providers/ empty until phase 3.
 
   - Order schema: tenantId, items (denormalized product snapshots — name, sku, price, qty), status, total, paymentRef, provider ('stripe'|'square'|null), createdAt.
   - service.ts: createOrderDraft(items), getOrderById, markOrderPaid(orderId, paymentRef).

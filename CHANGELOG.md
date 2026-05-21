@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `features/payments` — Order schema, checkout intent (501 via `getPaymentProvider` stub), webhook TODO; `CheckoutButton` on Home; `features.payments` enabled in defaults.
 - `features/intake` — FormDefinition + Submission schemas, GET/POST forms API, `GenericFormRenderer`; email deferred (`intake-notifications` TODO); `features.intake` enabled in defaults.
 - `features/content` — Page + Post schemas (Markdown `body`), REST read routes, dev seed, `README.md` body-format decision; client PageRenderer, PostList/Detail; `features.content` enabled in defaults.
 - `features/catalog` — Product schema, REST list/detail, dev seed, client ProductList/Detail + `useProducts`; `features.catalog` enabled in defaults.
