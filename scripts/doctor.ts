@@ -1,6 +1,7 @@
 /**
  * Phase 0 environment check — Node, env files, Mongo connectivity.
  * Phase 3.6 — payment provider env + credential smoke when payments pack is on.
+ * Phase 4.6 — when BOUND_TENANT_ID is set, verify _tenants row, preset, and seeded packs.
  * Run from repo root: npm run doctor
  */
 
@@ -8,10 +9,19 @@ import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import { connectDatabase, disconnectDatabase } from '../server/src/config/database';
 import { runContractCheck } from './contract-check';
+import { scopedForTenant } from '../server/src/db/scoped';
+import { Product } from '../server/src/features/catalog/schemas/product';
+import { Page } from '../server/src/features/content/schemas/page';
+import { FormDefinition } from '../server/src/features/intake/schemas/form-definition';
+import { TenantRegistry } from '../server/src/models/tenant-registry';
 import { defaultSiteConfig } from '../server/src/types/site-config.defaults';
-import type { PaymentProviderName } from '../server/src/types/site-config';
+import type { PaymentProviderName, SiteConfig } from '../server/src/types/site-config';
+import {
+  isVerticalPresetKey,
+  resolveSiteConfigForPreset,
+} from '../verticals/registry';
 
 const SQUARE_API_VERSION = '2024-12-18';
 
@@ -113,32 +123,121 @@ function checkEnvFiles(skipKeys: Set<string> = new Set()): string[] {
   return errors;
 }
 
-async function checkMongo(): Promise<string[]> {
+type BoundTenantResult = {
+  errors: string[];
+  notices: string[];
+  activeConfig: SiteConfig;
+};
+
+async function checkBoundTenant(tenantId: string): Promise<BoundTenantResult> {
   const errors: string[] = [];
+  const notices: string[] = [];
+
+  const registry = await TenantRegistry.findById(tenantId).lean();
+  if (!registry) {
+    return {
+      errors: [
+        `bound tenant: no _tenants document for BOUND_TENANT_ID=${tenantId} — run init-vertical`,
+      ],
+      notices: [],
+      activeConfig: defaultSiteConfig,
+    };
+  }
+
+  if (!isVerticalPresetKey(registry.preset)) {
+    return {
+      errors: [
+        `bound tenant: preset "${String(registry.preset)}" is not a registered vertical`,
+      ],
+      notices: [],
+      activeConfig: defaultSiteConfig,
+    };
+  }
+
+  const config = applyPaymentEnvOverride(
+    resolveSiteConfigForPreset(registry.preset, tenantId)
+  );
+
+  if (config.features.catalog) {
+    const count = await scopedForTenant(Product, tenantId).countDocuments();
+    if (count < 1) {
+      errors.push(
+        `bound tenant/catalog: no products for ${tenantId} — run init-vertical`
+      );
+    }
+  }
+
+  if (config.features.content) {
+    const count = await scopedForTenant(Page, tenantId).countDocuments();
+    if (count < 1) {
+      errors.push(
+        `bound tenant/content: no pages for ${tenantId} — run init-vertical`
+      );
+    }
+  }
+
+  if (config.features.intake) {
+    const count = await scopedForTenant(FormDefinition, tenantId).countDocuments();
+    if (count < 1) {
+      errors.push(
+        `bound tenant/intake: no forms for ${tenantId} — run init-vertical`
+      );
+    }
+  }
+
+  if (errors.length === 0) {
+    const packsOn = (Object.keys(config.features) as (keyof SiteConfig['features'])[])
+      .filter((k) => config.features[k])
+      .join(', ');
+    notices.push(
+      `bound tenant: ${tenantId} → preset ${registry.preset} (${config.branding.name}); packs on: ${packsOn}`
+    );
+  }
+
+  return { errors, notices, activeConfig: config };
+}
+
+async function checkMongo(): Promise<BoundTenantResult> {
+  const errors: string[] = [];
+  const notices: string[] = [];
+  let activeConfig = defaultSiteConfig;
   const serverEnv = join(ROOT, 'server/.env');
 
   if (!existsSync(serverEnv)) {
     errors.push('server: cannot check Mongo — server/.env missing');
-    return errors;
+    return { errors, notices, activeConfig };
   }
 
-  dotenv.config({ path: serverEnv });
-  const uri = process.env.MONGODB_URI;
-
-  if (!uri) {
+  if (!process.env.MONGODB_URI) {
     errors.push('server: MONGODB_URI not set in server/.env');
-    return errors;
+    return { errors, notices, activeConfig };
   }
 
   try {
-    await mongoose.connect(uri, { serverSelectionTimeoutMS: 3000 });
-    await mongoose.disconnect();
+    await connectDatabase();
+
+    const bound = process.env.BOUND_TENANT_ID?.trim();
+    if (bound) {
+      const boundResult = await checkBoundTenant(bound);
+      errors.push(...boundResult.errors);
+      notices.push(...boundResult.notices);
+      if (boundResult.errors.length === 0) {
+        activeConfig = boundResult.activeConfig;
+      }
+    }
+
+    await disconnectDatabase();
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     errors.push(`MongoDB: connection failed — ${message}`);
+    try {
+      await disconnectDatabase();
+    } catch {
+      /* ignore disconnect errors */
+    }
   }
 
-  return errors;
+  return { errors, notices, activeConfig };
 }
 
 function requireEnvVar(name: string): string | null {
@@ -147,12 +246,22 @@ function requireEnvVar(name: string): string | null {
 }
 
 /** Mirrors getSiteConfig payment resolution (server/.env PAYMENT_PROVIDER override). */
-function effectivePaymentProvider(): PaymentProviderName {
+function effectivePaymentProvider(
+  fallback: PaymentProviderName = defaultSiteConfig.payment.provider
+): PaymentProviderName {
   const raw = process.env.PAYMENT_PROVIDER?.trim().toLowerCase();
   if (raw === 'stripe' || raw === 'square' || raw === 'none') {
     return raw;
   }
-  return defaultSiteConfig.payment.provider;
+  return fallback;
+}
+
+function applyPaymentEnvOverride(config: SiteConfig): SiteConfig {
+  const provider = effectivePaymentProvider(config.payment.provider);
+  if (provider === config.payment.provider) {
+    return config;
+  }
+  return { ...config, payment: { provider } };
 }
 
 async function pingStripe(secretKey: string): Promise<string | null> {
@@ -206,11 +315,33 @@ async function pingSquare(accessToken: string): Promise<string | null> {
   }
 }
 
-async function checkPayments(): Promise<{
+function checkAuth(siteConfig: SiteConfig): string[] {
+  if (!siteConfig.features.auth) {
+    return [];
+  }
+
+  const errors: string[] = [];
+  const issuer =
+    requireEnvVar('AUTH0_ISSUER_BASE_URL') ?? requireEnvVar('AUTH0_DOMAIN');
+  const audience = requireEnvVar('AUTH0_AUDIENCE');
+
+  if (!issuer) {
+    errors.push(
+      'auth: missing AUTH0_ISSUER_BASE_URL (or AUTH0_DOMAIN) in server/.env'
+    );
+  }
+  if (!audience) {
+    errors.push('auth: missing AUTH0_AUDIENCE in server/.env');
+  }
+
+  return errors;
+}
+
+async function checkPayments(siteConfig: SiteConfig): Promise<{
   errors: string[];
   warnings: string[];
 }> {
-  if (!defaultSiteConfig.features.payments) {
+  if (!siteConfig.features.payments) {
     return { errors: [], warnings: [] };
   }
 
@@ -223,7 +354,7 @@ async function checkPayments(): Promise<{
   }
 
   dotenv.config({ path: serverEnv });
-  const provider = effectivePaymentProvider();
+  const provider = effectivePaymentProvider(siteConfig.payment.provider);
 
   if (provider === 'none') {
     return {
@@ -298,18 +429,29 @@ async function main(): Promise<void> {
     dotenv.config({ path: serverEnvPath });
   }
 
-  const paymentResult = await checkPayments();
-  const envSkipKeys = defaultSiteConfig.features.payments
-    ? paymentEnvKeysToSkip(effectivePaymentProvider())
+  const mongoResult = await checkMongo();
+  const activeConfig = mongoResult.activeConfig;
+
+  const paymentResult = await checkPayments(activeConfig);
+  const envSkipKeys = activeConfig.features.payments
+    ? paymentEnvKeysToSkip(effectivePaymentProvider(activeConfig.payment.provider))
     : new Set([...STRIPE_ENV_KEYS, ...SQUARE_ENV_KEYS, 'PAYMENT_PROVIDER']);
 
   const errors: string[] = [
     ...checkNodeVersion(),
     ...checkEnvFiles(envSkipKeys),
-    ...(await checkMongo()),
+    ...mongoResult.errors,
     ...(await runContractCheck()),
+    ...checkAuth(activeConfig),
     ...paymentResult.errors,
   ];
+
+  if (mongoResult.notices.length > 0) {
+    for (const notice of mongoResult.notices) {
+      console.log(`ℹ️  ${notice}`);
+    }
+    console.log('');
+  }
 
   if (paymentResult.warnings.length > 0) {
     console.log('⚠️  Warnings:\n');

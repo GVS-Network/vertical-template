@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Phase 4.6: `doctor` — when `BOUND_TENANT_ID` is set, verifies `_tenants` row, registered preset, and seeded catalog/content/intake data; payment/auth checks use bound preset features.
 - Phase 4.5: `farm-source` preset (8 inventory items, 3 pages, wholesale form, auth on); content route `/csa` — completes four-preset roster.
 - Phase 4.5: `food-truck` preset (8 menu items, 3 pages, catering form); content route `/locations`.
 - Phase 4.5: `bar-restaurant` preset (8 menu items, 3 pages, private-event form); content route `/events`; shared `verify-vertical-preset.ts`.
