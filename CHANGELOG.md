@@ -6,9 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Phase 3.3: Stripe provider (`server/src/providers/stripe.ts`), checkout Sessions, webhook verify/parse, `npm run test:stripe-happy-path`; `stripe` dependency.
+
 ### Changed
 
-- Phase 3.2: `PaymentProvider` + `WebhookEvent` contract (`server/src/types/payment-provider.ts`); `getPaymentProvider()` still throws until adapters land.
+- Phase 3.3: `POST /api/payments/checkout/intent` returns `{ url, orderId, providerRef }`; webhook route applies `order.paid` → `markOrderPaid`; raw body on `/api/payments/webhook/*`.
+- Phase 3.2: `PaymentProvider` + `WebhookEvent` contract (`server/src/types/payment-provider.ts`).
 
 ### Docs
 

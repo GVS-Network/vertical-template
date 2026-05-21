@@ -126,7 +126,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Approved, add when their phase lands.</strong> zod (validation, Phase 1+) · stripe · square (Phase 3) · cloudinary (content/uploads) · vitest (tests) · express-async-errors (optional; fork uses <code>asyncHandler</code> in <code>errorHandler.ts</code> today).</p>
+      <p><strong>Installed (phase 3+).</strong> stripe ^17 (server). <strong>Approved when their phase lands:</strong> zod · square · cloudinary · vitest · express-async-errors.</p>
     </div>
     <div class="callout discipline">
       <span class="icon">→</span>
@@ -147,12 +147,12 @@
     <ul>
       <li><code>NODE_ENV</code> · <code>PORT</code> (default 3001) · <code>MONGODB_URI</code> — read by <code>config/database.ts</code></li>
       <li><code>AUTH0_DOMAIN</code> · <code>AUTH0_AUDIENCE</code></li>
-      <li><code>CLIENT_URL</code> — production CORS origin only</li>
+      <li><code>CLIENT_URL</code> — checkout redirect + production CORS</li>
+      <li><code>STRIPE_SECRET_KEY</code> · <code>STRIPE_WEBHOOK_SECRET</code> — when <code>payment.provider === 'stripe'</code></li>
     </ul>
 
     <h4>Server env vars — planned (not in example yet)</h4>
     <ul>
-      <li><code>STRIPE_SECRET_KEY</code> — Phase 3, stripe provider</li>
       <li><code>SQUARE_ACCESS_TOKEN</code> · <code>SQUARE_LOCATION_ID</code> — Phase 3, square provider</li>
       <li><code>CLOUDINARY_URL</code> — content/uploads feature</li>
       <li><code>TENANT_ID</code> — defaults to <code>'default'</code> until Phase 7; not used in route handlers (use <code>getSiteConfig(req)</code> when seam exists)</li>

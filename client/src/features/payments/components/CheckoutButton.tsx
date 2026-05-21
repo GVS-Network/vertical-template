@@ -4,6 +4,12 @@ import type { OrderLineItem } from '../types';
 
 const LATER_PHASE_MESSAGE = 'Payments configured in a later phase';
 
+interface CheckoutIntentResponse {
+  url: string;
+  orderId: string;
+  providerRef: string;
+}
+
 interface CheckoutButtonProps {
   items: OrderLineItem[];
   label?: string;
@@ -20,8 +26,16 @@ function CheckoutButton({
     setLoading(true);
     setMessage(null);
     try {
-      await api.post('/payments/checkout/intent', { items });
-      setMessage('Checkout started (unexpected — provider should not be ready yet).');
+      const { data } = await api.post<{ data: CheckoutIntentResponse }>(
+        '/payments/checkout/intent',
+        { items }
+      );
+      const checkout = data.data;
+      if (checkout?.url) {
+        window.location.assign(checkout.url);
+        return;
+      }
+      setMessage('Checkout did not return a payment URL.');
     } catch (err: unknown) {
       const axiosErr = err as {
         response?: { status?: number; data?: { message?: string; code?: string } };

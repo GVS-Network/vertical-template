@@ -1,5 +1,6 @@
 import type { SiteConfig } from '../types/site-config';
 import type { PaymentProvider } from '../types/payment-provider';
+import { createStripePaymentProvider } from '../providers/stripe';
 
 export type {
   Order,
@@ -8,10 +9,22 @@ export type {
   WebhookEvent,
 } from '../types/payment-provider';
 
-/**
- * Returns the active payment adapter for this site. Factory body wired in 3.3–3.4.
- */
 export function getPaymentProvider(siteConfig: SiteConfig): PaymentProvider {
-  void siteConfig;
-  throw new Error('NotImplementedYet: payments arrive in phase 3');
+  const { provider } = siteConfig.payment;
+
+  if (provider === 'none') {
+    throw new Error(
+      'PAYMENTS_NOT_CONFIGURED: set siteConfig.payment.provider to stripe or square'
+    );
+  }
+
+  if (provider === 'stripe') {
+    return createStripePaymentProvider(siteConfig);
+  }
+
+  if (provider === 'square') {
+    throw new Error('NotImplementedYet: Square provider arrives in phase 3.4');
+  }
+
+  throw new Error(`Unknown payment provider: ${String(provider)}`);
 }

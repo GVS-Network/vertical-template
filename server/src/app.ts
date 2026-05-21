@@ -34,6 +34,11 @@ export async function createApp(
     })
   );
   app.use(morgan('dev'));
+  // Stripe/Square webhooks need raw body for signature verification (before json parser).
+  app.use(
+    '/api/payments/webhook',
+    express.raw({ type: 'application/json' })
+  );
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(attachSiteConfig);

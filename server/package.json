@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "test:registry": "tsx src/features/registry.smoke.ts",
-    "test:pack-compliance": "SKIP_PACK_SEEDS=1 tsx src/features/pack-compliance.smoke.ts"
+    "test:pack-compliance": "SKIP_PACK_SEEDS=1 tsx src/features/pack-compliance.smoke.ts",
+    "test:stripe-happy-path": "tsx src/scripts/stripe-happy-path.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -19,14 +20,15 @@
     "helmet": "^7.1.0",
     "jwks-rsa": "^3.1.0",
     "mongoose": "^8.3.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "stripe": "^17.7.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/morgan": "^1.9.9",
-    "@types/supertest": "^6.0.2",
     "@types/node": "^20.12.7",
+    "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "eslint": "^8.57.0",

@@ -19,7 +19,8 @@
     "clean": "rm -rf client/dist server/dist client/node_modules server/node_modules node_modules",
     "doctor": "tsx scripts/doctor.ts",
     "test:registry": "npm run test:registry --prefix server",
-    "test:pack-compliance": "npm run test:pack-compliance --prefix server"
+    "test:pack-compliance": "npm run test:pack-compliance --prefix server",
+    "test:stripe-happy-path": "npm run test:stripe-happy-path --prefix server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

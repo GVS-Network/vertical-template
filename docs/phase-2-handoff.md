@@ -26,4 +26,4 @@
 
 ## Phase 3 entry
 
-Read `docs/prompts/phase-3-payments.html` (when present) and **`docs/phase-3-open-questions.md`** before implementing adapters. Phase 3 fills `server/src/providers/` and wires `getPaymentProvider(siteConfig)` — not direct SDK calls from the payments pack router.
+Read `docs/prompts/phase-3-payments.html` and **`server/src/features/payments/README.md`** (3.1 closed). Phase 3 fills `server/src/providers/` and wires `getPaymentProvider(siteConfig)` — not direct SDK calls from the payments pack router.

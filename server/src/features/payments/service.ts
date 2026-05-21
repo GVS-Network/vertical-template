@@ -50,6 +50,30 @@ export async function getOrderById(
   return doc ? doc.toObject() : null;
 }
 
+export async function attachCheckoutToOrder(
+  tenantId: string,
+  orderId: OrderId,
+  paymentRef: string,
+  provider: OrderProvider
+): Promise<IOrder | null> {
+  const orders = scopedForTenant(Order, tenantId);
+  const existing = await getOrderById(tenantId, orderId);
+  if (!existing) {
+    return null;
+  }
+
+  await orders.updateOne(
+    { _id: orderId },
+    {
+      status: 'pending',
+      paymentRef,
+      provider,
+    }
+  );
+
+  return getOrderById(tenantId, orderId);
+}
+
 export async function markOrderPaid(
   tenantId: string,
   orderId: OrderId,
@@ -61,6 +85,10 @@ export async function markOrderPaid(
     return null;
   }
 
+  if (existing.status === 'paid') {
+    return existing;
+  }
+
   await orders.updateOne(
     { _id: orderId },
     {
@@ -70,4 +98,58 @@ export async function markOrderPaid(
   );
 
   return getOrderById(tenantId, orderId);
+}
+
+export async function markOrderPaidByProviderRef(
+  tenantId: string,
+  paymentRef: string
+): Promise<IOrder | null> {
+  const orders = scopedForTenant(Order, tenantId);
+  const doc = (await orders.findOne({ paymentRef })) as HydratedDocument<IOrder> | null;
+  if (!doc) {
+    return null;
+  }
+  return markOrderPaid(tenantId, doc._id, paymentRef);
+}
+
+export async function markOrderFailed(
+  tenantId: string,
+  orderId: OrderId
+): Promise<IOrder | null> {
+  const orders = scopedForTenant(Order, tenantId);
+  await orders.updateOne({ _id: orderId }, { status: 'cancelled' });
+  return getOrderById(tenantId, orderId);
+}
+
+export async function markOrderFailedByProviderRef(
+  tenantId: string,
+  paymentRef: string
+): Promise<IOrder | null> {
+  const orders = scopedForTenant(Order, tenantId);
+  const doc = (await orders.findOne({ paymentRef })) as HydratedDocument<IOrder> | null;
+  if (!doc) {
+    return null;
+  }
+  return markOrderFailed(tenantId, doc._id);
+}
+
+export async function markOrderRefunded(
+  tenantId: string,
+  orderId: OrderId
+): Promise<IOrder | null> {
+  const orders = scopedForTenant(Order, tenantId);
+  await orders.updateOne({ _id: orderId }, { status: 'cancelled' });
+  return getOrderById(tenantId, orderId);
+}
+
+export async function markOrderRefundedByProviderRef(
+  tenantId: string,
+  paymentRef: string
+): Promise<IOrder | null> {
+  const orders = scopedForTenant(Order, tenantId);
+  const doc = (await orders.findOne({ paymentRef })) as HydratedDocument<IOrder> | null;
+  if (!doc) {
+    return null;
+  }
+  return markOrderRefunded(tenantId, doc._id);
 }

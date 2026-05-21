@@ -10,9 +10,27 @@ export type Order = IOrder;
 export type Product = IProduct;
 
 export type WebhookEvent =
-  | { type: 'order.paid'; providerRef: string; eventId: string }
-  | { type: 'order.failed'; providerRef: string; eventId: string }
-  | { type: 'order.refunded'; providerRef: string; eventId: string }
+  | {
+      type: 'order.paid';
+      providerRef: string;
+      eventId: string;
+      tenantId: string;
+      orderId: string;
+    }
+  | {
+      type: 'order.failed';
+      providerRef: string;
+      eventId: string;
+      tenantId: string;
+      orderId: string;
+    }
+  | {
+      type: 'order.refunded';
+      providerRef: string;
+      eventId: string;
+      tenantId: string;
+      orderId: string;
+    }
   | { type: 'unknown'; eventId: string };
 
 /**
