@@ -34,10 +34,7 @@ export const getPostBySlug = asyncHandler(async (req: Request, res: Response) =>
   res.json({ status: 'success', data: post });
 });
 
-/** TODO: require auth when features.auth is enabled. */
+/** Protected by requireAuth when features.auth — CRUD implementation deferred. */
 export const writeNotReady = asyncHandler(async (_req: Request, _res: Response) => {
-  throw createError(
-    'Content write routes require auth pack — not wired in phase 2.5',
-    501
-  );
+  throw createError('Content write API not implemented yet (phase 2.5 scaffold)', 501);
 });

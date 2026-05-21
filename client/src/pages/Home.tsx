@@ -1,5 +1,5 @@
-import { useAuth0 } from '@auth0/auth0-react';
 import { defaultSiteConfig } from '../types/site-config.defaults';
+import { LoginButton } from '../features/auth';
 import { CheckoutButton } from '../features/payments';
 
 const DEMO_CHECKOUT_ITEMS = [
@@ -7,8 +7,6 @@ const DEMO_CHECKOUT_ITEMS = [
 ];
 
 function Home() {
-  const { isAuthenticated, loginWithRedirect } = useAuth0();
-
   return (
     <div className="py-12">
       <div className="text-center max-w-3xl mx-auto">
@@ -22,13 +20,8 @@ function Home() {
           {defaultSiteConfig.features.payments && (
             <CheckoutButton items={DEMO_CHECKOUT_ITEMS} />
           )}
-          {!isAuthenticated && (
-            <button
-              onClick={() => loginWithRedirect()}
-              className="btn-secondary text-lg px-8 py-3"
-            >
-              Log In
-            </button>
+          {defaultSiteConfig.features.auth && (
+            <LoginButton className="btn-secondary text-lg px-8 py-3" />
           )}
         </div>
       </div>

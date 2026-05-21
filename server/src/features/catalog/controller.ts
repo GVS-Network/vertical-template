@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { asyncHandler, createError } from '../../middleware/errorHandler';
 import type { ProductStatus } from './schemas/product';
+import type { CreateProductInput, UpdateProductInput } from './service';
 import * as catalogService from './service';
 
 function tenantId(req: Request): string {
@@ -27,18 +28,23 @@ export const getProductBySlug = asyncHandler(
   }
 );
 
-/** TODO: require auth when features.auth is enabled (auth pack middleware). */
-export const createProduct = asyncHandler(async (_req: Request, _res: Response) => {
-  throw createError(
-    'Catalog write routes require auth pack — not wired in phase 2.4',
-    501
-  );
+export const createProduct = asyncHandler(async (req: Request, res: Response) => {
+  const body = req.body as CreateProductInput;
+  if (!body?.name || !body?.slug || !body?.sku || body?.price === undefined) {
+    throw createError('name, slug, sku, and price are required', 400);
+  }
+  const product = await catalogService.createProduct(tenantId(req), body);
+  res.status(201).json({ status: 'success', data: product });
 });
 
-/** TODO: require auth when features.auth is enabled (auth pack middleware). */
-export const updateProduct = asyncHandler(async (_req: Request, _res: Response) => {
-  throw createError(
-    'Catalog write routes require auth pack — not wired in phase 2.4',
-    501
+export const updateProduct = asyncHandler(async (req: Request, res: Response) => {
+  const product = await catalogService.updateProduct(
+    tenantId(req),
+    req.params.slug,
+    req.body as UpdateProductInput
   );
+  if (!product) {
+    throw createError('Product not found', 404);
+  }
+  res.json({ status: 'success', data: product });
 });

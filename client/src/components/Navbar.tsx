@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { defaultSiteConfig } from '../types/site-config.defaults';
+import { LoginButton, LogoutButton, useSession } from '../features/auth';
 
 function Navbar() {
-  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
+  const { isAuthenticated, user } = useAuth0();
+  const { user: sessionUser } = useSession();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -79,27 +81,22 @@ function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                {user?.picture && (
-                  <img
-                    src={user.picture}
-                    alt={user.name || 'User'}
-                    className="w-8 h-8 rounded-full"
-                  />
-                )}
-                <button
-                  onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
-                  className="btn-secondary text-sm"
-                >
-                  Log Out
-                </button>
-              </div>
-            ) : (
-              <button onClick={() => loginWithRedirect()} className="btn-primary text-sm">
-                Log In
-              </button>
-            )}
+            {defaultSiteConfig.features.auth ? (
+              isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  {(sessionUser?.picture ?? user?.picture) && (
+                    <img
+                      src={(sessionUser?.picture ?? user?.picture) as string}
+                      alt={sessionUser?.name ?? user?.name ?? 'User'}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  )}
+                  <LogoutButton />
+                </div>
+              ) : (
+                <LoginButton />
+              )
+            ) : null}
           </div>
         </div>
       </div>

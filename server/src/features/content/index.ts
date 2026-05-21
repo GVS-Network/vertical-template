@@ -10,5 +10,5 @@ export async function register(
   siteConfig: SiteConfig
 ): Promise<void> {
   await seedContent(siteConfig.tenantId);
-  app.use('/api/content', createContentRouter());
+  app.use('/api/content', createContentRouter(siteConfig));
 }

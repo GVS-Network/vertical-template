@@ -10,5 +10,5 @@ export async function register(
   siteConfig: SiteConfig
 ): Promise<void> {
   await seedCatalogProducts(siteConfig.tenantId);
-  app.use('/api/catalog', createCatalogRouter());
+  app.use('/api/catalog', createCatalogRouter(siteConfig));
 }
