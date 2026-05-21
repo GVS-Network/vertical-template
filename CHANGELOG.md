@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Phase 3.2: `PaymentProvider` + `WebhookEvent` contract (`server/src/types/payment-provider.ts`); `getPaymentProvider()` still throws until adapters land.
+
+### Docs
+
+- Phase 3.1: resolved open questions in `server/src/features/payments/README.md` (one provider per site, Square inventory push, adapter paths, webhooks).
+
 ## [0.3.0] — 2026-05-21
 
 Phase 2 (Feature packs) closed. Five toggle-mounted packs on server and client, registry gate at boot, pack-pattern source of truth, compliance smokes. Payment checkout returns 501 until Phase 3 adapters.
