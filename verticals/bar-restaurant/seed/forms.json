@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "slug": "private-event",
+    "title": "Inquire about a private event",
+    "submitButtonLabel": "Send event inquiry",
+    "fields": [
+      { "name": "contact_name", "type": "text", "required": true },
+      { "name": "email", "type": "email", "required": true },
+      { "name": "phone", "type": "text", "required": false },
+      { "name": "event_type", "type": "select", "required": true, "options": ["Seated dinner", "Cocktail reception", "Full buyout", "Other"] },
+      { "name": "preferred_date", "type": "text", "required": true },
+      { "name": "guest_count", "type": "text", "required": true },
+      { "name": "budget_range", "type": "select", "required": false, "options": ["Under $3k", "$3k–$6k", "$6k–$10k", "$10k+", "Not sure"] },
+      { "name": "notes", "type": "textarea", "required": false }
+    ]
+  }
+]

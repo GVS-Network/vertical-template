@@ -1,6 +1,7 @@
 /**
- * Verify screen-printer preset data (Prompt 4.4).
- * Run: tsx scripts/verify-screen-printer-preset.ts
+ * Verify a vertical preset tenant (Prompt 4.4+).
+ * Usage: tsx scripts/verify-vertical-preset.ts <preset-key>
+ * Example: tsx scripts/verify-vertical-preset.ts bar-restaurant
  */
 import '../server/src/load-env';
 
@@ -14,8 +15,35 @@ import { FormDefinition } from '../server/src/features/intake/schemas/form-defin
 import { createApp } from '../server/src/app';
 import { primeBoundSiteConfig } from '../server/src/seams/bound-site-config';
 import { getSiteConfig } from '../server/src/seams/get-site-config';
+import type { PaymentProviderName } from '../server/src/types/site-config';
 
-const TENANT = 'demo-screen-printer';
+type PresetExpectation = {
+  tenantId: string;
+  brandingName: string;
+  provider: PaymentProviderName;
+  productCount: number;
+  pageSlugs: string[];
+  formSlug: string;
+};
+
+const EXPECTATIONS: Record<string, PresetExpectation> = {
+  'screen-printer': {
+    tenantId: 'demo-screen-printer',
+    brandingName: 'Inkline Print Co.',
+    provider: 'stripe',
+    productCount: 8,
+    pageSlugs: ['home', 'about', 'portfolio'],
+    formSlug: 'project-quote',
+  },
+  'bar-restaurant': {
+    tenantId: 'demo-bar-restaurant',
+    brandingName: 'Harbor & Hearth',
+    provider: 'square',
+    productCount: 8,
+    pageSlugs: ['home', 'about', 'events'],
+    formSlug: 'private-event',
+  },
+};
 
 async function httpGet(
   port: number,
@@ -44,27 +72,40 @@ async function httpGet(
 }
 
 async function main(): Promise<void> {
-  process.env.BOUND_TENANT_ID = TENANT;
+  const presetKey = process.argv[2]?.trim();
+  if (!presetKey) {
+    throw new Error('usage: tsx scripts/verify-vertical-preset.ts <preset-key>');
+  }
+
+  const expected = EXPECTATIONS[presetKey];
+  if (!expected) {
+    throw new Error(`no expectations for preset: ${presetKey}`);
+  }
+
+  process.env.BOUND_TENANT_ID = expected.tenantId;
+  process.env.PAYMENT_PROVIDER = expected.provider;
 
   await connectDatabase();
   await primeBoundSiteConfig();
 
-  const products = await scopedForTenant(Product, TENANT).find().lean();
-  if (products.length !== 8) {
-    throw new Error(`expected 8 products, got ${products.length}`);
+  const products = await scopedForTenant(Product, expected.tenantId).find().lean();
+  if (products.length !== expected.productCount) {
+    throw new Error(
+      `expected ${expected.productCount} products, got ${products.length}`
+    );
   }
 
-  const pages = await scopedForTenant(Page, TENANT).find().lean();
+  const pages = await scopedForTenant(Page, expected.tenantId).find().lean();
   const slugs = new Set(pages.map((p) => p.slug));
-  for (const expected of ['home', 'about', 'portfolio']) {
-    if (!slugs.has(expected)) {
-      throw new Error(`missing page slug: ${expected}`);
+  for (const slug of expected.pageSlugs) {
+    if (!slugs.has(slug)) {
+      throw new Error(`missing page slug: ${slug}`);
     }
   }
 
-  const forms = await scopedForTenant(FormDefinition, TENANT).find().lean();
-  if (forms.length !== 1 || forms[0]?.slug !== 'project-quote') {
-    throw new Error('expected project-quote form');
+  const forms = await scopedForTenant(FormDefinition, expected.tenantId).find().lean();
+  if (forms.length !== 1 || forms[0]?.slug !== expected.formSlug) {
+    throw new Error(`expected form ${expected.formSlug}`);
   }
 
   const app = await createApp();
@@ -78,11 +119,15 @@ async function main(): Promise<void> {
 
   const catalog = await httpGet(port, '/api/catalog/products');
   const catalogData = (catalog.body as { data?: unknown[] }).data;
-  if (catalog.status !== 200 || !Array.isArray(catalogData) || catalogData.length !== 8) {
+  if (
+    catalog.status !== 200 ||
+    !Array.isArray(catalogData) ||
+    catalogData.length !== expected.productCount
+  ) {
     throw new Error(`catalog API: status=${catalog.status} count=${catalogData?.length}`);
   }
 
-  for (const slug of ['home', 'about', 'portfolio'] as const) {
+  for (const slug of expected.pageSlugs) {
     const page = await httpGet(port, `/api/content/pages/${slug}`);
     const pageSlug = (page.body as { data?: { slug?: string } }).data?.slug;
     if (page.status !== 200 || pageSlug !== slug) {
@@ -90,25 +135,28 @@ async function main(): Promise<void> {
     }
   }
 
-  const form = await httpGet(port, '/api/intake/forms/project-quote');
+  const form = await httpGet(port, `/api/intake/forms/${expected.formSlug}`);
   const formSlug = (form.body as { data?: { slug?: string } }).data?.slug;
-  if (form.status !== 200 || formSlug !== 'project-quote') {
+  if (form.status !== 200 || formSlug !== expected.formSlug) {
     throw new Error(`form API: status=${form.status}`);
   }
 
   server.close();
 
   const config = getSiteConfig({} as import('express').Request);
-  if (config.tenantId !== TENANT || config.vertical !== 'screen-printer') {
+  if (config.tenantId !== expected.tenantId || config.vertical !== presetKey) {
     throw new Error('BOUND_TENANT_ID site config mismatch');
   }
-  if (config.branding.name !== 'Inkline Print Co.') {
-    throw new Error('expected Inkline branding');
+  if (config.branding.name !== expected.brandingName) {
+    throw new Error(`expected branding ${expected.brandingName}`);
+  }
+  if (config.payment.provider !== expected.provider) {
+    throw new Error(`expected provider ${expected.provider}`);
   }
 
   await disconnectDatabase();
 
-  console.log('verify-screen-printer-preset: OK');
+  console.log(`verify-vertical-preset (${presetKey}): OK`);
   console.log(`  products: ${products.length} (e.g. ${products[0]?.name})`);
   console.log(`  pages: ${[...slugs].join(', ')}`);
   console.log(`  form: ${forms[0]?.slug}`);
@@ -116,6 +164,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error('verify-screen-printer-preset FAILED:', err);
+  console.error('verify-vertical-preset FAILED:', err);
   void disconnectDatabase().finally(() => process.exit(1));
 });

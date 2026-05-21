@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Phase 4.5: `bar-restaurant` preset (8 menu items, 3 pages, private-event form); content route `/events`; shared `verify-vertical-preset.ts`.
 - Phase 4.4: `screen-printer` preset (8 products, 3 pages, project-quote form); `BOUND_TENANT_ID` seam; content routes `/home`, `/portfolio`.
 - Phase 4.3: `npm run init:vertical` — `--preset` / `--tenant` / `--force`; seeds from `verticals/<key>/seed/*.json`; `_tenants` registry (`server/src/models/tenant-registry.ts`); idempotent re-run.
 - Phase 4.2: `verticals/_preset-pattern.md`, `verticals/registry.ts` (four presets + `mergePreset`), stub preset folders, `zod` (root) for `product-attributes.schema.ts`; `npm run test:vertical-registry`.

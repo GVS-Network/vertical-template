@@ -1,1 +1,103 @@
-[]
+[
+  {
+    "name": "Oysters on the Half Shell",
+    "slug": "oysters-half-shell",
+    "sku": "APP-OYS-01",
+    "price": 1800,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "allergens": ["shellfish"],
+      "dietaryTags": ["gluten-free"],
+      "spiceLevel": "mild"
+    }
+  },
+  {
+    "name": "Charred Shishito Peppers",
+    "slug": "charred-shishito-peppers",
+    "sku": "APP-SHI-02",
+    "price": 1100,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "allergens": ["soy"],
+      "dietaryTags": ["vegetarian"],
+      "spiceLevel": "medium"
+    }
+  },
+  {
+    "name": "Grass-Fed Burger & Fries",
+    "slug": "grass-fed-burger-fries",
+    "sku": "ENT-BRG-03",
+    "price": 2200,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "allergens": ["gluten", "dairy", "egg"],
+      "spiceLevel": "mild"
+    }
+  },
+  {
+    "name": "Pan-Roasted Salmon",
+    "slug": "pan-roasted-salmon",
+    "sku": "ENT-SAL-04",
+    "price": 2800,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "allergens": ["fish"],
+      "dietaryTags": ["gluten-free"],
+      "spiceLevel": "mild"
+    }
+  },
+  {
+    "name": "Wild Mushroom Risotto",
+    "slug": "wild-mushroom-risotto",
+    "sku": "ENT-RIS-05",
+    "price": 2400,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "allergens": ["dairy"],
+      "dietaryTags": ["vegetarian", "gluten-free"],
+      "spiceLevel": "mild"
+    }
+  },
+  {
+    "name": "Chocolate Pot de Crème",
+    "slug": "chocolate-pot-de-creme",
+    "sku": "DES-CHO-06",
+    "price": 900,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "allergens": ["dairy", "egg"],
+      "dietaryTags": ["vegetarian"],
+      "spiceLevel": "mild"
+    }
+  },
+  {
+    "name": "House Old Fashioned",
+    "slug": "house-old-fashioned",
+    "sku": "BAR-OFD-07",
+    "price": 1400,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "dietaryTags": ["gluten-free"],
+      "spiceLevel": "mild"
+    }
+  },
+  {
+    "name": "Rising Tide IPA (Draft)",
+    "slug": "rising-tide-ipa-draft",
+    "sku": "BAR-IPA-08",
+    "price": 800,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "allergens": ["gluten"],
+      "spiceLevel": "mild"
+    }
+  }
+]

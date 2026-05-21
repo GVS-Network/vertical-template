@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "slug": "home",
+    "title": "Harbor & Hearth",
+    "status": "published",
+    "hero": {
+      "headline": "Harbor & Hearth",
+      "subheadline": "Wood-fired plates and a thoughtful bar on the waterfront"
+    },
+    "body": "# Welcome\n\nWe are a neighborhood restaurant focused on Maine seafood, local farms, and a bar program that favors small producers. The **menu** lists what is on the pass tonight — no public online ordering; staff run tabs and events through Square at the house.\n\n## Tonight\n\n- Raw bar rotation and daily catch\n- A short list of wines by the glass\n- Happy hour at the bar, Tuesday through Thursday, 4–6pm\n\nBrowse the **catalog** for current dishes and dietary notes, or inquire about a **private event** if you are planning a gathering."
+  },
+  {
+    "slug": "about",
+    "title": "Our story",
+    "status": "published",
+    "body": "# About Harbor & Hearth\n\nChef Mara Ellis opened Harbor & Hearth in 2018 after a decade cooking on fishing boats and in oyster bars downeast. The dining room seats forty-six; the bar seats twelve. We buy whole fish when we can, break them down in-house, and build menus around what landed that week.\n\n## What to expect\n\n- Reservations recommended Thursday through Saturday\n- Walk-ins welcome at the bar when seats are open\n- We accommodate allergies with notice — tell your server before you order\n\nPrivate buyouts and rehearsal dinners are common here; start with the **private event** form and we will follow up with a package."
+  },
+  {
+    "slug": "events",
+    "title": "Private events",
+    "status": "published",
+    "hero": {
+      "headline": "Private events",
+      "subheadline": "Buyouts, seated dinners, and standing receptions"
+    },
+    "body": "# Private events\n\nHarbor & Hearth hosts weddings, corporate dinners, and family celebrations. We offer full-restaurant buyouts on Sunday and Monday evenings, or partial dining-room holds on select weeknights.\n\n## Typical packages\n\n- **Seated dinner** — three courses, family-style sides, coffee service\n- **Cocktail reception** — passed bites, raw bar add-on, open bar or consumption tab\n- **Chef's lunch** — shorter menu for daytime meetings (twenty guests minimum)\n\nSubmit the **private event** form with your date range and headcount. Our events lead replies within two business days with availability and a rough per-guest estimate."
+  }
+]

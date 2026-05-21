@@ -62,6 +62,7 @@ export type ProductAttributes = z.infer<typeof productAttributesSchema>;
 | `forms.json` | Array of FormDefinition-shaped objects (intake pack) |
 
 - **No lorem** in finished presets (4.4+).
+- Verify after init: `npm run test:<preset>-preset` → `scripts/verify-vertical-preset.ts <key>` (DB + HTTP walk).
 - Empty `[]` is valid for pattern stubs @ 4.2.
 
 ### 4. `README.md`

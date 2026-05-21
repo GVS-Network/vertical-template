@@ -27,7 +27,8 @@
     "test:vertical-registry": "tsx verticals/registry.smoke.ts",
     "init:vertical": "tsx scripts/init-vertical.ts",
     "test:init-vertical": "tsx scripts/init-vertical.smoke.ts",
-    "test:screen-printer-preset": "tsx scripts/verify-screen-printer-preset.ts"
+    "test:screen-printer-preset": "tsx scripts/verify-vertical-preset.ts screen-printer",
+    "test:bar-restaurant-preset": "tsx scripts/verify-vertical-preset.ts bar-restaurant"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
