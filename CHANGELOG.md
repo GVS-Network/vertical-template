@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `getSiteConfig(req)` seam, `attachSiteConfig` middleware, `Express.Request.siteConfig` augmentation; `/api/health` returns `site` from config.
 - `scripts/contract-check.ts` — twin type-file parity + `defaultSiteConfig` required-field validation; wired to `doctor`, `prebuild`, and `contract:check`.
 
 ### Docs

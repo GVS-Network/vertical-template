@@ -4,9 +4,10 @@ import mongoose from 'mongoose';
 const router = Router();
 
 // GET /api/health - Basic health check
-router.get('/', (_req: Request, res: Response) => {
+router.get('/', (req: Request, res: Response) => {
   res.json({
     status: 'ok',
+    site: req.siteConfig.branding.name,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });

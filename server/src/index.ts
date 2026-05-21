@@ -9,6 +9,7 @@ dotenv.config();
 
 import { connectDatabase } from './config/database';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { attachSiteConfig } from './middleware/site-config';
 import healthRoutes from './routes/health';
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(attachSiteConfig);
 
 // Routes
 app.use('/api/health', healthRoutes);
