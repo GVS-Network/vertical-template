@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Glossary · v0.1.0</span>
+      <span>Glossary · v0.2.0</span>
     </div>
     <h1 class="doc-title">Words that mean <em>specific things</em> here.</h1>
     <p class="doc-subtitle">Project-internal vocabulary. When Claude (or anyone) uses these terms in a PR or a prompt, they carry the definitions below — not the generic ones.</p>
@@ -45,7 +45,7 @@
       <div class="decision-row">
         <div class="key">SiteConfig</div>
         <div class="val">
-          <p>The one TypeScript shape that describes what a build looks like. Lives twin in <code>client/src/types/site-config.ts</code> and <code>server/src/types/site-config.ts</code>, kept identical by <code>contract:check</code>. Contains <code>tenantId · vertical · branding · features</code>. Read at runtime through <code>getSiteConfig(req)</code>.</p>
+          <p>The one TypeScript shape that describes what a build looks like. Lives twin in <code>client/src/types/site-config.ts</code> and <code>server/src/types/site-config.ts</code>, kept identical by <code>contract:check</code>. Top-level fields: <code>tenantId · vertical · features</code> (five booleans) · <code>payment</code> · <code>branding</code> · <code>contact</code> · <code>locale</code>. Server runtime: <code>req.siteConfig</code> via <code>attachSiteConfig</code>, sourced from <code>getSiteConfig(req)</code>.</p>
         </div>
       </div>
 
@@ -66,7 +66,7 @@
       <div class="decision-row">
         <div class="key">Seam</div>
         <div class="val">
-          <p>A single function or middleware boundary that the rest of the codebase reads through. The platform has two named seams: <code>getSiteConfig(req)</code> (tenant context) and <code>getPaymentProvider()</code> (payments). The point of a seam is that the body can change without callers changing.</p>
+          <p>A single function boundary the rest of the codebase reads through. Two seams live under <code>server/src/seams/</code>: <code>getSiteConfig(req)</code> (tenant context) and <code>getPaymentProvider(siteConfig)</code> (payments). The point of a seam is that the body can change without callers changing.</p>
         </div>
       </div>
 
@@ -144,11 +144,19 @@
     <div class="decisions">
       <div class="decision-row">
         <div class="key">getSiteConfig(req)</div>
-        <div class="val"><p>The single server-side seam for tenant context. Today returns a singleton; in phase 7, returns per-request from <code>req.tenantConfig</code>. Application code calls it; nothing else.</p></div>
+        <div class="val"><p>Seam in <code>server/src/seams/get-site-config.ts</code>. Today returns <code>defaultSiteConfig</code>; phase 7 resolves per host/<code>Tenant</code>. Middleware sets <code>req.siteConfig</code>; routes may use either the seam or <code>req.siteConfig</code> after <code>attachSiteConfig</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">scoped(Model, req)</div>
+        <div class="val"><p>Tenant-scoped Mongoose query helper in <code>server/src/db/scoped.ts</code>. Merges <code>req.siteConfig.tenantId</code> into find/findOne/create/update/delete. Replaces raw <code>Model.find</code> in feature packs. Requires <code>attachSiteConfig</code> on the request.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">tenantIdSchemaDefinition</div>
+        <div class="val"><p>Shared Mongoose field + <code>applyTenantCompoundIndex(schema, field)</code> in <code>server/src/db/tenant-schema.ts</code>. Every new schema spreads this; compound-index the natural lookup key (slug, auth0Id, etc.).</p></div>
       </div>
       <div class="decision-row">
         <div class="key">PaymentProvider</div>
-        <div class="val"><p>Interface in <code>server/src/providers/PaymentProvider.ts</code>. Two adapters: <code>stripe.ts</code>, <code>square.ts</code>. Selected by SiteConfig. <code>getPaymentProvider()</code> returns the active one.</p></div>
+        <div class="val"><p>Type-only interface in <code>server/src/types/payment-provider.ts</code> (phase 1). Factory seam: <code>getPaymentProvider(siteConfig)</code> in <code>server/src/seams/get-payment-provider.ts</code> — throws until phase 3. Adapters land under <code>server/src/providers/</code> later.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">isFieldActive(field, formState)</div>

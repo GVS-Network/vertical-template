@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Stack Context · v0.1.1</span>
+      <span>Stack Context · v0.2.0</span>
     </div>
     <h1 class="doc-title">The <em>stack</em>, pinned.</h1>
     <p class="doc-subtitle">What's installed, what's chosen, what's expressly forbidden. Read before suggesting a library; read again before adding a dependency. Reconciled against <code>docs/inventory.md</code> (Phase 0, Prompt 0.2).</p>
@@ -223,7 +223,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Target rules (Phase 1+).</strong> The fork still uses demo <code>User</code> / <code>Item</code> models without <code>tenantId</code> and has no <code>getSiteConfig(req)</code> yet. The rules below apply to new template code — do not extend the demo patterns.</p>
+      <p><strong>Phase 1 complete (v0.2.0).</strong> <code>SiteConfig</code>, <code>getSiteConfig(req)</code>, <code>scoped(Model, req)</code>, and tenant schema helpers are live. Demo <code>User</code>/<code>Item</code> removed. Feature packs and provider adapters are not built yet — rules below apply to all new code.</p>
     </div>
     <div class="callout risk">
       <span class="icon">!</span>
@@ -251,7 +251,8 @@
   <section class="status-section">
     <span class="section-num">07 — Status</span>
     <h2>What's pinned today, what changes later</h2>
-    <p><strong>v0.1.1 (2026-05-21):</strong> Reconciled with <code>docs/inventory.md</code> after baseapp fork. The fork runs React 18.2, Vite 5.2, Express 4.19, Mongoose 8.3, Auth0 (SPA + <code>express-oauth2-jwt-bearer</code>), and legacy Tailwind 3. Target stack (token registry, zod, payments, Cloudinary, <code>tenantId</code>, feature packs) is documented as planned per phase — not claimed as present.</p>
+    <p><strong>v0.2.0 (2026-05-21):</strong> Phase 1 closed. Present: <code>SiteConfig</code> twin types, <code>contract:check</code>, <code>getSiteConfig</code>/<code>getPaymentProvider</code> seams, <code>scoped()</code>, <code>doctor</code>. Still planned per phase: feature packs (2), payment adapters (3), vertical presets (4), token registry (5). Tailwind frozen until phase 5.</p>
+    <p><strong>v0.1.1:</strong> Post-fork inventory reconciliation (React 18.2, Vite 5.2, Express 4.19, Mongoose 8.3, legacy Tailwind 3).</p>
 
     <h4>Phase 0 decisions (locked 2026-05-21)</h4>
     <div class="decisions">

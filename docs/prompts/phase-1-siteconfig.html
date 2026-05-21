@@ -249,20 +249,15 @@ Commit: <span class="hl">"phase-1: close v0.2.0"</span>. Tag <span class="hl">v0
   <!-- ===================== -->
   <section class="status-section">
     <span class="section-num">06 — Status &amp; handoff to Phase 2</span>
-    <h2>What's true at the end of Phase 1</h2>
-    <p>There is one shape, two seams, and one defaulted tenant. The template is now a MERN that knows it is going to become many sites — even though right now it is only one. Phase 2 stops talking about shape and starts building behavior.</p>
+    <h2>Phase 1 closed · <code>v0.2.0</code></h2>
+    <p>There is one shape, two seams, and one defaulted tenant. Acceptance criteria met; tag <code>v0.2.0</code>. Handoff: <code>docs/phase-1-handoff.md</code>. Open questions for phase 2: <code>docs/phase-2-open-questions.md</code>.</p>
 
     <h4>What Phase 2 will pick up</h4>
     <ul>
       <li>The five feature packs (<code>catalog</code>, <code>content</code>, <code>intake</code>, <code>payments</code>, <code>auth</code>), each scaffolded as a self-contained module.</li>
-      <li>Toggle-mounting: feature packs read <code>req.siteConfig.features.*</code> and silently skip when off.</li>
-      <li>Each pack ships a schema, a service, a controller, a router, and a client component family.</li>
+      <li>Toggle-mounting: resolve mount strategy (middleware vs in-router) — see open questions doc.</li>
+      <li>Each pack ships a schema (with <code>tenantId</code> + <code>scoped()</code>), service, controller, router, and client components.</li>
     </ul>
-
-    <div class="open-q">
-      <span class="q-label">Open question to carry forward</span>
-      <p>Should feature packs read SiteConfig directly, or should the server middleware filter them out before the request even reaches the pack's router? Phase 2's first prompt resolves this.</p>
-    </div>
   </section>
 
 </article>

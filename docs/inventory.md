@@ -270,4 +270,5 @@ The root README is still the full **MERN Stack Starter Template** guide:
 - [x] Keep vs remove/replace lists populated
 - [x] **Prompt 0.2** — `stack-context.html` reconciled to v0.1.1 (2026-05-21)
 - [x] **Prompts 0.3–0.8** — Phase 0 closed; template tagged **v0.1.0**
-- [ ] Next: **Phase 1** — SiteConfig, `getSiteConfig(req)`, `tenantId` on models (see `docs/phase-0-handoff.md`)
+- [x] **Phase 1** closed @ `v0.2.0` — see `docs/phase-1-handoff.md`
+- [ ] Next: **Phase 2** — feature packs (see `docs/phase-2-open-questions.md`)

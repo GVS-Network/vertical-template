@@ -6,16 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-05-21
+
+Phase 1 (SiteConfig & seams) closed. One TypeScript shape, two seams, defaulted tenant infrastructure. No feature packs yet.
+
+### Phase 1 — closed (prompt log)
+
+| Prompt | Outcome |
+|--------|---------|
+| **1.1** | Open questions resolved (`docs/phase-1-prompt-1.1-resolutions.md`) |
+| **1.2** | `SiteConfig` / `ThemeTokens` types; demo User/Item/routes removed |
+| **1.3** | `defaultSiteConfig` (client + server) |
+| **1.4** | `contract:check` script |
+| **1.5** | `getSiteConfig(req)`, `attachSiteConfig`, health reads `site` |
+| **1.6** | `getPaymentProvider` stub + `PaymentProvider` interface |
+| **1.7** | `scoped()`, `tenantIdSchemaDefinition`; audit doc (zero live schemas) |
+| **1.8** | Docs + tag `v0.2.0` |
+
 ### Added
 
-- `getSiteConfig(req)` seam, `attachSiteConfig` middleware, `Express.Request.siteConfig` augmentation; `/api/health` returns `site` from config.
-- `PaymentProvider` interface (type-only) and `getPaymentProvider(siteConfig)` throwing stub until phase 3.
-- `server/src/db/scoped.ts` (`scoped(Model, req)`), `tenant-schema.ts` helpers; audit in `docs/phase-1-prompt-1.7-tenant-audit.md` (no live schemas after demo removal).
-- `scripts/contract-check.ts` — twin type-file parity + `defaultSiteConfig` required-field validation; wired to `doctor`, `prebuild`, and `contract:check`.
+- Twin `SiteConfig` types + `defaultSiteConfig`; `scripts/contract-check.ts` on doctor/prebuild.
+- `server/src/seams/get-site-config.ts`, `get-payment-provider.ts`; `middleware/site-config.ts`.
+- `server/src/db/scoped.ts`, `tenant-schema.ts` — tenant query discipline for phase 2 models.
+- `PaymentProvider` type-only interface; throwing `getPaymentProvider(siteConfig)` until phase 3.
+
+### Changed
+
+- Root, client, server `package.json` → `0.2.0`.
+- Demo CRUD and dashboard removed; minimal shell + `/api/health` only.
 
 ### Docs
 
-- Phase 1.1: open questions from Phase 0 resolved (`docs/phase-1-prompt-1.1-resolutions.md`).
+- Glossary, repo-context §05 file map, stack-context status, session-starter standing rules; `70-multi-tenant-seams.mdc` aligned with `scoped()` + payment seam paths.
+- `docs/phase-1-handoff.md`, `docs/phase-2-open-questions.md`.
 
 ## [0.1.0] — 2026-05-21
 

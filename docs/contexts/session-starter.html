@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Session Starter · v0.1.0</span>
+      <span>Session Starter · v0.2.0</span>
     </div>
     <h1 class="doc-title">Paste this <em>at the top</em> of every Cursor session.</h1>
     <p class="doc-subtitle">A repeatable opening prompt that primes Claude with the briefs it should re-read, the phase the build is in, and the discipline that's currently in force.</p>
@@ -94,10 +94,11 @@
   · You are working on the template repo. Match agency-app patterns when in doubt;
     do not invent a second convention for something the agency app has solved.
 
-  · Every Mongoose model gets tenantId (single-tenant value: 'default').
-  · Every route reads tenant context through getSiteConfig(req). No exceptions.
-  · Payments go through getPaymentProvider(). Stripe/Square SDKs are not imported
-    outside server/src/providers/.
+  · Every Mongoose model uses tenantIdSchemaDefinition; every query uses
+    scoped(Model, req) from server/src/db/scoped.ts (tenantId: 'default' today).
+  · Tenant context: getSiteConfig(req) / req.siteConfig after attachSiteConfig.
+  · Payments: getPaymentProvider(siteConfig) only. Stripe/Square SDKs stay in
+    server/src/providers/ when adapters land (phase 3).
   · Theme values come from resolveTokens()-emitted CSS variables. No hardcoded
     hexes outside theme/ files.
   · Client builds (Type C) never edit core code (Type A). If a one-off seems like

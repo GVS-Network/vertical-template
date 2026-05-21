@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Repository Context · v0.1.0</span>
+      <span>Repository Context · v0.2.0</span>
     </div>
     <h1 class="doc-title">The <em>codebase family</em>.</h1>
     <p class="doc-subtitle">Three repositories, one lineage. What lives where, what each is for, and which conventions cross repo boundaries unchanged.</p>
@@ -200,66 +200,49 @@
     <span class="section-num">05 — Reference: file map</span>
     <h2>What lives where in the template</h2>
 
-<div class="tree"><span class="accent">vertical-template/</span>
+<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.2.0 — phase 1 closed</span>
 ├── client/
 │   ├── src/
-│   │   ├── features/
-│   │   │   ├── catalog/                 <span class="dim">feature pack</span>
-│   │   │   ├── content/
-│   │   │   ├── intake/
-│   │   │   └── payments/
-│   │   ├── theme/
-│   │   │   ├── tokens.foundation.ts     <span class="dim">L1</span>
-│   │   │   ├── resolveTokens.ts         <span class="dim">the resolver</span>
-│   │   │   ├── palettes/
-│   │   │   ├── pairings/
-│   │   │   └── presets/
 │   │   ├── types/
 │   │   │   ├── site-config.ts           <span class="dim">contract-checked w/ server</span>
-│   │   │   └── theme-tokens.ts          <span class="dim">contract-checked w/ server</span>
-│   │   ├── site.config.ts               <span class="dim">per-build, do not pull-overwrite</span>
-│   │   ├── site.theme.ts                <span class="dim">per-build, do not pull-overwrite</span>
-│   │   └── App.tsx
+│   │   │   ├── site-config.defaults.ts
+│   │   │   └── theme-tokens.ts
+│   │   ├── features/                    <span class="dim">phase 2+</span>
+│   │   └── App.tsx                      <span class="dim">minimal shell</span>
 │   └── package.json
 │
 ├── server/
 │   ├── src/
-│   │   ├── features/                    <span class="dim">mirrors client/</span>
+│   │   ├── seams/
+│   │   │   ├── get-site-config.ts       <span class="dim">tenant context seam</span>
+│   │   │   └── get-payment-provider.ts  <span class="dim">throws until phase 3</span>
+│   │   ├── db/
+│   │   │   ├── scoped.ts                <span class="dim">scoped(Model, req)</span>
+│   │   │   └── tenant-schema.ts         <span class="dim">tenantId field + compound index</span>
 │   │   ├── middleware/
-│   │   │   ├── auth.ts                  <span class="dim">Auth0, agency-app pattern</span>
-│   │   │   └── tenant.ts                <span class="dim">phase-7 only; stub returns 'default'</span>
-│   │   ├── providers/
-│   │   │   ├── PaymentProvider.ts       <span class="dim">interface</span>
-│   │   │   ├── stripe.ts
-│   │   │   └── square.ts
-│   │   ├── models/                      <span class="dim">all carry tenantId</span>
+│   │   │   ├── site-config.ts           <span class="dim">req.siteConfig = getSiteConfig(req)</span>
+│   │   │   └── auth.ts                  <span class="dim">Auth0 wrapper</span>
+│   │   ├── models/index.ts              <span class="dim">pack models land in phase 2</span>
 │   │   ├── types/
 │   │   │   ├── site-config.ts
+│   │   │   ├── site-config.defaults.ts
+│   │   │   ├── payment-provider.ts      <span class="dim">interface only</span>
 │   │   │   └── theme-tokens.ts
-│   │   ├── getSiteConfig.ts             <span class="dim">the single seam</span>
+│   │   ├── routes/health.ts
+│   │   ├── providers/                   <span class="dim">phase 3 — stripe/square adapters</span>
+│   │   ├── features/                    <span class="dim">phase 2 — toggle-mounted packs</span>
 │   │   └── index.ts
 │   └── package.json
 │
-├── verticals/
-│   ├── bar-restaurant/
-│   │   ├── preset.ts
-│   │   └── theme.preset.ts
-│   ├── food-truck/
-│   ├── farm-source/
-│   └── screen-printer/
-│
 ├── scripts/
-│   ├── init-vertical.ts                 <span class="dim">npm run init:vertical</span>
 │   ├── contract-check.ts                <span class="dim">dual-file type parity</span>
-│   └── doctor.ts                        <span class="dim">env/health check</span>
+│   └── doctor.ts
 │
-├── docs/                                <span class="dim">this build-docs folder</span>
+├── docs/                                <span class="dim">build-docs family</span>
 │
-├── .cursorrules                         <span class="dim">legacy, always-on</span>
-├── .cursor/rules/                       <span class="dim">scoped rules</span>
+├── .cursor/rules/
 ├── CHANGELOG.md
-├── package.json                         <span class="dim">root scripts: dev, init:vertical, etc.</span>
-└── README.md                            <span class="dim">links to docs/README.html</span></div>
+└── package.json                         <span class="dim">dev, doctor, contract:check</span></div>
   </section>
 
   <!-- ===================== -->
