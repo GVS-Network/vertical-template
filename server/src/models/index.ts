@@ -1,2 +1,1 @@
-export { User, IUser } from './User';
-export { Item, IItem } from './Item';
+// Mongoose models export from this barrel as feature packs land.
