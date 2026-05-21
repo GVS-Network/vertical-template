@@ -30,8 +30,8 @@
       <span class="icon">!</span>
       <p><strong>To remove before Phase 0 ends.</strong> The baseapp fork still ships legacy pieces the template forbids. Do not build new UI on them; resolve in Phase 0 housekeeping or early Phase 5:</p>
       <ul>
-        <li><strong>Tailwind CSS 3</strong> — <code>tailwindcss</code>, <code>postcss</code>, <code>autoprefixer</code>, <code>@tailwind</code> in <code>client/src/styles/index.css</code>, utility classes across all pages/components. Target: CSS variables from <code>resolveTokens()</code> (Phase 5).</li>
-        <li><strong><code>express-jwt</code></strong> — listed in <code>server/package.json</code> but unused; auth uses <code>express-oauth2-jwt-bearer</code> in <code>middleware/auth.ts</code>. Remove dependency in Phase 0.</li>
+        <li><strong>Tailwind CSS 3</strong> — frozen until Phase 5 strip (see §07 decisions). Do not add new utility usage.</li>
+        <li><strong><code>express-jwt</code></strong> — remove from <code>server/package.json</code> in Phase 0 housekeeping (Prompt 0.5 or 0.7).</li>
       </ul>
     </div>
 
@@ -253,15 +253,25 @@
     <h2>What's pinned today, what changes later</h2>
     <p><strong>v0.1.1 (2026-05-21):</strong> Reconciled with <code>docs/inventory.md</code> after baseapp fork. The fork runs React 18.2, Vite 5.2, Express 4.19, Mongoose 8.3, Auth0 (SPA + <code>express-oauth2-jwt-bearer</code>), and legacy Tailwind 3. Target stack (token registry, zod, payments, Cloudinary, <code>tenantId</code>, feature packs) is documented as planned per phase — not claimed as present.</p>
 
+    <h4>Phase 0 decisions (locked 2026-05-21)</h4>
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">Tailwind</div>
+        <div class="val">
+          <p><strong>Strip in Phase 5</strong> with <code>resolveTokens()</code> and the token registry — not Phase 0. Until then: <em>freeze</em> — no new Tailwind classes or components. Phase 0 removes only <code>express-jwt</code> (unused dep).</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Node pin</div>
+        <div class="val"><p><strong>Yes in Prompt 0.5:</strong> add <code>.nvmrc</code> → <code>20</code> and root <code>engines.node</code> → <code>&gt;=20.0.0</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Demo <code>/api/items</code></div>
+        <div class="val"><p><strong>Keep through Phase 0.7</strong> for dev-loop and Auth0 path verification. <strong>Remove at Phase 1 start</strong> (before SiteConfig work); do not extend Item/User demo patterns.</p></div>
+      </div>
+    </div>
+
     <h4>Updates this context will receive</h4>
-    <div class="open-q">
-      <span class="q-label">Q · Tailwind removal timing</span>
-      <p>Strip Tailwind in Phase 0 housekeeping vs wait for Phase 5 token registry? Inventory recommends deciding before new UI work.</p>
-    </div>
-    <div class="open-q">
-      <span class="q-label">Q · Node pin</span>
-      <p>Add <code>.nvmrc</code> (20) and bump root <code>engines</code> to <code>&gt;=20</code> in Phase 0.5?</p>
-    </div>
     <div class="open-q">
       <span class="q-label">Q · Version bumps</span>
       <p>React 19, Vite 6, Mongoose updates — pin here when adopted.</p>
