@@ -46,8 +46,10 @@ export interface ScopedCollection<T> {
   deleteMany(filter?: FilterQuery<T>): ReturnType<Model<T>['deleteMany']>;
 }
 
-export function scoped<T>(Model: Model<T>, req: Request): ScopedCollection<T> {
-  const tenantId = tenantIdFromRequest(req);
+function buildScopedCollection<T>(
+  Model: Model<T>,
+  tenantId: string
+): ScopedCollection<T> {
   const merge = (filter?: FilterQuery<T>) => withTenantFilter(tenantId, filter);
 
   return {
@@ -65,4 +67,16 @@ export function scoped<T>(Model: Model<T>, req: Request): ScopedCollection<T> {
     deleteOne: (filter) => Model.deleteOne(merge(filter)),
     deleteMany: (filter) => Model.deleteMany(merge(filter)),
   };
+}
+
+/** Seeds, webhooks, jobs — same tenant merge without an Express request. */
+export function scopedForTenant<T>(
+  Model: Model<T>,
+  tenantId: string
+): ScopedCollection<T> {
+  return buildScopedCollection(Model, tenantId);
+}
+
+export function scoped<T>(Model: Model<T>, req: Request): ScopedCollection<T> {
+  return buildScopedCollection(Model, tenantIdFromRequest(req));
 }

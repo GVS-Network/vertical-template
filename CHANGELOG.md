@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `server/src/features/registry.ts` + `createApp()` — registry gate (b); stub pack entrypoints; `npm run test:registry` smoke (all features off → 404).
+- `scopedForTenant(Model, tenantId)` for non-request queries.
 - `server/src/features/_pack-pattern.md` — feature pack source of truth (registry gate, exports, tenant rules).
 
 ### Docs

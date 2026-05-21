@@ -147,17 +147,8 @@ Outcomes: <code>docs/phase-2-prompt-2.1-resolutions.md</code>. Toggle gate: <spa
 
     <h3>Prompt 2.3 — Build the registry</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 2.3</span>
-Create server/features/registry.ts. Responsibilities:
-
-  1. Read <code>SiteConfig.features</code> at app boot (same config source as <code>getSiteConfig</code> today).
-  2. For each pack whose flag is <code>true</code>, dynamic-import its module and call <code>register(app, siteConfig)</code>.
-  3. For each pack whose flag is <code>false</code>, log <span class="hl">[feature:off] catalog</span> (etc.) once — do not import or register.
-  4. Do not mount all packs and skip null routers (locked in <code>docs/phase-2-prompt-2.1-resolutions.md</code>).
-
-Also create a tiny test: spin up the app with features all-false, hit one route from each pack's namespace, confirm <span class="hl">404</span> (not 500, not "Cannot find module").
-
-Commit: <span class="hl">"phase-2: feature registry + toggle-mount test"</span>.</div>
+<span class="prompt-label">Prompt 2.3 · closed</span>
+<code>server/src/features/registry.ts</code>, <code>createApp()</code>, stub pack stubs, <code>scopedForTenant</code>, <code>npm run test:registry</code>. Commit: <span class="hl">phase-2: feature registry + toggle-mount test</span>.</div>
 
     <h3>Prompt 2.4 — features/catalog</h3>
     <div class="prompt-block">
