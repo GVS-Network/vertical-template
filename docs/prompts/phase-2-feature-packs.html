@@ -46,7 +46,7 @@
     <div class="decisions">
       <div class="decision-row">
         <div class="key"><strong>The pack pattern</strong><span class="why">documented before any pack is built</span></div>
-        <div class="val"><p>A short <code>server/features/_pack-pattern.md</code> describing the folder shape, the required exports, and how a pack registers itself with the app. Every pack conforms.</p></div>
+        <div class="val"><p><code>server/src/features/_pack-pattern.md</code> — folder shape, exports, registry gate, tenant rules. Every pack conforms.</p></div>
       </div>
       <div class="decision-row">
         <div class="key"><strong>features/catalog</strong><span class="why">products + inventory shape</span></div>
@@ -101,7 +101,7 @@
       </div>
       <div class="worked-step">
         <div class="n">4</div>
-        <div class="body"><strong>router.ts</strong> — Express router exporting a function that takes <code>siteConfig</code> and returns the router (or null if the feature is off).</div>
+        <div class="body"><strong>router.ts</strong> — Express router factory; only called when the registry has already enabled the pack (no null-router gate — see 2.1 resolutions).</div>
       </div>
       <div class="worked-step">
         <div class="n">5</div>
@@ -137,38 +137,23 @@
 
     <h3>Prompt 2.1 — Carry forward open questions</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 2.1</span>
-Resolve every OPEN_QUESTION from Phase 1's close before any code change. Same three outcomes as before: resolve, defer-with-rationale, or drop.
-
-Specifically: <span class="hl">decide where feature toggling happens</span>. Two options:
-  (a) Each pack's router.ts returns null when its flag is off; app skips null routers.
-  (b) The registry filters packs before they're loaded; off packs never construct their router.
-
-Pick one, document why, then proceed. The whole phase depends on this decision.</div>
+<span class="prompt-label">Prompt 2.1 · closed</span>
+Outcomes: <code>docs/phase-2-prompt-2.1-resolutions.md</code>. Toggle gate: <span class="hl">(b) registry</span> — off packs never import/register; not null-router skip.</div>
 
     <h3>Prompt 2.2 — Write the pack pattern doc</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 2.2</span>
-Create server/features/_pack-pattern.md documenting:
-
-  - Folder shape (server and client) — match phase-2-feature-packs.html §03.
-  - Required exports.
-  - How a pack registers itself with the app via server/features/registry.ts.
-  - The toggle-mount rule (whichever (a) or (b) won in 2.1).
-  - The tenantId rule (every schema includes it; every query goes through scoped()).
-  - Naming convention: features.catalog, features.content, features.intake, features.payments, features.auth (kebab nowhere).
-
-This doc is the source of truth other prompts will reference. Commit: <span class="hl">"phase-2: pack pattern (foundation)"</span>.</div>
+<span class="prompt-label">Prompt 2.2 · closed</span>
+<code>server/src/features/_pack-pattern.md</code> — registry gate (b), exports, tenant rules, naming. Commit: <span class="hl">phase-2: pack pattern (foundation)</span>.</div>
 
     <h3>Prompt 2.3 — Build the registry</h3>
     <div class="prompt-block">
 <span class="prompt-label">Prompt 2.3</span>
 Create server/features/registry.ts. Responsibilities:
 
-  1. Import every pack's index.ts.
-  2. Read req.siteConfig.features at request boot.
-  3. For each pack whose flag is true, call register(app, siteConfig).
-  4. For each pack whose flag is false, log <span class="hl">[feature:off] catalog (etc)</span> at boot ONCE — not per request.
+  1. Read <code>SiteConfig.features</code> at app boot (same config source as <code>getSiteConfig</code> today).
+  2. For each pack whose flag is <code>true</code>, dynamic-import its module and call <code>register(app, siteConfig)</code>.
+  3. For each pack whose flag is <code>false</code>, log <span class="hl">[feature:off] catalog</span> (etc.) once — do not import or register.
+  4. Do not mount all packs and skip null routers (locked in <code>docs/phase-2-prompt-2.1-resolutions.md</code>).
 
 Also create a tiny test: spin up the app with features all-false, hit one route from each pack's namespace, confirm <span class="hl">404</span> (not 500, not "Cannot find module").
 

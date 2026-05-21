@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `server/src/features/_pack-pattern.md` — feature pack source of truth (registry gate, exports, tenant rules).
+
+### Docs
+
+- Phase 2.1: open questions resolved (`docs/phase-2-prompt-2.1-resolutions.md`) — registry toggle gate (b), `scopedForTenant`, auth/user uniqueness, client tenantId server-only.
+
 ## [0.2.0] — 2026-05-21
 
 Phase 1 (SiteConfig & seams) closed. One TypeScript shape, two seams, defaulted tenant infrastructure. No feature packs yet.
