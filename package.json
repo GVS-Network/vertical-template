@@ -1,7 +1,7 @@
 {
-  "name": "baseapp",
-  "version": "1.0.0",
-  "description": "Modern MERN stack starter with TypeScript, Auth0, and Tailwind CSS",
+  "name": "vertical-template",
+  "version": "0.1.0",
+  "description": "MERN vertical SaaS template — multi-tenant-ready starter for small businesses",
   "private": true,
   "scripts": {
     "dev": "concurrently -n server,client -c magenta,cyan \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
@@ -21,11 +21,11 @@
     "prettier": "^3.2.5"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/misterlinderman/baseapp.git"
+    "url": "https://github.com/GVS-Network/vertical-template.git"
   },
   "keywords": [
     "mern",
@@ -34,7 +34,8 @@
     "express",
     "mongodb",
     "auth0",
-    "tailwind"
+    "vertical-saas",
+    "template"
   ],
   "author": "",
   "license": "MIT"
