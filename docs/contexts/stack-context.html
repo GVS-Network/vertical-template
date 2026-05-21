@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Stack Context · v0.4.0</span>
+      <span>Stack Context · v0.5.0</span>
     </div>
     <h1 class="doc-title">The <em>stack</em>, pinned.</h1>
     <p class="doc-subtitle">What's installed, what's chosen, what's expressly forbidden. Read before suggesting a library; read again before adding a dependency. Reconciled against <code>docs/inventory.md</code> (Phase 0, Prompt 0.2).</p>
@@ -102,7 +102,8 @@
     <h4>Root scripts — planned (not in fork yet)</h4>
     <ul>
       <li><code>doctor</code> — Phase 0.6: env + Mongo connectivity check</li>
-      <li><code>init:vertical -- --vertical=&lt;id&gt; --tenant=&lt;slug&gt;</code> — Phase 4</li>
+      <li><code>init:vertical -- --preset=&lt;key&gt; --tenant=&lt;id&gt; [--force]</code> — Phase 4</li>
+      <li><code>test:vertical-registry</code> · <code>test:*-preset</code> — preset registry + seeded-tenant smokes</li>
       <li><code>contract:check</code> — Phase 1+: dual-file type parity for <code>site-config.ts</code> / <code>theme-tokens.ts</code></li>
       <li><code>test</code> · <code>typecheck</code> — when vitest and CI scripts land</li>
     </ul>
@@ -224,7 +225,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Phase 3 complete (v0.4.0).</strong> Stripe + Square adapters, idempotent webhooks (<code>WebhookEventLog</code>), doctor provider checks. Checkout + webhooks live when env is configured.</p>
+      <p><strong>Phase 4 complete (v0.5.0).</strong> Four vertical presets, <code>init-vertical</code>, <code>BOUND_TENANT_ID</code> local binding, tenant-aware doctor. Phase 3 payments (Stripe + Square, webhooks) unchanged.</p>
     </div>
     <div class="callout risk">
       <span class="icon">!</span>

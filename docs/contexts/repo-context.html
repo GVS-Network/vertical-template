@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Repository Context · v0.4.0</span>
+      <span>Repository Context · v0.5.0</span>
     </div>
     <h1 class="doc-title">The <em>codebase family</em>.</h1>
     <p class="doc-subtitle">Three repositories, one lineage. What lives where, what each is for, and which conventions cross repo boundaries unchanged.</p>
@@ -175,7 +175,7 @@
 
     <div class="callout opportunity">
       <span class="icon">✓</span>
-      <p><strong>Vertical presets.</strong> The agency app is one shape; the template is four. The whole point of the platform thesis. Verticals live in <code>verticals/&lt;id&gt;/preset.ts</code> and <code>verticals/&lt;id&gt;/theme.preset.ts</code>.</p>
+      <p><strong>Vertical presets.</strong> The agency app is one shape; the template is four. Verticals live in <code>verticals/&lt;key&gt;/</code> — <code>site-config.preset.ts</code>, <code>seed/*.json</code>, <code>product-attributes.schema.ts</code>, <code>brand-stub.ts</code> (Phase 5 tokens). Provision with <code>npm run init:vertical</code>; local demo binds via <code>BOUND_TENANT_ID</code> in <code>server/.env</code>.</p>
     </div>
     <div class="callout opportunity">
       <span class="icon">✓</span>
@@ -200,7 +200,7 @@
     <span class="section-num">05 — Reference: file map</span>
     <h2>What lives where in the template</h2>
 
-<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.4.0 — phase 4 in progress</span>
+<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.5.0 — phase 4 closed</span>
 ├── client/
 │   ├── src/
 │   │   ├── types/
@@ -220,8 +220,11 @@
 ├── server/
 │   ├── src/
 │   │   ├── seams/
-│   │   │   ├── get-site-config.ts
+│   │   │   ├── get-site-config.ts       <span class="dim">BOUND_TENANT_ID → bound preset</span>
+│   │   │   ├── bound-site-config.ts
 │   │   │   └── get-payment-provider.ts  <span class="dim">stripe | square factory</span>
+│   │   ├── models/
+│   │   │   └── tenant-registry.ts       <span class="dim">_tenants collection (phase 4)</span>
 │   │   ├── shared/
 │   │   │   ├── write-guards.ts          <span class="dim">catalog/content write JWT</span>
 │   │   │   └── dev-seeds.ts             <span class="dim">SKIP_PACK_SEEDS for smokes</span>
@@ -253,15 +256,22 @@
 │   │   └── index.ts
 │   └── package.json
 │
-├── verticals/
+├── verticals/                           <span class="dim">four shipped presets — see README.md</span>
+│   ├── README.md                        <span class="dim">build order + provider defaults</span>
 │   ├── _preset-pattern.md
-│   ├── registry.ts                      <span class="dim">four presets + mergePreset</span>
-│   ├── screen-printer/ … farm-source/   <span class="dim">site-config.preset, seed/, zod attrs</span>
+│   ├── registry.ts                      <span class="dim">mergePreset + verticalPresets</span>
+│   ├── registry.smoke.ts
+│   ├── screen-printer/
+│   ├── bar-restaurant/
+│   ├── food-truck/
+│   └── farm-source/                     <span class="dim">each: preset.ts, seed/, brand-stub.ts</span>
 │
 ├── scripts/
 │   ├── contract-check.ts
-│   ├── doctor.ts                        <span class="dim">+ payment provider cred checks (3.6)</span>
-│   └── init-vertical.ts                 <span class="dim">--preset --tenant [--force]</span>
+│   ├── doctor.ts                        <span class="dim">env, mongo, bound-tenant seeds (4.6)</span>
+│   ├── init-vertical.ts                 <span class="dim">--preset --tenant [--force]</span>
+│   ├── init-vertical.smoke.ts
+│   └── verify-vertical-preset.ts        <span class="dim">per-preset DB + HTTP walk</span>
 │
 ├── docs/
 ├── .cursor/rules/

@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Glossary · v0.4.0</span>
+      <span>Glossary · v0.5.0</span>
     </div>
     <h1 class="doc-title">Words that mean <em>specific things</em> here.</h1>
     <p class="doc-subtitle">Project-internal vocabulary. When Claude (or anyone) uses these terms in a PR or a prompt, they carry the definitions below — not the generic ones.</p>
@@ -31,14 +31,14 @@
       <div class="decision-row">
         <div class="key">Tenant</div>
         <div class="val">
-          <p>A business using the platform. In single-tenant mode (now) there is one tenant with <code>tenantId === 'default'</code>. In multi-tenant mode (phase 7) tenants are documents in the <code>Tenant</code> collection, resolved per-request from the host header. Maps directly to <code>workspaceOwnerId</code> in the agency app.</p>
+          <p>A business using the platform — identified by <code>tenantId</code> on every document and in <code>SiteConfig</code>. Today: one dev tenant <code>'default'</code> plus optional demo tenants (e.g. <code>demo-screen-printer</code>) created by <code>init-vertical</code>. Phase 4 registry: MongoDB <code>_tenants</code> maps <code>tenantId → preset</code>. Phase 7: full <code>Tenant</code> model + host resolution. Maps to <code>workspaceOwnerId</code> in the agency app.</p>
         </div>
       </div>
 
       <div class="decision-row">
         <div class="key">Vertical</div>
         <div class="val">
-          <p>A business type the platform is opinionated about. v1 ships four: <code>bar-restaurant</code> · <code>food-truck</code> · <code>farm-source</code> · <code>screen-printer</code>. Each has a <code>preset.ts</code> (SiteConfig defaults) and a <code>theme.preset.ts</code> (token defaults). A tenant declares its vertical; a tenant cannot occupy two verticals.</p>
+          <p>A business type the platform is opinionated about. v1 ships four keys on <code>SiteConfig.vertical</code>: <code>screen-printer</code> · <code>bar-restaurant</code> · <code>food-truck</code> · <code>farm-source</code> (plus <code>generic</code> for the template default). Each has a folder under <code>verticals/&lt;key&gt;/</code>. A <strong>tenant</strong> is provisioned from exactly one vertical preset via <code>init-vertical</code>; the <code>_tenants</code> row records that choice. A tenant cannot occupy two verticals.</p>
         </div>
       </div>
 
@@ -61,7 +61,7 @@
       <div class="decision-row">
         <div class="key">Preset</div>
         <div class="val">
-          <p>A starting set of values for a vertical. Two flavors: <code>preset.ts</code> (SiteConfig minus tenantId + branding) and <code>theme.preset.ts</code> (ThemeTokens minus tenant overrides). Consumed at <code>init:vertical</code> time only. <strong>Existing builds do not retroactively change when a preset changes</strong> — that is the Type-B propagation rule.</p>
+          <p>A vertical's opinionated starter kit in <code>verticals/&lt;key&gt;/</code>: <code>site-config.preset.ts</code> (partial <code>SiteConfig</code> merged via <code>mergePreset</code>), <code>seed/*.json</code> (catalog/content/intake data), <code>product-attributes.schema.ts</code> (Zod), and <code>brand-stub.ts</code> (<code>ThemeTokens</code> overrides — empty until Phase 5). <code>npm run init:vertical -- --preset=&lt;key&gt; --tenant=&lt;id&gt;</code> stamps <code>tenantId</code> on seeded rows and writes <code>_tenants</code>. <strong>tenantId</strong> is chosen at init time, not inside the preset file. <strong>Existing tenants do not retroactively change when a preset changes</strong> — Type-B propagation.</p>
         </div>
       </div>
 
@@ -215,8 +215,8 @@
     <h2>How this glossary updates</h2>
     <p>This is a working document. When a phase prompt introduces a new term that's specific to the project, that term lands here in the same PR. When a term changes meaning (or stops being used), it moves into §05 with a note explaining what replaced it.</p>
 
-    <h4>Open questions — Phase 4</h4>
-    <p>See <code>docs/phase-4-open-questions.md</code> — lead: vertical preset → payment provider defaults and go-to-market order (P4-1).</p>
+    <h4>Open questions — Phase 5</h4>
+    <p>See <code>docs/phase-5-open-questions.md</code> — lead: which preset is the brand test case for the visual system (P5-1).</p>
 
     <h4>Anticipated additions</h4>
     <div class="open-q">

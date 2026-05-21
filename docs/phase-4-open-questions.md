@@ -1,7 +1,8 @@
 # Open questions for Phase 4
 
-**Status:** Prompt **4.1** closed (2026-05-21). Build order + provider defaults locked.  
-**Authoritative:** [`verticals/README.md`](../verticals/README.md) · [`docs/phase-4-prompt-4.1-resolutions.md`](phase-4-prompt-4.1-resolutions.md)
+**Status:** Phase 4 **closed** @ **v0.5.0** (2026-05-21).  
+**Authoritative:** [`verticals/README.md`](../verticals/README.md) · [`docs/phase-4-prompt-4.1-resolutions.md`](phase-4-prompt-4.1-resolutions.md)  
+**Phase 5 lead:** [`docs/phase-5-open-questions.md`](phase-5-open-questions.md)
 
 ---
 
@@ -12,7 +13,7 @@
 | **P4-1** | Provider defaults + GTM | See README — screen-printer **Stripe**; bar / food-truck / farm **Square** (farm = public checkout per architecture brief §04) |
 | **P4-2** | Ship all presets at once? | **No** — staggered: screen-printer → bar-restaurant → food-truck → farm-source |
 
-### Build order (locked)
+### Build order (locked) — all shipped @ v0.5.0
 
 1. `screen-printer` — operator knowledge (`askanddeliverwebapp`)
 2. `bar-restaurant` — Square, fixed-location
@@ -21,14 +22,13 @@
 
 ---
 
-## Still open
+## Carried to Phase 5
 
 | ID | Topic | Notes |
 |----|--------|--------|
-| **P4-3** | Square inventory sync trigger | Cron vs catalog mutation vs manual — decide when building Square presets (#2–4) |
-| **P4-4** | Catalog ↔ checkout | Replace demo `CheckoutButton` items with seeded products |
-| **P4-5** | Square POS read-sync | Out of scope Phase 3; still deferred |
-| **P4-6** | Dual active providers | Rejected @ v0.4.0 |
+| **P4-3** | Square inventory sync trigger | See `docs/phase-5-open-questions.md` |
+| **P4-4** | Catalog ↔ checkout | Demo line items on Home |
+| **P4-5** | Square POS read-sync | Out of scope |
 | **P4-7** | Intake email notifications | Deferred from 2.6 |
 
 ---

@@ -6,19 +6,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-05-21
+
+Phase 4 (Vertical presets) closed. Four opinionated vertical presets, `init-vertical` provisioning, `BOUND_TENANT_ID` local binding, tenant-aware doctor, and per-preset verification smokes.
+
+### Phase 4 — closed (prompt log)
+
+| Prompt | Outcome |
+|--------|---------|
+| **4.1** | Build order locked: `screen-printer` → `bar-restaurant` → `food-truck` → `farm-source`; provider defaults in `verticals/README.md` |
+| **4.2** | `verticals/_preset-pattern.md`, `registry.ts`, `mergePreset`, stub folders, `test:vertical-registry` |
+| **4.3** | `npm run init:vertical` + `_tenants` registry; idempotent `--force` re-seed |
+| **4.4** | First full preset: `screen-printer` (Stripe, 8 products, portfolio page, project-quote form); `BOUND_TENANT_ID` seam |
+| **4.5** | Presets #2–#4: `bar-restaurant`, `food-truck`, `farm-source` (one commit each); `verify-vertical-preset.ts` |
+| **4.6** | `doctor` — bound-tenant `_tenants`, preset, and per-pack seed checks |
+| **4.7** | Docs + tag `v0.5.0`; `docs/phase-5-open-questions.md` |
+
+### Build order & presets shipped
+
+```text
+screen-printer → bar-restaurant → food-truck → farm-source
+```
+
+| Preset | Provider | Packs on | Demo tenant | Vertical-specific page |
+|--------|----------|----------|-------------|------------------------|
+| `screen-printer` | Stripe | all five | `demo-screen-printer` | `portfolio` |
+| `bar-restaurant` | Square | catalog, content, intake, payments | `demo-bar-restaurant` | `events` |
+| `food-truck` | Square | catalog, content, intake, payments | `demo-food-truck` | `locations` |
+| `farm-source` | Square | all five | `demo-farm-source` | `csa` |
+
 ### Added
 
-- Phase 4.6: `doctor` — when `BOUND_TENANT_ID` is set, verifies `_tenants` row, registered preset, and seeded catalog/content/intake data; payment/auth checks use bound preset features.
-- Phase 4.5: `farm-source` preset (8 inventory items, 3 pages, wholesale form, auth on); content route `/csa` — completes four-preset roster.
-- Phase 4.5: `food-truck` preset (8 menu items, 3 pages, catering form); content route `/locations`.
-- Phase 4.5: `bar-restaurant` preset (8 menu items, 3 pages, private-event form); content route `/events`; shared `verify-vertical-preset.ts`.
-- Phase 4.4: `screen-printer` preset (8 products, 3 pages, project-quote form); `BOUND_TENANT_ID` seam; content routes `/home`, `/portfolio`.
-- Phase 4.3: `npm run init:vertical` — `--preset` / `--tenant` / `--force`; seeds from `verticals/<key>/seed/*.json`; `_tenants` registry (`server/src/models/tenant-registry.ts`); idempotent re-run.
-- Phase 4.2: `verticals/_preset-pattern.md`, `verticals/registry.ts` (four presets + `mergePreset`), stub preset folders, `zod` (root) for `product-attributes.schema.ts`; `npm run test:vertical-registry`.
+- **`verticals/<key>/`** — `site-config.preset.ts`, `product-attributes.schema.ts` (Zod), `brand-stub.ts`, `seed/*.json`, `README.md` per preset.
+- **`npm run init:vertical`** — `--preset` / `--tenant` / `--force`; stamps `tenantId` on Product, Page, FormDefinition; writes `_tenants` row.
+- **`BOUND_TENANT_ID`** — `server/src/seams/bound-site-config.ts`; `getSiteConfig` returns bound preset merge for local demo.
+- **`scripts/verify-vertical-preset.ts`** — DB + HTTP walk per preset (`test:*-preset` npm scripts).
+- **Doctor (4.6)** — when `BOUND_TENANT_ID` set: registry row, registered preset, seeded catalog/content/intake; payment/auth checks use bound features.
+- **Content routes** — `/home`, `/portfolio`, `/events`, `/locations`, `/csa` for preset page slugs.
+
+### Changed
+
+- Dev pack seeds skip non-`default` tenants (`skipDevSeedsForTenant`).
+- Root, client, server `package.json` → **0.5.0**.
 
 ### Docs
 
-- Phase 4.1: vertical **build order** locked (`screen-printer` → `bar-restaurant` → `food-truck` → `farm-source`); payment provider defaults + GTM order in `verticals/README.md`; `docs/phase-4-prompt-4.1-resolutions.md`.
+- `docs/phase-4-prompt-4.1-resolutions.md`, `docs/phase-4-open-questions.md` (closed)
+- `docs/phase-5-open-questions.md` — Phase 5 kickoff (visual system lead: brand test-case preset)
+- `docs/contexts/repo-context.html` §05, `glossary.html`, `session-starter.html`, `stack-context.html`
+- Build docs family **v0.5.0** in `docs/README.html`
 
 ## [0.4.0] — 2026-05-21
 
