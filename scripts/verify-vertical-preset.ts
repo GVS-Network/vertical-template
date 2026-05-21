@@ -43,6 +43,14 @@ const EXPECTATIONS: Record<string, PresetExpectation> = {
     pageSlugs: ['home', 'about', 'events'],
     formSlug: 'private-event',
   },
+  'food-truck': {
+    tenantId: 'demo-food-truck',
+    brandingName: 'Sidewalk Tacos',
+    provider: 'square',
+    productCount: 8,
+    pageSlugs: ['home', 'about', 'locations'],
+    formSlug: 'catering',
+  },
 };
 
 async function httpGet(

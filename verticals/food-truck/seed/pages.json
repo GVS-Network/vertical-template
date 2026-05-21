@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "slug": "home",
+    "title": "Sidewalk Tacos",
+    "status": "published",
+    "hero": {
+      "headline": "Sidewalk Tacos",
+      "subheadline": "Al pastor, carnitas, and quesabirria from a roaming kitchen"
+    },
+    "body": "# Welcome\n\nSidewalk Tacos is a Portland food truck serving lunch Tuesday through Saturday. We post today's **location** on this site and on Instagram — the menu below is what we are running on the truck right now.\n\n## How to order\n\n- Walk up to the window — we do not take online orders on this site\n- Catering and office lunches: use the **catering** form (48-hour notice minimum)\n\nCheck the **catalog** for today's items and whether they are on the truck or catering-only."
+  },
+  {
+    "slug": "about",
+    "title": "About the truck",
+    "status": "published",
+    "body": "# About Sidewalk Tacos\n\nRosa and Miguel Villanueva started Sidewalk Tacos in 2016 with one propane plancha and a borrowed commissary slot. We still prep in the same commissary, now with a second truck for busy summer weeks.\n\n## What we stand for\n\n- Corn tortillas pressed to order when the line allows\n- Meats marinated overnight; vegetarian filling always on the board\n- Clear posted allergens at the window — ask if you need detail\n\nWe rotate breweries, office parks, and farmers markets. The **locations** page is the source of truth for where we are parked this week."
+  },
+  {
+    "slug": "locations",
+    "title": "Where we are",
+    "status": "published",
+    "hero": {
+      "headline": "Locations",
+      "subheadline": "Updated each morning — follow us if plans change for weather"
+    },
+    "body": "# Where we are this week\n\n**Today (lunch service):** Downtown — Congress & Oak, 11:00am–2:30pm\n\n## Upcoming stops\n\n| Day | Location | Hours |\n|-----|----------|-------|\n| Tue | Congress & Oak | 11:00–14:30 |\n| Wed | Riverside Office Park (Lot C) | 11:30–14:00 |\n| Thu | Congress & Oak | 11:00–14:30 |\n| Fri | Bayside Brewing — taproom lot | 12:00–20:00 |\n| Sat | Portland Farmers Market — Row 7 | 08:30–13:00 |\n| Sun | Off | — |\n\nRain can move us under cover at the brewery lot on Fridays. Catering jobs do not appear here — they run from the commissary kitchen."
+  }
+]

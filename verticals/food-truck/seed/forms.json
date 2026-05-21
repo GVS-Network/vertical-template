@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "slug": "catering",
+    "title": "Request catering",
+    "submitButtonLabel": "Send catering inquiry",
+    "fields": [
+      { "name": "contact_name", "type": "text", "required": true },
+      { "name": "email", "type": "email", "required": true },
+      { "name": "phone", "type": "text", "required": true },
+      { "name": "company_or_venue", "type": "text", "required": false },
+      { "name": "event_date", "type": "text", "required": true },
+      { "name": "service_window", "type": "select", "required": true, "options": ["Breakfast", "Lunch", "Dinner", "All day"] },
+      { "name": "headcount", "type": "text", "required": true },
+      { "name": "service_style", "type": "select", "required": true, "options": ["Truck on-site", "Drop-off taco packs", "Not sure"] },
+      { "name": "dietary_needs", "type": "textarea", "required": false },
+      { "name": "notes", "type": "textarea", "required": false }
+    ]
+  }
+]

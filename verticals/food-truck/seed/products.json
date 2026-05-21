@@ -1,1 +1,98 @@
-[]
+[
+  {
+    "name": "Al Pastor Tacos (3)",
+    "slug": "al-pastor-tacos",
+    "sku": "TAC-ALP-01",
+    "price": 1100,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": true,
+      "locationToday": "Downtown — Congress & Oak"
+    }
+  },
+  {
+    "name": "Carnitas Tacos (3)",
+    "slug": "carnitas-tacos",
+    "sku": "TAC-CAR-02",
+    "price": 1050,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": true,
+      "locationToday": "Downtown — Congress & Oak"
+    }
+  },
+  {
+    "name": "Veggie Rajas Tacos (3)",
+    "slug": "veggie-rajas-tacos",
+    "sku": "TAC-VEG-03",
+    "price": 1000,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": true,
+      "locationToday": "Downtown — Congress & Oak"
+    }
+  },
+  {
+    "name": "Quesabirria Tacos (2)",
+    "slug": "quesabirria-tacos",
+    "sku": "TAC-QSB-04",
+    "price": 1300,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": true,
+      "locationToday": "Downtown — Congress & Oak"
+    }
+  },
+  {
+    "name": "Street Corn Cup",
+    "slug": "street-corn-cup",
+    "sku": "SID-ELT-05",
+    "price": 600,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": true,
+      "locationToday": "Downtown — Congress & Oak"
+    }
+  },
+  {
+    "name": "Horchata (16oz)",
+    "slug": "horchata-16oz",
+    "sku": "BEV-HOR-06",
+    "price": 450,
+    "stock": 40,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": true,
+      "locationToday": "Downtown — Congress & Oak"
+    }
+  },
+  {
+    "name": "Jarritos Mandarin",
+    "slug": "jarritos-mandarin",
+    "sku": "BEV-JAR-07",
+    "price": 350,
+    "stock": 60,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": true,
+      "locationToday": "Downtown — Congress & Oak"
+    }
+  },
+  {
+    "name": "Catering Taco Pack (50)",
+    "slug": "catering-taco-pack-50",
+    "sku": "CAT-50-08",
+    "price": 45000,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "dailyAvailable": false,
+      "locationToday": "Off-truck — catering only"
+    }
+  }
+]

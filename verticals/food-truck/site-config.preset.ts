@@ -1,6 +1,5 @@
 import type { SiteConfig } from '../../server/src/types/site-config';
 
-/** Stub @ 4.2 — full preset in 4.5. */
 export const preset: Partial<SiteConfig> = {
   vertical: 'food-truck',
   features: {
@@ -11,5 +10,18 @@ export const preset: Partial<SiteConfig> = {
     auth: false,
   },
   payment: { provider: 'square' },
-  branding: { name: 'Food Truck (preset stub)' },
+  branding: {
+    name: 'Sidewalk Tacos',
+    tagline: 'Roaming lunch, brewery nights, and office catering',
+  },
+  contact: {
+    email: 'hello@sidewalktacos.co',
+    phone: '(555) 771-3304',
+    address: 'Commissary Kitchen 4, Portland ME',
+  },
+  locale: {
+    currency: 'USD',
+    timezone: 'America/New_York',
+    lang: 'en-US',
+  },
 };
