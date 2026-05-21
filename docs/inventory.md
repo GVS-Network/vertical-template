@@ -266,4 +266,5 @@ The root README is still the full **MERN Stack Starter Template** guide:
 - [x] Top-level structure documented
 - [x] Compared against `stack-context.html`
 - [x] Keep vs remove/replace lists populated
-- [ ] Next: **Prompt 0.2** — propose `stack-context.html` diffs from this inventory
+- [x] **Prompt 0.2** — `stack-context.html` reconciled to v0.1.1 (2026-05-21)
+- [ ] Next: **Prompt 0.3** — cursor rules already installed; verify or skip to 0.4+
