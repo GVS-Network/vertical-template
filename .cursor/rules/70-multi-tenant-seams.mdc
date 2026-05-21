@@ -33,12 +33,9 @@ Routes never branch on `config.features.payments.provider`. They call `getPaymen
 Every Mongoose schema has `tenantId`. Every query filters on `tenantId`. Today's value is `'default'`; that does not make the field optional.
 
 ```ts
-// ✅ correct, single-tenant
-await Menu.find({ tenantId: 'default', published: true });
-
-// ✅ correct, picks up tenant from request
-const { tenantId } = getSiteConfig(req);
-await Menu.find({ tenantId, published: true });
+// ✅ correct — tenant filter baked in
+const menu = scoped(Menu, req);
+await menu.find({ published: true });
 
 // ❌ forbidden — would silently break under multi-tenancy
 await Menu.find({ published: true });

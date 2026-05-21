@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - `getSiteConfig(req)` seam, `attachSiteConfig` middleware, `Express.Request.siteConfig` augmentation; `/api/health` returns `site` from config.
 - `PaymentProvider` interface (type-only) and `getPaymentProvider(siteConfig)` throwing stub until phase 3.
+- `server/src/db/scoped.ts` (`scoped(Model, req)`), `tenant-schema.ts` helpers; audit in `docs/phase-1-prompt-1.7-tenant-audit.md` (no live schemas after demo removal).
 - `scripts/contract-check.ts` — twin type-file parity + `defaultSiteConfig` required-field validation; wired to `doctor`, `prebuild`, and `contract:check`.
 
 ### Docs

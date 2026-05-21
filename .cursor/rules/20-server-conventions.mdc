@@ -32,17 +32,19 @@ router.get('/menu', async (req, res) => {
 The seam's body is a singleton today. In phase 7 it returns per-request from `req.tenantConfig`. **Callers never change.** That is the entire point.
 
 ## Mongoose models
-Every schema declares `tenantId`, indexed compound with its natural key:
+Every schema uses `tenantIdSchemaDefinition` from `@/db/tenant-schema` and a compound index via `applyTenantCompoundIndex(schema, 'slug')` (or the natural lookup field).
 
 ```ts
+import { tenantIdSchemaDefinition, applyTenantCompoundIndex } from '@/db/tenant-schema';
+
 const schema = new Schema({
-  tenantId: { type: String, required: true, default: 'default' },
-  // ...
+  ...tenantIdSchemaDefinition,
+  slug: { type: String, required: true },
 });
-schema.index({ tenantId: 1, slug: 1 }, { unique: true });
+applyTenantCompoundIndex(schema, 'slug', { unique: true });
 ```
 
-**Every query filters on `tenantId`**, even in single-tenant mode. Today the filter is always `{ tenantId: 'default' }`; that is not optional.
+**Every query goes through `scoped(Model, req)`** from `@/db/scoped` — not raw `Model.find` / `findOne`. Today `req.siteConfig.tenantId` is `'default'`; that does not make the filter optional.
 
 ## Payments
 - Interface: `server/src/providers/PaymentProvider.ts`.

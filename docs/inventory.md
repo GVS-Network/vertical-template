@@ -100,9 +100,11 @@ server/src/
 ├── middleware/
 │   ├── auth.ts           # express-oauth2-jwt-bearer (checkJwt, optionalAuth)
 │   └── errorHandler.ts   # createError, asyncHandler, global error middleware
+├── db/
+│   ├── scoped.ts         # scoped(Model, req) — tenantId filter on all queries
+│   └── tenant-schema.ts  # tenantIdSchemaDefinition + applyTenantCompoundIndex
 ├── models/
-│   ├── User.ts           # auth0Id, email, name, picture — no tenantId
-│   └── Item.ts           # CRUD demo todos scoped by Auth0 user id — no tenantId
+│   └── index.ts          # barrel (demo User/Item removed in phase 1 prep)
 ├── routes/
 │   ├── health.ts         # GET /api/health, /api/health/detailed
 │   ├── users.ts          # JWT-protected /api/users/me
@@ -182,7 +184,7 @@ client/src/
 | Async errors | `express-async-errors` in index | Custom `asyncHandler` only |
 | Auth package | `express-oauth2-jwt-bearer` | ✓ used; `express-jwt` dead weight |
 | Payments / Cloudinary | Planned adapters | Not present (expected pre–phase 3) |
-| `tenantId` on models | Required everywhere | **Absent** on User/Item (expected until phase 1/7) |
+| `tenantId` on models | Required everywhere | **Helpers in place**; no schemas until phase 2 packs (demo removed in 1.1) |
 | `getSiteConfig(req)` | Single seam | **Absent** (phase 1) |
 | Repo/package identity | vertical-template | Still named `baseapp` in package.json + repository URL |
 
