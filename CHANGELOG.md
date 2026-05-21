@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Phase 3.4: Square provider (`server/src/providers/square.ts`) — Orders + Payment Links checkout, HMAC webhook verify/parse, `syncInventory` push to Square Catalog Inventory; `square` dependency; `npm run test:square-happy-path` and `test:square-sync-inventory`.
 - Phase 3.3: Stripe provider (`server/src/providers/stripe.ts`), checkout Sessions, webhook verify/parse, `npm run test:stripe-happy-path`; `stripe` dependency.
 
 ### Changed

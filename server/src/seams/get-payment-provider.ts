@@ -1,5 +1,6 @@
 import type { SiteConfig } from '../types/site-config';
 import type { PaymentProvider } from '../types/payment-provider';
+import { createSquarePaymentProvider } from '../providers/square';
 import { createStripePaymentProvider } from '../providers/stripe';
 
 export type {
@@ -23,7 +24,7 @@ export function getPaymentProvider(siteConfig: SiteConfig): PaymentProvider {
   }
 
   if (provider === 'square') {
-    throw new Error('NotImplementedYet: Square provider arrives in phase 3.4');
+    return createSquarePaymentProvider(siteConfig);
   }
 
   throw new Error(`Unknown payment provider: ${String(provider)}`);

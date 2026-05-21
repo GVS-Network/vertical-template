@@ -154,7 +154,8 @@ export const handleWebhook = asyncHandler(async (req: Request, res: Response) =>
     const message = err instanceof Error ? err.message : '';
     if (
       message.includes('NotImplementedYet') ||
-      message.includes('Missing STRIPE')
+      message.includes('Missing STRIPE') ||
+      message.includes('Missing SQUARE')
     ) {
       console.log(`[payments:webhook] ${providerParam} skipped: ${message}`);
       res.status(200).send();

@@ -126,7 +126,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Installed (phase 3+).</strong> stripe ^17 (server). <strong>Approved when their phase lands:</strong> zod · square · cloudinary · vitest · express-async-errors.</p>
+      <p><strong>Installed (phase 3+).</strong> stripe ^17 · square ^43 (server). <strong>Approved when their phase lands:</strong> zod · cloudinary · vitest · express-async-errors.</p>
     </div>
     <div class="callout discipline">
       <span class="icon">→</span>
@@ -149,11 +149,12 @@
       <li><code>AUTH0_DOMAIN</code> · <code>AUTH0_AUDIENCE</code></li>
       <li><code>CLIENT_URL</code> — checkout redirect + production CORS</li>
       <li><code>STRIPE_SECRET_KEY</code> · <code>STRIPE_WEBHOOK_SECRET</code> — when <code>payment.provider === 'stripe'</code></li>
+      <li><code>SQUARE_ACCESS_TOKEN</code> · <code>SQUARE_LOCATION_ID</code> · <code>SQUARE_WEBHOOK_SIGNATURE_KEY</code> · <code>SQUARE_ENV</code> (<code>sandbox</code>|<code>production</code>) · optional <code>SQUARE_WEBHOOK_NOTIFICATION_URL</code> — when <code>payment.provider === 'square'</code></li>
+      <li><code>PAYMENT_PROVIDER</code> — local dev override for <code>getSiteConfig()</code> (<code>stripe</code>|<code>square</code>|<code>none</code>)</li>
     </ul>
 
     <h4>Server env vars — planned (not in example yet)</h4>
     <ul>
-      <li><code>SQUARE_ACCESS_TOKEN</code> · <code>SQUARE_LOCATION_ID</code> — Phase 3, square provider</li>
       <li><code>CLOUDINARY_URL</code> — content/uploads feature</li>
       <li><code>TENANT_ID</code> — defaults to <code>'default'</code> until Phase 7; not used in route handlers (use <code>getSiteConfig(req)</code> when seam exists)</li>
     </ul>
