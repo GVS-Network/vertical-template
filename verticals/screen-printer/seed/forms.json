@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "slug": "project-quote",
+    "title": "Request a project quote",
+    "submitButtonLabel": "Send quote request",
+    "fields": [
+      { "name": "contact_name", "type": "text", "required": true },
+      { "name": "email", "type": "email", "required": true },
+      { "name": "organization", "type": "text", "required": false },
+      { "name": "garment_type", "type": "select", "required": true, "options": ["T-shirts", "Hoodies", "Hats", "Totes", "Posters / banners", "Mixed / other"] },
+      { "name": "quantity", "type": "text", "required": true },
+      { "name": "need_by", "type": "text", "required": false },
+      { "name": "artwork_ready", "type": "select", "required": true, "options": ["Yes — vector or high-res", "Needs design help", "Not sure yet"] },
+      { "name": "notes", "type": "textarea", "required": false }
+    ]
+  }
+]

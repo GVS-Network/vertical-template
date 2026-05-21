@@ -1,5 +1,5 @@
 import { scopedForTenant } from '../../db/scoped';
-import { skipDevSeeds } from '../../shared/dev-seeds';
+import { skipDevSeedsForTenant } from '../../shared/dev-seeds';
 import { Product } from './schemas/product';
 
 const SAMPLE_PRODUCTS = [
@@ -36,7 +36,7 @@ const SAMPLE_PRODUCTS = [
  * Dev-only seed when tenant has zero products. Not a migration.
  */
 export async function seedCatalogProducts(tenantId: string): Promise<void> {
-  if (process.env.NODE_ENV === 'production' || skipDevSeeds()) {
+  if (process.env.NODE_ENV === 'production' || skipDevSeedsForTenant(tenantId)) {
     return;
   }
 

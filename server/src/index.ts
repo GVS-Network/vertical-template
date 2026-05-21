@@ -3,12 +3,14 @@ import './load-env';
 
 import { connectDatabase } from './config/database';
 import { createApp } from './app';
+import { primeBoundSiteConfig } from './seams/bound-site-config';
 
 const PORT = process.env.PORT || 3001;
 
 const startServer = async () => {
   try {
     await connectDatabase();
+    await primeBoundSiteConfig();
 
     const app = await createApp();
 

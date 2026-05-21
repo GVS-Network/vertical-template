@@ -1,1 +1,106 @@
-[]
+[
+  {
+    "name": "District Perfect Tri Tee",
+    "slug": "district-perfect-tri-tee",
+    "sku": "TEE-DPT-01",
+    "price": 895,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "printSides": "two",
+      "garmentBlank": "District DT6000",
+      "minQty": 24
+    }
+  },
+  {
+    "name": "Independent Trading Midweight Hoodie",
+    "slug": "independent-midweight-hoodie",
+    "sku": "HD-IND-02",
+    "price": 2495,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "printSides": "one",
+      "garmentBlank": "IND4000",
+      "minQty": 12
+    }
+  },
+  {
+    "name": "Canvas Tote — 12oz",
+    "slug": "canvas-tote-12oz",
+    "sku": "TOTE-CV-03",
+    "price": 650,
+    "stock": 200,
+    "status": "active",
+    "attributes": {
+      "printSides": "one",
+      "garmentBlank": "Liberty Bags 8860",
+      "minQty": 48
+    }
+  },
+  {
+    "name": "18×24 Poster Print",
+    "slug": "poster-18x24",
+    "sku": "PST-1824",
+    "price": 1200,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "printSides": "one",
+      "garmentBlank": "80# gloss poster stock",
+      "minQty": 25
+    }
+  },
+  {
+    "name": "Richardson 112 Trucker Cap",
+    "slug": "richardson-112-cap",
+    "sku": "CAP-R112",
+    "price": 1450,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "printSides": "one",
+      "garmentBlank": "Richardson 112",
+      "minQty": 24
+    }
+  },
+  {
+    "name": "13oz Vinyl Banner — 3×6",
+    "slug": "vinyl-banner-3x6",
+    "sku": "BNR-3X6",
+    "price": 8900,
+    "stock": 15,
+    "status": "active",
+    "attributes": {
+      "printSides": "one",
+      "garmentBlank": "13oz matte vinyl + grommets",
+      "minQty": 1
+    }
+  },
+  {
+    "name": "Bella Canvas Flowy Tank",
+    "slug": "bella-flowy-tank",
+    "sku": "TNK-BC-07",
+    "price": 1095,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "printSides": "one",
+      "garmentBlank": "BC8800",
+      "minQty": 24
+    }
+  },
+  {
+    "name": "Port Authority Soft Shell Jacket",
+    "slug": "port-authority-soft-shell",
+    "sku": "JKT-J317",
+    "price": 4850,
+    "stock": null,
+    "status": "active",
+    "attributes": {
+      "printSides": "one",
+      "garmentBlank": "Port Authority J317",
+      "minQty": 12
+    }
+  }
+]

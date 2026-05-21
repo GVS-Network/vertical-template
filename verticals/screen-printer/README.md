@@ -1,16 +1,49 @@
 # screen-printer
 
-**Stub @ Prompt 4.2** — full preset ships in **4.4** (first in build order).
+Custom print shop preset — quote-driven sales, portfolio-style catalog, Stripe for deposits and invoices (aligned with `askanddeliverwebapp`).
 
 ## Who it's for
 
-Custom print shops: quote-driven work, portfolio catalog, Stripe deposits/invoices (aligned with `askanddeliverwebapp`).
+Screen printers, embroiderers, and promo product shops that quote jobs before production. Customers browse blanks and minimums; staff close deals with proofs and payment links.
 
 ## Assumptions
 
-- `payment.provider`: **stripe**
-- Packs: catalog (portfolio), content, intake (project quote), payments, auth
+| Setting | Value |
+|---------|--------|
+| `payment.provider` | `stripe` |
+| Feature packs | catalog, content, intake, payments, auth (all on) |
+| Catalog mode | Portfolio / blanks list — prices are reference, not public cart |
+| Checkout | Staff-driven via payments pack (demo checkout on Home still uses sample line items until P4-4 catalog wiring) |
 
-## Day one (after `init-vertical`)
+## Day one after `init-vertical`
 
-Seeded demo tenant with quote form, sample portfolio items, and staff auth — no lorem in the finished preset.
+```bash
+npm run init:vertical -- --preset=screen-printer --tenant=demo-screen-printer --force
+```
+
+Set in `server/.env`:
+
+```
+BOUND_TENANT_ID=demo-screen-printer
+PAYMENT_PROVIDER=stripe
+```
+
+Restart `npm run dev`, then walk:
+
+| Pack | URL | Expect |
+|------|-----|--------|
+| Catalog | `/catalog` | 8 seeded blanks (tees, hoodie, tote, …) |
+| Content | `/home`, `/about`, `/portfolio` | Inkline copy |
+| Intake | `/forms/project-quote` | Quote form |
+| Payments | `/` + checkout button | Stripe when configured |
+| Auth | Login / `GET /api/auth/me` | Auth0 when configured |
+
+## Seed inventory
+
+- **8 products** — real garment names, SKUs, `minQty` / `printSides` attributes
+- **3 pages** — `home`, `about`, `portfolio`
+- **1 form** — `project-quote`
+
+## Product attributes (Zod)
+
+`printSides`, `garmentBlank`, `minQty` — see `product-attributes.schema.ts`.

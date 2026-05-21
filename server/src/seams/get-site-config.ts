@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import type { PaymentProviderName, SiteConfig } from '../types/site-config';
 import { defaultSiteConfig } from '../types/site-config.defaults';
+import { getBoundSiteConfig } from './bound-site-config';
 
 /** Local dev: PAYMENT_PROVIDER=stripe|square in server/.env (see get-site-config seam). */
 function paymentProviderFromEnv(): PaymentProviderName {
@@ -11,12 +12,7 @@ function paymentProviderFromEnv(): PaymentProviderName {
   return defaultSiteConfig.payment.provider;
 }
 
-/**
- * Single tenant-context seam. Phase 1: singleton default.
- * Phase 7: resolve from req.hostname / Tenant document — callers unchanged.
- */
-export function getSiteConfig(req: Request): SiteConfig {
-  void req;
+function defaultSingletonConfig(): SiteConfig {
   const provider = paymentProviderFromEnv();
   if (provider === defaultSiteConfig.payment.provider) {
     return defaultSiteConfig;
@@ -26,3 +22,19 @@ export function getSiteConfig(req: Request): SiteConfig {
     payment: { provider },
   };
 }
+
+/**
+ * Single tenant-context seam. Phase 1: singleton default.
+ * Phase 4: BOUND_TENANT_ID + _tenants registry (see bound-site-config.ts).
+ * Phase 7: resolve from req.hostname / Tenant document — callers unchanged.
+ */
+export function getSiteConfig(req: Request): SiteConfig {
+  void req;
+  const bound = getBoundSiteConfig();
+  if (bound) {
+    return bound;
+  }
+  return defaultSingletonConfig();
+}
+
+export { primeBoundSiteConfig } from './bound-site-config';

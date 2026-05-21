@@ -58,7 +58,7 @@ export type ProductAttributes = z.infer<typeof productAttributesSchema>;
 | File | Contents |
 |------|----------|
 | `products.json` | Array of `{ name, slug, sku, price, stock, status, attributes }` — no `tenantId` (stamped at seed time) |
-| `pages.json` | Array of `{ slug, title, body }` (content pack shape) |
+| `pages.json` | Array of `{ slug, title, body, status?, hero? }` — add matching client routes in `content/routes.tsx` when introducing new slugs (e.g. `/portfolio`) |
 | `forms.json` | Array of FormDefinition-shaped objects (intake pack) |
 
 - **No lorem** in finished presets (4.4+).

@@ -26,7 +26,8 @@
     "test:webhook-idempotency": "npm run test:webhook-idempotency --prefix server",
     "test:vertical-registry": "tsx verticals/registry.smoke.ts",
     "init:vertical": "tsx scripts/init-vertical.ts",
-    "test:init-vertical": "tsx scripts/init-vertical.smoke.ts"
+    "test:init-vertical": "tsx scripts/init-vertical.smoke.ts",
+    "test:screen-printer-preset": "tsx scripts/verify-screen-printer-preset.ts"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

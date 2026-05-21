@@ -8,7 +8,9 @@ import PostList from './components/PostList';
 export function contentRouteElements(): ReactNode {
   return (
     <>
+      <Route path="/home" element={<PageRenderer slug="home" />} />
       <Route path="/about" element={<PageRenderer slug="about" />} />
+      <Route path="/portfolio" element={<PageRenderer slug="portfolio" />} />
       <Route path="/blog" element={<PostList />} />
       <Route path="/blog/:slug" element={<PostDetail />} />
     </>

@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "slug": "home",
+    "title": "Custom print that ships on time",
+    "status": "published",
+    "hero": {
+      "headline": "Inkline Print Co.",
+      "subheadline": "Screen printing, embroidery, and digital for teams and brands"
+    },
+    "body": "# Welcome\n\nWe help breweries, schools, and growing brands turn artwork into wearable and printable goods — with clear proofs, honest minimums, and rush options when you need them.\n\n## What we do best\n\n- Contract screen printing on cotton and blends\n- Embroidery for hats and polos\n- Posters, banners, and event signage\n\nBrowse the **catalog** for common blanks and minimums, or start a **project quote** if you already have art and quantities."
+  },
+  {
+    "slug": "about",
+    "title": "About Inkline",
+    "status": "published",
+    "body": "# About Inkline Print Co.\n\nInkline started in 2011 as a two-press shop serving local bands and food trucks. Today we run automatic presses, a small embroidery cell, and a digital print station — but we still answer the phone and read your art files before we quote.\n\n## How we work\n\n1. You send garment type, quantities, and artwork (or a rough idea).\n2. We reply with a proof, price, and ship date — usually within one business day.\n3. You approve; we print; we ship or hold for pickup.\n\nWe are not a marketplace. Every job is produced in-house at our Chicago shop."
+  },
+  {
+    "slug": "portfolio",
+    "title": "Recent work",
+    "status": "published",
+    "hero": {
+      "headline": "Portfolio",
+      "subheadline": "A sample of client runs — not an exhaustive gallery"
+    },
+    "body": "# Recent work\n\nThese are representative jobs from the last two seasons. Your catalog and quote flow will show live blanks and pricing; this page is for credibility when you pitch a new client.\n\n## Highlights\n\n- **Lakeside Brewing** — 2-color tee run, 400 pieces, soft-hand water base\n- **Northside FC** — hoodies + joggers, name/number personalization\n- **Summit Health** — embroidered polos for 60 staff\n- **Riverfest** — 3×6 banners and wayfinding posters\n\nAsk for references in your industry when you submit a project quote."
+  }
+]

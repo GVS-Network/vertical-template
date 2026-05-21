@@ -6,6 +6,14 @@ node_modules/
 # Build outputs
 dist/
 build/
+verticals/**/*.js
+verticals/**/*.js.map
+verticals/**/*.d.ts
+verticals/**/*.d.ts.map
+client/src/types/theme-tokens.js
+client/src/types/theme-tokens.js.map
+client/src/types/theme-tokens.d.ts
+client/src/types/theme-tokens.d.ts.map
 
 # Environment files
 .env

@@ -1,10 +1,10 @@
 import { scopedForTenant } from '../../db/scoped';
-import { skipDevSeeds } from '../../shared/dev-seeds';
+import { skipDevSeedsForTenant } from '../../shared/dev-seeds';
 import { Page } from './schemas/page';
 import { Post } from './schemas/post';
 
 export async function seedContent(tenantId: string): Promise<void> {
-  if (process.env.NODE_ENV === 'production' || skipDevSeeds()) {
+  if (process.env.NODE_ENV === 'production' || skipDevSeedsForTenant(tenantId)) {
     return;
   }
 
