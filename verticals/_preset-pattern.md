@@ -93,7 +93,7 @@ Phase 5 replaces `{}` with vertical token overrides.
 
 `VerticalPresetEntry`: `{ preset, brandStub, productAttributesSchema }`.
 
-`init-vertical` (4.3) imports the registry — never hardcodes vertical list.
+`init-vertical` (4.3+) imports the registry — never hardcodes vertical list. Writes `server/src/models/tenant-registry.ts` → MongoDB collection `_tenants` (`_id` = tenant id, `preset`, `createdAt`, `seededAt`). Idempotent unless `--force` (wipes tenant-scoped Product/Page/Post/FormDefinition/Submission/Order rows).
 
 ---
 

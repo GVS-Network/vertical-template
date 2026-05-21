@@ -24,7 +24,9 @@
     "test:square-happy-path": "npm run test:square-happy-path --prefix server",
     "test:square-sync-inventory": "npm run test:square-sync-inventory --prefix server",
     "test:webhook-idempotency": "npm run test:webhook-idempotency --prefix server",
-    "test:vertical-registry": "tsx verticals/registry.smoke.ts"
+    "test:vertical-registry": "tsx verticals/registry.smoke.ts",
+    "init:vertical": "tsx scripts/init-vertical.ts",
+    "test:init-vertical": "tsx scripts/init-vertical.smoke.ts"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

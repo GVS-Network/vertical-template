@@ -3,7 +3,8 @@
 Four opinionated starting points for `SiteConfig`, seed data, product attribute shapes, and payment defaults. Each lives in `verticals/<key>/` once built.
 
 **Phase 4 prompt log:** decisions in `docs/phase-4-prompt-4.1-resolutions.md`.  
-**Preset pattern:** [`_preset-pattern.md`](_preset-pattern.md) · **Registry:** [`registry.ts`](registry.ts) (`npm run test:vertical-registry`).
+**Preset pattern:** [`_preset-pattern.md`](_preset-pattern.md) · **Registry:** [`registry.ts`](registry.ts) (`npm run test:vertical-registry`).  
+**Init tenant:** `npm run init:vertical -- --preset=<key> --tenant=<id> [--force]` (`npm run test:init-vertical`).
 
 ---
 

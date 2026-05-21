@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Phase 4.3: `npm run init:vertical` — `--preset` / `--tenant` / `--force`; seeds from `verticals/<key>/seed/*.json`; `_tenants` registry (`server/src/models/tenant-registry.ts`); idempotent re-run.
 - Phase 4.2: `verticals/_preset-pattern.md`, `verticals/registry.ts` (four presets + `mergePreset`), stub preset folders, `zod` (root) for `product-attributes.schema.ts`; `npm run test:vertical-registry`.
 
 ### Docs

@@ -61,4 +61,4 @@
 
 ## Next prompt
 
-**4.3** — `scripts/init-vertical.ts` (registry + seed). Pattern + registry shipped in **4.2**.
+**4.4** — First full preset (`screen-printer`). `init-vertical` shipped in **4.3**.
