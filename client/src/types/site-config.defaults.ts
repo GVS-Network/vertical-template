@@ -5,7 +5,7 @@ export const defaultSiteConfig: SiteConfig = {
   tenantId: 'default',
   features: {
     catalog: true,
-    content: false,
+    content: true,
     intake: false,
     payments: false,
     auth: false,

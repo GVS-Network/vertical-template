@@ -40,6 +40,30 @@ function Navbar() {
                 Catalog
               </Link>
             )}
+            {defaultSiteConfig.features.content && (
+              <>
+                <Link
+                  to="/about"
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/about')
+                      ? 'text-primary-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  About
+                </Link>
+                <Link
+                  to="/blog"
+                  className={`text-sm font-medium transition-colors ${
+                    location.pathname.startsWith('/blog')
+                      ? 'text-primary-600'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Blog
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">

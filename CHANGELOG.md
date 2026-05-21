@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `features/content` — Page + Post schemas (Markdown `body`), REST read routes, dev seed, `README.md` body-format decision; client PageRenderer, PostList/Detail; `features.content` enabled in defaults.
 - `features/catalog` — Product schema, REST list/detail, dev seed, client ProductList/Detail + `useProducts`; `features.catalog` enabled in defaults.
 - `server/src/features/registry.ts` + `createApp()` — registry gate (b); stub pack entrypoints; `npm run test:registry` smoke (all features off → 404).
 - `scopedForTenant(Model, tenantId)` for non-request queries.
