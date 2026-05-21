@@ -1,31 +1,38 @@
-# Open questions for Phase 4 (from Phase 3 close)
+# Open questions for Phase 4
 
-**Status:** Open · Phase 4 entry  
-**Prerequisites:** Phase 3 closed @ `v0.4.0` — both payment providers, idempotent webhooks.
-
----
-
-## Priority — go-to-market and provider defaults
-
-| # | Question | Why it matters |
-|---|----------|----------------|
-| **P4-1** | **Which vertical preset defaults to which `payment.provider`, and what does that say about our go-to-market order?** | Template brief §04 already sketches bar/food-truck/farm → Square, screen-printer → Stripe. Phase 4 must encode that in `init-vertical` / preset `site.config` — and the *sequence* we sell (Square-first verticals vs Stripe-first) is a GTM decision, not just config. |
-| **P4-2** | Do we ship four presets in one phase or stagger (e.g. food-truck + bar first)? | Affects prompt split, sample content depth, and first client-build targets. |
+**Status:** Prompt **4.1** closed (2026-05-21). Build order + provider defaults locked.  
+**Authoritative:** [`verticals/README.md`](../verticals/README.md) · [`docs/phase-4-prompt-4.1-resolutions.md`](phase-4-prompt-4.1-resolutions.md)
 
 ---
 
-## Carried from Phase 3 (deferred)
+## Resolved @ 4.1
 
-| # | Topic | Notes |
-|---|--------|--------|
-| **P4-3** | Square inventory sync trigger | Cron vs on product mutation vs manual — bar/food-truck will force the choice. |
-| **P4-4** | Catalog ↔ checkout wiring | `CheckoutButton` still uses demo line items; presets may need product-backed cart. |
-| **P4-5** | Square POS read-sync | Pull inventory from Square into Mongo — out of scope Phase 3 (push-only). |
-| **P4-6** | Dual active providers per site | Thesis-level; rejected for v0.4.0. |
-| **P4-7** | Intake email notifications | Still deferred from 2.6. |
+| ID | Question | Outcome |
+|----|----------|---------|
+| **P4-1** | Provider defaults + GTM | See README — screen-printer **Stripe**; bar / food-truck / farm **Square** (farm = public checkout per architecture brief §04) |
+| **P4-2** | Ship all presets at once? | **No** — staggered: screen-printer → bar-restaurant → food-truck → farm-source |
+
+### Build order (locked)
+
+1. `screen-printer` — operator knowledge (`askanddeliverwebapp`)
+2. `bar-restaurant` — Square, fixed-location
+3. `food-truck` — Square, mobile/schedule
+4. `farm-source` — five-pack stress test (last / cleanest)
+
+---
+
+## Still open
+
+| ID | Topic | Notes |
+|----|--------|--------|
+| **P4-3** | Square inventory sync trigger | Cron vs catalog mutation vs manual — decide when building Square presets (#2–4) |
+| **P4-4** | Catalog ↔ checkout | Replace demo `CheckoutButton` items with seeded products |
+| **P4-5** | Square POS read-sync | Out of scope Phase 3; still deferred |
+| **P4-6** | Dual active providers | Rejected @ v0.4.0 |
+| **P4-7** | Intake email notifications | Deferred from 2.6 |
 
 ---
 
 ## Resolved in Phase 3 (do not re-litigate)
 
-See `docs/phase-3-open-questions.md` and `server/src/features/payments/README.md`.
+`docs/phase-3-open-questions.md` · `server/src/features/payments/README.md`

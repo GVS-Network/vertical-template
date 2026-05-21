@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Phase 4.2: `verticals/_preset-pattern.md`, `verticals/registry.ts` (four presets + `mergePreset`), stub preset folders, `zod` (root) for `product-attributes.schema.ts`; `npm run test:vertical-registry`.
+
+### Docs
+
+- Phase 4.1: vertical **build order** locked (`screen-printer` → `bar-restaurant` → `food-truck` → `farm-source`); payment provider defaults + GTM order in `verticals/README.md`; `docs/phase-4-prompt-4.1-resolutions.md`.
+
 ## [0.4.0] — 2026-05-21
 
 Phase 3 (Payments) closed. Stripe and Square adapters behind `getPaymentProvider`, checkout Sessions / Square Payment Links, signature-verified webhooks with `WebhookEventLog` idempotency, Square inventory push, doctor provider checks.

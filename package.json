@@ -23,7 +23,8 @@
     "test:stripe-happy-path": "npm run test:stripe-happy-path --prefix server",
     "test:square-happy-path": "npm run test:square-happy-path --prefix server",
     "test:square-sync-inventory": "npm run test:square-sync-inventory --prefix server",
-    "test:webhook-idempotency": "npm run test:webhook-idempotency --prefix server"
+    "test:webhook-idempotency": "npm run test:webhook-idempotency --prefix server",
+    "test:vertical-registry": "tsx verticals/registry.smoke.ts"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
@@ -31,7 +32,8 @@
     "mongoose": "^8.3.1",
     "prettier": "^3.2.5",
     "tsx": "^4.19.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "zod": "^3.23.8"
   },
   "engines": {
     "node": ">=20.0.0"

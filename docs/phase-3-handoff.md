@@ -25,4 +25,4 @@
 
 ## Phase 4 entry
 
-Read `docs/prompts/phase-4-verticals.html` and **`docs/phase-4-open-questions.md`** — especially which vertical defaults to which payment provider and what that implies for go-to-market order.
+Read `docs/prompts/phase-4-verticals.html`. **4.1 done:** build order + provider defaults in **`verticals/README.md`**. Next: **4.2** preset pattern + registry.
