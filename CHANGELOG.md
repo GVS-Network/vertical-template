@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Pack compliance audit (`docs/phase-2-pack-compliance-audit.md`); `writeGuards` → `shared/`; client `FeatureRoutes` registry; `test:pack-compliance`.
 - `features/auth` — `requireAuth`, `GET /api/auth/me`, `LoginButton`/`LogoutButton`/`useSession`; `writeGuards` on catalog/content writes; delta in `docs/phase-2-auth-wiring-delta.md`.
 - `features/payments` — Order schema, checkout intent (501 via `getPaymentProvider` stub), webhook TODO; `CheckoutButton` on Home; `features.payments` enabled in defaults.
 - `features/intake` — FormDefinition + Submission schemas, GET/POST forms API, `GenericFormRenderer`; email deferred (`intake-notifications` TODO); `features.intake` enabled in defaults.

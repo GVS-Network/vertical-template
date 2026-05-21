@@ -87,7 +87,7 @@ export function register(app: Express, siteConfig: SiteConfig): void {
 | Pack | `register` behavior |
 |------|---------------------|
 | `catalog`, `content`, `intake`, `payments` | `app.use('/api/<pack>', createRouter(siteConfig))` |
-| `auth` | Mount `/api/auth` routes **and** export `requireAuth` middleware for other packs (no vendor imports outside auth pack) |
+| `auth` | Mount `/api/auth` routes **and** export `requireAuth` from `middleware.ts` (no `schemas/` or `service.ts` — JWT-only pack) |
 
 Do **not** export a `null` router as the toggle. Do **not** read `siteConfig.features.<pack>` inside `register` to no-op — the registry already skipped disabled packs.
 
@@ -175,6 +175,7 @@ Compound unique index: `(tenantId, auth0Id)`.
 ## Cross-pack rules
 
 - No deep imports across packs — lift shared code to `server/src/shared/` or `client/src/shared/`.
+- Write-route JWT guards: `server/src/shared/write-guards.ts` (uses `requireAuth` from auth middleware when `features.auth` is on).
 - No reading another pack's `features.*` flag from inside a pack.
 - No direct writes to another pack's Mongoose models.
 - Payments: routes call `getPaymentProvider(siteConfig)`; no Stripe/Square SDK outside `server/src/providers/` (phase 3).

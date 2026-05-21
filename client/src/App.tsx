@@ -4,10 +4,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Loading from './components/Loading';
 import { useApiAuth } from './hooks/useApiAuth';
-import { defaultSiteConfig } from './types/site-config.defaults';
-import { CatalogRoutes } from './features/catalog';
-import { ContentRoutes } from './features/content';
-import { IntakeRoutes } from './features/intake';
+import { FeatureRoutes } from './features/registry';
 
 function App() {
   const { isLoading } = useAuth0();
@@ -22,9 +19,7 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
-        {defaultSiteConfig.features.catalog && <CatalogRoutes />}
-        {defaultSiteConfig.features.content && <ContentRoutes />}
-        {defaultSiteConfig.features.intake && <IntakeRoutes />}
+        <FeatureRoutes />
       </Routes>
     </Layout>
   );

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { SiteConfig } from '../../types/site-config';
-import { writeGuards } from '../auth/write-guards';
+import { writeGuards } from '../../shared/write-guards';
 import * as controller from './controller';
 
 export function createContentRouter(siteConfig: SiteConfig): Router {

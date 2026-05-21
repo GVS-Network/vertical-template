@@ -1,8 +1,9 @@
 import { scopedForTenant } from '../../db/scoped';
+import { skipDevSeeds } from '../../shared/dev-seeds';
 import { FormDefinition } from './schemas/form-definition';
 
 export async function seedIntakeForms(tenantId: string): Promise<void> {
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' || skipDevSeeds()) {
     return;
   }
 

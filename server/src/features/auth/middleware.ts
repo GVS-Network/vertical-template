@@ -1,5 +1,5 @@
 import { auth } from 'express-oauth2-jwt-bearer';
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
 
 function resolveIssuerBaseURL(): string {
   const explicit = process.env.AUTH0_ISSUER_BASE_URL?.trim();
@@ -16,12 +16,22 @@ function resolveIssuerBaseURL(): string {
   );
 }
 
-/** Validates JWT via Auth0 issuer + audience from env. */
-export const requireAuth = auth({
-  audience: process.env.AUTH0_AUDIENCE,
-  issuerBaseURL: resolveIssuerBaseURL(),
-  tokenSigningAlg: 'RS256',
-});
+let jwtValidator: RequestHandler | undefined;
+
+function getJwtValidator(): RequestHandler {
+  if (!jwtValidator) {
+    jwtValidator = auth({
+      audience: process.env.AUTH0_AUDIENCE,
+      issuerBaseURL: resolveIssuerBaseURL(),
+      tokenSigningAlg: 'RS256',
+    });
+  }
+  return jwtValidator;
+}
+
+/** Validates JWT via Auth0 issuer + audience from env (lazy — no env read at import). */
+export const requireAuth: RequestHandler = (req, res, next) =>
+  getJwtValidator()(req, res, next);
 
 export const optionalAuth = (
   req: Request,

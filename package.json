@@ -18,7 +18,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "rm -rf client/dist server/dist client/node_modules server/node_modules node_modules",
     "doctor": "tsx scripts/doctor.ts",
-    "test:registry": "npm run test:registry --prefix server"
+    "test:registry": "npm run test:registry --prefix server",
+    "test:pack-compliance": "npm run test:pack-compliance --prefix server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

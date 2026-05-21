@@ -34,7 +34,7 @@
 ### `server/src/features/catalog/router.ts`
 
 - **Changed** `createCatalogRouter()` → `createCatalogRouter(siteConfig)`.
-- **Added** `writeGuards(siteConfig)` on `POST /products` and `PUT /products/:slug`.
+- **Added** `writeGuards(siteConfig)` on `POST /products` and `PUT /products/:slug` (via `server/src/shared/write-guards.ts` after 2.9).
 
 ### `server/src/features/catalog/index.ts`
 
@@ -48,7 +48,7 @@
 ### `server/src/features/content/router.ts`
 
 - **Changed** `createContentRouter()` → `createContentRouter(siteConfig)`.
-- **Added** `writeGuards(siteConfig)` on all four write routes (`POST/PUT` pages and posts).
+- **Added** `writeGuards(siteConfig)` on all four write routes (`POST/PUT` pages and posts) (via `shared/write-guards` after 2.9).
 
 ### `server/src/features/content/index.ts`
 
