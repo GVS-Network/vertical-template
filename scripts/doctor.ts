@@ -111,7 +111,7 @@ async function checkMongo(): Promise<string[]> {
 }
 
 async function main(): Promise<void> {
-  console.log('vertical-template doctor (phase 0)\n');
+  console.log('vertical-template doctor\n');
 
   const errors: string[] = [
     ...checkNodeVersion(),
