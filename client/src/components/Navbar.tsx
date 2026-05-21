@@ -64,6 +64,18 @@ function Navbar() {
                 </Link>
               </>
             )}
+            {defaultSiteConfig.features.intake && (
+              <Link
+                to="/forms/contact"
+                className={`text-sm font-medium transition-colors ${
+                  location.pathname.startsWith('/forms')
+                    ? 'text-primary-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Contact
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">

@@ -1,0 +1,72 @@
+import type { HydratedDocument } from 'mongoose';
+import { scopedForTenant } from '../../db/scoped';
+import { createError } from '../../middleware/errorHandler';
+import {
+  FormDefinition,
+  type FormFieldDefinition,
+  type IFormDefinition,
+} from './schemas/form-definition';
+import { Submission, type ISubmission } from './schemas/submission';
+
+export async function getFormBySlug(
+  tenantId: string,
+  slug: string
+): Promise<IFormDefinition | null> {
+  const forms = scopedForTenant(FormDefinition, tenantId);
+  const doc = (await forms.findOne({
+    slug: slug.toLowerCase(),
+  })) as HydratedDocument<IFormDefinition> | null;
+  return doc ? doc.toObject() : null;
+}
+
+function validateSubmissionData(
+  fields: FormFieldDefinition[],
+  data: Record<string, unknown>
+): void {
+  for (const field of fields) {
+    const value = data[field.name];
+    if (field.required) {
+      if (value === undefined || value === null || value === '') {
+        throw createError(`Field "${field.name}" is required`, 400);
+      }
+    }
+    if (field.type === 'email' && typeof value === 'string' && value) {
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      if (!ok) {
+        throw createError(`Field "${field.name}" must be a valid email`, 400);
+      }
+    }
+    if (field.type === 'select' && field.options?.length && value) {
+      if (!field.options.includes(String(value))) {
+        throw createError(`Field "${field.name}" has an invalid option`, 400);
+      }
+    }
+  }
+}
+
+export async function createSubmission(
+  tenantId: string,
+  formSlug: string,
+  data: Record<string, unknown>,
+  ip?: string
+): Promise<ISubmission> {
+  const form = await getFormBySlug(tenantId, formSlug);
+  if (!form) {
+    throw createError('Form not found', 404);
+  }
+
+  validateSubmissionData(form.fields, data);
+
+  const submissions = scopedForTenant(Submission, tenantId);
+  const doc = await submissions.create({
+    formSlug: formSlug.toLowerCase(),
+    data,
+    createdAt: new Date(),
+    ip,
+    processed: false,
+  });
+
+  // TODO(later): intake-notifications — email/Slack/webhook when a submission is created.
+
+  return doc.toObject() as ISubmission;
+}

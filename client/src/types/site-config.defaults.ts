@@ -6,7 +6,7 @@ export const defaultSiteConfig: SiteConfig = {
   features: {
     catalog: true,
     content: true,
-    intake: false,
+    intake: true,
     payments: false,
     auth: false,
   },
