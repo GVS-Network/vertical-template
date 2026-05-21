@@ -11,6 +11,8 @@ export type {
 
 export type { ThemeTokens } from './theme-tokens';
 
+export { defaultSiteConfig } from './site-config.defaults';
+
 export interface ApiError {
   message: string;
   status: number;

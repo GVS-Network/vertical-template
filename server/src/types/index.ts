@@ -11,6 +11,8 @@ export type {
 
 export type { ThemeTokens } from './theme-tokens';
 
+export { defaultSiteConfig } from './site-config.defaults';
+
 // Note: Auth types are provided by express-oauth2-jwt-bearer
 
 export interface EnvConfig {
