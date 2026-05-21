@@ -5,11 +5,10 @@
 
 ## Paste into session-starter `{OPEN_QUESTIONS}`
 
+**Superseded by Prompt 1.1** — see `docs/phase-1-prompt-1.1-resolutions.md`.
+
 ```
-Phase 1 first: remove demo User/Item routes and models (kept through 0.7 only).
-Tailwind frozen until Phase 5 — no new utility classes.
-Vite @ alias in vite.config.ts still wrong ('/src' absolute) — fix if @/ imports fail.
-Auth0 env vars may still be placeholders until admin routes are tested.
+none — Phase 0 carry-forward closed. Next code: demo removal + vite alias (1.2 prep), then SiteConfig type.
 ```
 
 ## Surprises from inventory (inform Phase 1 prompts)

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Docs
+
+- Phase 1.1: open questions from Phase 0 resolved (`docs/phase-1-prompt-1.1-resolutions.md`).
+
 ## [0.1.0] — 2026-05-21
 
 Phase 0 (Bootstrap) closed. Template is a owned fork of baseapp with docs, cursor rules, doctor script, and a verified dev loop. No SiteConfig, feature packs, or Type A/B/C taxonomy work yet.
