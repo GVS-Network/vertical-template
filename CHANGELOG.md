@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Phase 3.6: `npm run doctor` validates payment provider env + live Stripe/Square API credentials when `features.payments` is on; WARN when `provider: none`.
 - Phase 3.5: `WebhookEventLog` model (`tenantId`, `provider`, `eventId`, `eventType`, `processedAt`, optional `payloadHash`); unique index on `(tenantId, provider, eventId)`; webhook handler idempotency + signature verification; `npm run test:webhook-idempotency`.
 - Phase 3.4: Square provider (`server/src/providers/square.ts`) — Orders + Payment Links checkout, HMAC webhook verify/parse, `syncInventory` push to Square Catalog Inventory; `square` dependency; `npm run test:square-happy-path` and `test:square-sync-inventory`.
 - Phase 3.3: Stripe provider (`server/src/providers/stripe.ts`), checkout Sessions, webhook verify/parse, `npm run test:stripe-happy-path`; `stripe` dependency.

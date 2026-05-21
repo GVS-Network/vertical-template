@@ -83,7 +83,7 @@ Routes never import Stripe/Square SDKs — only `getPaymentProvider(siteConfig)`
 2. ~~**3.3**~~ — `server/src/providers/stripe.ts` + factory + webhook handler (idempotency log in **3.5**).
 3. ~~**3.4**~~ — `server/src/providers/square.ts` + `syncInventory` push; `npm run test:square-happy-path` / `test:square-sync-inventory`.
 4. ~~**3.5**~~ — `WebhookEventLog` + controller webhook pipeline; `npm run test:webhook-idempotency`.
-5. **3.6** — Doctor provider checks.
+5. ~~**3.6**~~ — Doctor provider checks (`npm run doctor` when `features.payments` is on).
 6. **3.7** — Close phase @ `v0.4.0`.
 
 ---
