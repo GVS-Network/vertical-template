@@ -24,6 +24,6 @@
 | **1.7** | `scoped()` + tenant schema helpers — `docs/phase-1-prompt-1.7-tenant-audit.md` |
 | **1.8** | Docs + `v0.2.0` tag |
 
-## Phase 2 entry
+## Phase 2 entry (closed)
 
-Read `docs/prompts/phase-2-feature-packs.html`. Phase 2.1 closed: `docs/phase-2-prompt-2.1-resolutions.md`.
+See `docs/phase-2-handoff.md` @ `v0.3.0`. Phase 3: `docs/phase-3-open-questions.md`.

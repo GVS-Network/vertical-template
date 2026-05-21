@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Stack Context · v0.2.0</span>
+      <span>Stack Context · v0.3.0</span>
     </div>
     <h1 class="doc-title">The <em>stack</em>, pinned.</h1>
     <p class="doc-subtitle">What's installed, what's chosen, what's expressly forbidden. Read before suggesting a library; read again before adding a dependency. Reconciled against <code>docs/inventory.md</code> (Phase 0, Prompt 0.2).</p>
@@ -223,7 +223,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Phase 1 complete (v0.2.0).</strong> <code>SiteConfig</code>, <code>getSiteConfig(req)</code>, <code>scoped(Model, req)</code>, and tenant schema helpers are live. Demo <code>User</code>/<code>Item</code> removed. Feature packs and provider adapters are not built yet — rules below apply to all new code.</p>
+      <p><strong>Phase 2 complete (v0.3.0).</strong> Five feature packs under <code>features/</code>, registry toggle at boot, <code>scopedForTenant</code>, compliance smokes. Payment adapters still phase 3 — checkout returns 501 via <code>getPaymentProvider</code> stub.</p>
     </div>
     <div class="callout risk">
       <span class="icon">!</span>
@@ -251,7 +251,8 @@
   <section class="status-section">
     <span class="section-num">07 — Status</span>
     <h2>What's pinned today, what changes later</h2>
-    <p><strong>v0.2.0 (2026-05-21):</strong> Phase 1 closed. Present: <code>SiteConfig</code> twin types, <code>contract:check</code>, <code>getSiteConfig</code>/<code>getPaymentProvider</code> seams, <code>scoped()</code>, <code>doctor</code>. Still planned per phase: feature packs (2), payment adapters (3), vertical presets (4), token registry (5). Tailwind frozen until phase 5.</p>
+    <p><strong>v0.3.0 (2026-05-21):</strong> Phase 2 closed. Present: five feature packs, <code>registry.ts</code> gate, <code>_pack-pattern.md</code>, <code>test:registry</code> + <code>test:pack-compliance</code>. Still planned: payment adapters (3), vertical presets (4), token registry (5). Tailwind frozen until phase 5.</p>
+    <p><strong>v0.2.0:</strong> Phase 1 — <code>SiteConfig</code>, seams, <code>scoped()</code>, tenant schema helpers.</p>
     <p><strong>v0.1.1:</strong> Post-fork inventory reconciliation (React 18.2, Vite 5.2, Express 4.19, Mongoose 8.3, legacy Tailwind 3).</p>
 
     <h4>Phase 0 decisions (locked 2026-05-21)</h4>

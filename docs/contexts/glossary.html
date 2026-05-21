@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Glossary · v0.2.0</span>
+      <span>Glossary · v0.3.0</span>
     </div>
     <h1 class="doc-title">Words that mean <em>specific things</em> here.</h1>
     <p class="doc-subtitle">Project-internal vocabulary. When Claude (or anyone) uses these terms in a PR or a prompt, they carry the definitions below — not the generic ones.</p>
@@ -52,7 +52,9 @@
       <div class="decision-row">
         <div class="key">Feature pack</div>
         <div class="val">
-          <p>A toggle-mounted module that contributes API + UI surface when enabled and zero surface when disabled. The five: <code>catalog · content · intake · payments · auth</code> (auth is technically middleware). Each has a folder on the server and a folder on the client. Routers conditionally mount on <code>SiteConfig.features.&lt;id&gt;.enabled</code>.</p>
+          <p>A toggle-mounted module: API + UI when <code>SiteConfig.features.&lt;pack&gt; === true</code>, zero surface when false (404, not stub routes). Five packs: <code>catalog · content · intake · payments · auth</code>.</p>
+          <p><strong>Server shape</strong> (<code>server/src/features/&lt;pack&gt;/</code>): <code>index.ts</code> exports <code>packKey</code> + <code>register(app, siteConfig)</code>; data packs add <code>schemas/</code>, <code>service.ts</code>, <code>controller.ts</code>, <code>router.ts</code>, optional <code>seed.ts</code>. <strong>auth</strong> is JWT-only (no Mongoose layer). Boot gate: <code>registry.ts</code> dynamic-imports enabled packs only — see <code>_pack-pattern.md</code>.</p>
+          <p><strong>Client shape</strong> (<code>client/src/features/&lt;pack&gt;/</code>): <code>index.ts</code> + optional <code>routes.tsx</code>, <code>components/</code>, <code>hooks/</code>. <code>client/src/features/registry.tsx</code> merges routes when the flag is on. No cross-pack imports; shared helpers live in <code>server/src/shared/</code> (e.g. <code>write-guards.ts</code>).</p>
         </div>
       </div>
 
@@ -148,7 +150,11 @@
       </div>
       <div class="decision-row">
         <div class="key">scoped(Model, req)</div>
-        <div class="val"><p>Tenant-scoped Mongoose query helper in <code>server/src/db/scoped.ts</code>. Merges <code>req.siteConfig.tenantId</code> into find/findOne/create/update/delete. Replaces raw <code>Model.find</code> in feature packs. Requires <code>attachSiteConfig</code> on the request.</p></div>
+        <div class="val"><p>Tenant-scoped Mongoose helper in <code>server/src/db/scoped.ts</code>. <code>scoped(Model, req)</code> merges <code>req.siteConfig.tenantId</code> (HTTP handlers). <code>scopedForTenant(Model, tenantId)</code> for seeds, webhooks, and services that receive <code>tenantId</code> from the controller. Replaces raw <code>Model.find</code> without tenant scope.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Pack registry</div>
+        <div class="val"><p><code>server/src/features/registry.ts</code> (server) and <code>client/src/features/registry.tsx</code> (client). The only toggle gate: iterate <code>catalog → content → intake → payments → auth</code>; if flag false, log <code>[feature:off]</code> once and skip import/register.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">tenantIdSchemaDefinition</div>
@@ -200,6 +206,9 @@
     <span class="section-num">06 — Status</span>
     <h2>How this glossary updates</h2>
     <p>This is a working document. When a phase prompt introduces a new term that's specific to the project, that term lands here in the same PR. When a term changes meaning (or stops being used), it moves into §05 with a note explaining what replaced it.</p>
+
+    <h4>Open questions — Phase 3</h4>
+    <p>See <code>docs/phase-3-open-questions.md</code> (payments scaffold fill-in, provider adapters, webhook idempotency).</p>
 
     <h4>Anticipated additions</h4>
     <div class="open-q">

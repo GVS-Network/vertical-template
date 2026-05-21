@@ -6,21 +6,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added
+## [0.3.0] — 2026-05-21
 
-- Pack compliance audit (`docs/phase-2-pack-compliance-audit.md`); `writeGuards` → `shared/`; client `FeatureRoutes` registry; `test:pack-compliance`.
-- `features/auth` — `requireAuth`, `GET /api/auth/me`, `LoginButton`/`LogoutButton`/`useSession`; `writeGuards` on catalog/content writes; delta in `docs/phase-2-auth-wiring-delta.md`.
-- `features/payments` — Order schema, checkout intent (501 via `getPaymentProvider` stub), webhook TODO; `CheckoutButton` on Home; `features.payments` enabled in defaults.
-- `features/intake` — FormDefinition + Submission schemas, GET/POST forms API, `GenericFormRenderer`; email deferred (`intake-notifications` TODO); `features.intake` enabled in defaults.
-- `features/content` — Page + Post schemas (Markdown `body`), REST read routes, dev seed, `README.md` body-format decision; client PageRenderer, PostList/Detail; `features.content` enabled in defaults.
-- `features/catalog` — Product schema, REST list/detail, dev seed, client ProductList/Detail + `useProducts`; `features.catalog` enabled in defaults.
-- `server/src/features/registry.ts` + `createApp()` — registry gate (b); stub pack entrypoints; `npm run test:registry` smoke (all features off → 404).
-- `scopedForTenant(Model, tenantId)` for non-request queries.
-- `server/src/features/_pack-pattern.md` — feature pack source of truth (registry gate, exports, tenant rules).
+Phase 2 (Feature packs) closed. Five toggle-mounted packs on server and client, registry gate at boot, pack-pattern source of truth, compliance smokes. Payment checkout returns 501 until Phase 3 adapters.
+
+### Phase 2 — closed (prompt log)
+
+| Prompt | Outcome |
+|--------|---------|
+| **2.1** | Open questions resolved — `docs/phase-2-prompt-2.1-resolutions.md` (registry gate **b**, `scopedForTenant`, auth uniqueness, client never sends `tenantId`) |
+| **2.2** | `server/src/features/_pack-pattern.md` — pack layout, exports, tenant rules |
+| **2.3** | `registry.ts` + `createApp()`; stub entrypoints; `npm run test:registry` |
+| **2.4** | **catalog** — Product schema, REST list/detail, dev seed, client ProductList/Detail |
+| **2.5** | **content** — Page + Post (Markdown `body`), read API, client blog/about routes |
+| **2.6** | **intake** — FormDefinition + Submission, GET/POST forms, `GenericFormRenderer`; email deferred |
+| **2.7** | **payments** — Order schema, checkout intent (501 via seam), webhook stub; `CheckoutButton` on Home |
+| **2.8** | **auth** — `requireAuth`, `GET /api/auth/me`, Login/Logout/`useSession`; `writeGuards` on catalog/content writes |
+| **2.9** | Pack compliance audit — `docs/phase-2-pack-compliance-audit.md`; `shared/write-guards`; `test:pack-compliance` |
+| **2.10** | Docs + tag `v0.3.0`; `docs/phase-3-open-questions.md` |
+
+### Added — feature packs
+
+| Pack | Server | Client |
+|------|--------|--------|
+| **catalog** | `Product` schema, `/api/catalog/products`, dev seed | `/catalog`, `/catalog/:slug`, `useProducts` |
+| **content** | `Page` + `Post`, `/api/content/*`, Markdown body (see pack `README.md`) | `/about`, `/blog`, `/blog/:slug` |
+| **intake** | `FormDefinition` + `Submission`, `/api/intake/forms/:slug` | `/forms/:slug`, `GenericFormRenderer` |
+| **payments** | `Order`, `POST /checkout/intent` (501), `POST /webhook/:provider` stub | `CheckoutButton` on Home (no pack routes yet) |
+| **auth** | `requireAuth` middleware, `GET /api/auth/me` | `LoginButton`, `LogoutButton`, `useSession` (shell; no `routes.tsx`) |
+
+- `server/src/features/registry.ts` — dynamic `import()` + `register()` only when `features.<pack> === true`; `[feature:off]` log when false.
+- `client/src/features/registry.tsx` — `FeatureRoutes()` mirrors server flags.
+- `scopedForTenant(Model, tenantId)` for seeds, services, and non-request contexts.
+- `server/src/shared/write-guards.ts` — JWT on catalog/content write routes when `features.auth` is on (no cross-pack imports).
+- `server/src/shared/dev-seeds.ts` — `SKIP_PACK_SEEDS` for registry/compliance smokes without MongoDB.
+- `npm run test:registry`, `npm run test:pack-compliance`.
+
+### Pack-pattern revisions (vs draft in 2.2)
+
+- Toggle gate is **registry option (b)** only — no per-pack `register` no-op, no static import-all.
+- `SiteConfig.features.*` are **booleans** (not `.enabled` suffixes).
+- **auth** pack: JWT middleware only — no `schemas/` or `service.ts` (documented exemption).
+- **auth (client)**: components/hooks exported from `index.ts`; no `routes.tsx` (shell mounts in `Navbar` / Home).
+- Cross-pack writes use **`shared/write-guards.ts`**, not `import` from `features/auth/`.
+- HTTP handlers may pass `tenantId` into services using `scopedForTenant` (equivalent discipline to `scoped(Model, req)`).
+
+### Changed
+
+- Root, client, server `package.json` → `0.3.0`.
+- `server/src/middleware/auth.ts` — thin re-export of `features/auth/middleware` (legacy path).
+- All five `features.*` default **true** in twin `defaultSiteConfig` files.
 
 ### Docs
 
-- Phase 2.1: open questions resolved (`docs/phase-2-prompt-2.1-resolutions.md`) — registry toggle gate (b), `scopedForTenant`, auth/user uniqueness, client tenantId server-only.
+- `docs/phase-2-handoff.md`, `docs/phase-3-open-questions.md`, `docs/phase-2-pack-compliance-audit.md`.
+- `docs/contexts/repo-context.html` §05 — `features/*` file map; `glossary.html` — concrete feature-pack shape.
+- `docs/contexts/stack-context.html`, `session-starter.html` — Phase 2 complete @ v0.3.0.
+- Build docs family → **v0.3.0** (`docs/README.html`).
 
 ## [0.2.0] — 2026-05-21
 

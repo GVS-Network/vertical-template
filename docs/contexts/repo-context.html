@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Repository Context · v0.2.0</span>
+      <span>Repository Context · v0.3.0</span>
     </div>
     <h1 class="doc-title">The <em>codebase family</em>.</h1>
     <p class="doc-subtitle">Three repositories, one lineage. What lives where, what each is for, and which conventions cross repo boundaries unchanged.</p>
@@ -179,7 +179,7 @@
     </div>
     <div class="callout opportunity">
       <span class="icon">✓</span>
-      <p><strong>Feature packs.</strong> Catalog, content, intake, payments + auth as middleware. Toggle-mounted. A disabled pack contributes zero API surface. The agency app has fixed features — the template doesn't.</p>
+      <p><strong>Feature packs.</strong> Five packs (<code>catalog · content · intake · payments · auth</code>) under <code>server/src/features/</code> and <code>client/src/features/</code>. Registry gates at boot (option b): disabled packs never import or register — routes 404. Pattern: <code>server/src/features/_pack-pattern.md</code>.</p>
     </div>
     <div class="callout opportunity">
       <span class="icon">✓</span>
@@ -200,49 +200,62 @@
     <span class="section-num">05 — Reference: file map</span>
     <h2>What lives where in the template</h2>
 
-<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.2.0 — phase 1 closed</span>
+<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.3.0 — phase 2 closed</span>
 ├── client/
 │   ├── src/
 │   │   ├── types/
 │   │   │   ├── site-config.ts           <span class="dim">contract-checked w/ server</span>
 │   │   │   ├── site-config.defaults.ts
 │   │   │   └── theme-tokens.ts
-│   │   ├── features/                    <span class="dim">phase 2+</span>
-│   │   └── App.tsx                      <span class="dim">minimal shell</span>
+│   │   ├── features/
+│   │   │   ├── registry.tsx             <span class="dim">FeatureRoutes() — flag gate</span>
+│   │   │   ├── catalog/                 <span class="dim">routes, hooks, ProductList/Detail</span>
+│   │   │   ├── content/                 <span class="dim">routes, PageRenderer, PostList/Detail</span>
+│   │   │   ├── intake/                  <span class="dim">routes, GenericFormRenderer</span>
+│   │   │   ├── payments/                <span class="dim">CheckoutButton (Home); no routes yet</span>
+│   │   │   └── auth/                    <span class="dim">Login/Logout, useSession — no routes.tsx</span>
+│   │   └── App.tsx
 │   └── package.json
 │
 ├── server/
 │   ├── src/
 │   │   ├── seams/
-│   │   │   ├── get-site-config.ts       <span class="dim">tenant context seam</span>
+│   │   │   ├── get-site-config.ts
 │   │   │   └── get-payment-provider.ts  <span class="dim">throws until phase 3</span>
+│   │   ├── shared/
+│   │   │   ├── write-guards.ts          <span class="dim">catalog/content write JWT</span>
+│   │   │   └── dev-seeds.ts             <span class="dim">SKIP_PACK_SEEDS for smokes</span>
 │   │   ├── db/
-│   │   │   ├── scoped.ts                <span class="dim">scoped(Model, req)</span>
-│   │   │   └── tenant-schema.ts         <span class="dim">tenantId field + compound index</span>
+│   │   │   ├── scoped.ts                <span class="dim">scoped + scopedForTenant</span>
+│   │   │   └── tenant-schema.ts
 │   │   ├── middleware/
-│   │   │   ├── site-config.ts           <span class="dim">req.siteConfig = getSiteConfig(req)</span>
-│   │   │   └── auth.ts                  <span class="dim">Auth0 wrapper</span>
-│   │   ├── models/index.ts              <span class="dim">pack models land in phase 2</span>
-│   │   ├── types/
 │   │   │   ├── site-config.ts
-│   │   │   ├── site-config.defaults.ts
-│   │   │   ├── payment-provider.ts      <span class="dim">interface only</span>
-│   │   │   └── theme-tokens.ts
+│   │   │   └── auth.ts                  <span class="dim">re-export → features/auth</span>
+│   │   ├── types/                       <span class="dim">site-config, payment-provider, theme-tokens</span>
 │   │   ├── routes/health.ts
-│   │   ├── providers/                   <span class="dim">phase 3 — stripe/square adapters</span>
-│   │   ├── features/                    <span class="dim">phase 2 — toggle-mounted packs</span>
+│   │   ├── providers/                   <span class="dim">phase 3 — stripe.ts, square.ts</span>
+│   │   ├── features/
+│   │   │   ├── _pack-pattern.md         <span class="dim">source of truth</span>
+│   │   │   ├── registry.ts              <span class="dim">boot-time toggle gate (b)</span>
+│   │   │   ├── registry.smoke.ts
+│   │   │   ├── pack-compliance.smoke.ts
+│   │   │   ├── catalog/                 <span class="dim">Product, /api/catalog</span>
+│   │   │   ├── content/                 <span class="dim">Page, Post, /api/content</span>
+│   │   │   ├── intake/                  <span class="dim">FormDefinition, Submission</span>
+│   │   │   ├── payments/                <span class="dim">Order; checkout 501; webhook stub</span>
+│   │   │   └── auth/                    <span class="dim">requireAuth, /api/auth/me</span>
+│   │   ├── app.ts                       <span class="dim">createApp() for tests + index</span>
 │   │   └── index.ts
 │   └── package.json
 │
 ├── scripts/
-│   ├── contract-check.ts                <span class="dim">dual-file type parity</span>
+│   ├── contract-check.ts
 │   └── doctor.ts
 │
-├── docs/                                <span class="dim">build-docs family</span>
-│
+├── docs/
 ├── .cursor/rules/
 ├── CHANGELOG.md
-└── package.json                         <span class="dim">dev, doctor, contract:check</span></div>
+└── package.json                         <span class="dim">dev, doctor, test:registry, test:pack-compliance</span></div>
   </section>
 
   <!-- ===================== -->
