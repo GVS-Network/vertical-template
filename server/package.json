@@ -12,7 +12,8 @@
     "test:pack-compliance": "SKIP_PACK_SEEDS=1 tsx src/features/pack-compliance.smoke.ts",
     "test:stripe-happy-path": "tsx src/scripts/stripe-happy-path.ts",
     "test:square-happy-path": "tsx src/scripts/square-happy-path.ts",
-    "test:square-sync-inventory": "tsx src/scripts/square-sync-inventory.ts"
+    "test:square-sync-inventory": "tsx src/scripts/square-sync-inventory.ts",
+    "test:webhook-idempotency": "tsx src/features/payments/webhook-idempotency.smoke.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",

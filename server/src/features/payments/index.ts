@@ -1,5 +1,6 @@
 import type { Express } from 'express';
 import type { SiteConfig } from '../../types/site-config';
+import './schemas/webhook-event-log';
 import { createPaymentsRouter } from './router';
 
 export const packKey = 'payments' as const;
