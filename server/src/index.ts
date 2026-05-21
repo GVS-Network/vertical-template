@@ -1,6 +1,5 @@
-import dotenv from 'dotenv';
-
-dotenv.config();
+/// <reference path="./types/express.d.ts" />
+import './load-env';
 
 import { connectDatabase } from './config/database';
 import { createApp } from './app';

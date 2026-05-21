@@ -1,20 +1,23 @@
+import type { ReactNode } from 'react';
 import { defaultSiteConfig } from '../types/site-config.defaults';
-import { CatalogRoutes } from './catalog/routes';
-import { ContentRoutes } from './content/routes';
-import { IntakeRoutes } from './intake/routes';
+import { catalogRouteElements } from './catalog/routes';
+import { contentRouteElements } from './content/routes';
+import { intakeRouteElements } from './intake/routes';
 
 /**
  * Client feature registry — mirrors server toggle gate (option b).
- * Disabled packs: no routes imported from this module for that pack's paths.
+ * Returns route elements for use inside <Routes>. Must be function calls
+ * (catalogRouteElements()), not components (<CatalogRoutes />) — RR v6 only
+ * accepts <Route> or <Fragment> as descendants, not custom components.
  */
-export function FeatureRoutes() {
+export function featureRouteElements(): ReactNode {
   const { features } = defaultSiteConfig;
 
   return (
     <>
-      {features.catalog && <CatalogRoutes />}
-      {features.content && <ContentRoutes />}
-      {features.intake && <IntakeRoutes />}
+      {features.catalog && catalogRouteElements()}
+      {features.content && contentRouteElements()}
+      {features.intake && intakeRouteElements()}
     </>
   );
 }

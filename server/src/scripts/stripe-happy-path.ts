@@ -3,7 +3,7 @@
  *
  * Prerequisites:
  *   - server/.env: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, MONGODB_URI
- *   - defaultSiteConfig.payment.provider = 'stripe' (or pass STRIPE_TEST=1)
+ *   - server/.env: PAYMENT_PROVIDER=stripe
  *   - Server running: npm run dev
  *   - Webhook forwarding: stripe listen --forward-to localhost:3001/api/payments/webhook/stripe
  *
@@ -24,13 +24,27 @@ async function main(): Promise<void> {
     throw new Error('Missing STRIPE_WEBHOOK_SECRET in server/.env');
   }
 
-  const res = await fetch(`${API}/payments/checkout/intent`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      items: [{ name: 'Happy Path Widget', sku: 'HP-001', price: 1500, qty: 1 }],
-    }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API}/payments/checkout/intent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [{ name: 'Happy Path Widget', sku: 'HP-001', price: 1500, qty: 1 }],
+      }),
+    });
+  } catch (err) {
+    const code =
+      err && typeof err === 'object' && 'cause' in err
+        ? (err.cause as { code?: string })?.code
+        : undefined;
+    if (code === 'ECONNREFUSED') {
+      throw new Error(
+        `Cannot reach ${API} — start the API first: npm run dev (from repo root).`
+      );
+    }
+    throw err;
+  }
 
   const body = (await res.json()) as {
     status?: string;
@@ -39,8 +53,12 @@ async function main(): Promise<void> {
   };
 
   if (!res.ok) {
+    const hint =
+      res.status === 501
+        ? ' Add PAYMENT_PROVIDER=stripe to server/.env and restart npm run dev.'
+        : '';
     throw new Error(
-      `checkout/intent ${res.status}: ${body.message ?? JSON.stringify(body)}`
+      `checkout/intent ${res.status}: ${body.message ?? JSON.stringify(body)}${hint}`
     );
   }
 

@@ -4,7 +4,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Loading from './components/Loading';
 import { useApiAuth } from './hooks/useApiAuth';
-import { FeatureRoutes } from './features/registry';
+import { featureRouteElements } from './features/registry';
 
 function App() {
   const { isLoading } = useAuth0();
@@ -19,7 +19,7 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
-        <FeatureRoutes />
+        {featureRouteElements()}
       </Routes>
     </Layout>
   );
