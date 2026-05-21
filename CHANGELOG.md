@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `features/catalog` — Product schema, REST list/detail, dev seed, client ProductList/Detail + `useProducts`; `features.catalog` enabled in defaults.
 - `server/src/features/registry.ts` + `createApp()` — registry gate (b); stub pack entrypoints; `npm run test:registry` smoke (all features off → 404).
 - `scopedForTenant(Model, tenantId)` for non-request queries.
 - `server/src/features/_pack-pattern.md` — feature pack source of truth (registry gate, exports, tenant rules).

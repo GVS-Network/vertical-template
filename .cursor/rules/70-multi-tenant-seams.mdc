@@ -45,7 +45,7 @@ await Menu.find({ published: true });
 
 **Exceptions (document, do not use `scoped`):** `Tenant` registry (phase 7), and any system-wide idempotency model once its scope is locked in phase 3. See `docs/phase-1-prompt-1.7-tenant-audit.md`.
 
-**Open for phase 2:** seeds/webhooks without an Express `req` need an explicit pattern (`scopedForTenant`, mock req, or documented system query). See `docs/phase-2-open-questions.md`.
+**Non-request queries:** use `scopedForTenant(Model, tenantId)` from `@/db/scoped` (same merge as `scoped`, explicit tenant id). See `docs/phase-2-prompt-2.1-resolutions.md`.
 
 There is no shortcut. The day the seam is flipped to per-request resolution, every query that wasn't tenant-filtered becomes a cross-tenant data leak.
 

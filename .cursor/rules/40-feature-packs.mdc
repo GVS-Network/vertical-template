@@ -40,26 +40,22 @@ features/catalog/
   hooks/             — feature-scoped hooks
 ```
 
-## The toggle
-The main server bootstrap conditionally mounts:
+## The toggle (registry gate — option b)
+**`server/src/features/registry.ts` is the only mount gate.** At boot it reads `SiteConfig.features` (same source as `getSiteConfig` today). Enabled packs: dynamic `import()` + `register(app, config)`. Disabled packs: log `[feature:off] <pack>` once; no import, no `register`, no `app.use`.
 
 ```ts
-const config = loadSiteConfig();
-if (config.features.catalog.enabled) {
-  const { router } = await import('@/features/catalog');
-  app.use('/api/catalog', router);
+// registry.ts — illustrative
+if (config.features.catalog) {
+  const { register } = await import('@/features/catalog');
+  register(app, config);
 }
 ```
 
-The main client App.tsx conditionally renders:
+Do **not** mount all packs and skip `null` routers. Pack `createRouter` assumes the feature is already on.
 
-```tsx
-{config.features.catalog.enabled && (
-  <Route path="/menu" element={<MenuPage />} />
-)}
-```
+Client: one registry (or `App.tsx` table) conditionally lazy-imports pack routes only when the flag is `true`.
 
-**A disabled pack must not contribute any code path.** Not a 404, not an empty router, not a stub. The condition is evaluated once at boot. If the answer is `false`, the import doesn't happen, the route doesn't mount, and the bundle should tree-shake the client code.
+**A disabled pack must not contribute any code path.** Not a 404 handler inside the pack, not an empty router, not a stub. Flags are booleans: `features.catalog`, not `.enabled`.
 
 ## Cross-pack rules
 

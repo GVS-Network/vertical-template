@@ -1,9 +1,14 @@
 import type { Express } from 'express';
 import type { SiteConfig } from '../../types/site-config';
+import { createCatalogRouter } from './router';
+import { seedCatalogProducts } from './seed';
 
 export const packKey = 'catalog' as const;
 
-/** Stub until Prompt 2.4 — registry only calls this when features.catalog is true. */
-export function register(_app: Express, _siteConfig: SiteConfig): void {
-  // router mount lands in 2.4
+export async function register(
+  app: Express,
+  siteConfig: SiteConfig
+): Promise<void> {
+  await seedCatalogProducts(siteConfig.tenantId);
+  app.use('/api/catalog', createCatalogRouter());
 }

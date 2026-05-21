@@ -4,6 +4,8 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Loading from './components/Loading';
 import { useApiAuth } from './hooks/useApiAuth';
+import { defaultSiteConfig } from './types/site-config.defaults';
+import { CatalogRoutes } from './features/catalog';
 
 function App() {
   const { isLoading } = useAuth0();
@@ -18,6 +20,7 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        {defaultSiteConfig.features.catalog && <CatalogRoutes />}
       </Routes>
     </Layout>
   );

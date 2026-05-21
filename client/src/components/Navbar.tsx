@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
+import { defaultSiteConfig } from '../types/site-config.defaults';
 
 function Navbar() {
   const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
@@ -27,6 +28,18 @@ function Navbar() {
             >
               Home
             </Link>
+            {defaultSiteConfig.features.catalog && (
+              <Link
+                to="/catalog"
+                className={`text-sm font-medium transition-colors ${
+                  location.pathname.startsWith('/catalog')
+                    ? 'text-primary-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Catalog
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">

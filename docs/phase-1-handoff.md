@@ -26,4 +26,4 @@
 
 ## Phase 2 entry
 
-Read `docs/prompts/phase-2-feature-packs.html`. Open questions: `docs/phase-2-open-questions.md`.
+Read `docs/prompts/phase-2-feature-packs.html`. Phase 2.1 closed: `docs/phase-2-prompt-2.1-resolutions.md`.
