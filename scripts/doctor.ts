@@ -8,6 +8,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { runContractCheck } from './contract-check';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -116,6 +117,7 @@ async function main(): Promise<void> {
     ...checkNodeVersion(),
     ...checkEnvFiles(),
     ...(await checkMongo()),
+    ...(await runContractCheck()),
   ];
 
   if (errors.length === 0) {

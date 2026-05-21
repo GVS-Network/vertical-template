@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- `scripts/contract-check.ts` — twin type-file parity + `defaultSiteConfig` required-field validation; wired to `doctor`, `prebuild`, and `contract:check`.
+
 ### Docs
 
 - Phase 1.1: open questions from Phase 0 resolved (`docs/phase-1-prompt-1.1-resolutions.md`).
