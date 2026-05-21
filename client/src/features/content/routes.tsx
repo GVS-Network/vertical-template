@@ -13,6 +13,7 @@ export function contentRouteElements(): ReactNode {
       <Route path="/portfolio" element={<PageRenderer slug="portfolio" />} />
       <Route path="/events" element={<PageRenderer slug="events" />} />
       <Route path="/locations" element={<PageRenderer slug="locations" />} />
+      <Route path="/csa" element={<PageRenderer slug="csa" />} />
       <Route path="/blog" element={<PostList />} />
       <Route path="/blog/:slug" element={<PostDetail />} />
     </>

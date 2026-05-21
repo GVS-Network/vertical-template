@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "slug": "home",
+    "title": "Black Oak Farm",
+    "status": "published",
+    "hero": {
+      "headline": "Black Oak Farm",
+      "subheadline": "Vegetables, eggs, and pasture meats from Hartland"
+    },
+    "body": "# Welcome\n\nBlack Oak Farm grows on forty-two acres in the Connecticut River valley. We sell through a **CSA**, a Saturday farmers market stand, and a small **shop** catalog with live inventory — what you see in stock is what we can pack today.\n\n## Shop with us\n\n- Browse the **catalog** and check out online (Square) for pickup or local delivery\n- Members sign in for CSA pickup schedules and account history\n- Restaurants and stores: use the **wholesale** inquiry form\n\nInventory counts sync to Square when we adjust stock in the barn office."
+  },
+  {
+    "slug": "about",
+    "title": "Our farm",
+    "status": "published",
+    "body": "# About Black Oak Farm\n\nJon and Priya Nair bought this hillside in 2012 and spent three years building soil before the first CSA season. We run a mixed vegetable operation, a forty-bird laying flock, and a small beef herd on rotationally grazed pasture.\n\n## Practices\n\n- No synthetic nitrogen on vegetable ground — compost and cover crops instead\n- Chickens moved behind cattle to break up parasite cycles\n- Pick-your-own flowers on CSA pickup days in July and August\n\nWe are not certified organic but welcome visits during Saturday market hours. Wholesale buyers can request our crop plan and availability sheet after submitting an inquiry."
+  },
+  {
+    "slug": "csa",
+    "title": "CSA shares",
+    "status": "published",
+    "hero": {
+      "headline": "CSA shares",
+      "subheadline": "Twenty-two weeks of vegetables, plus member perks"
+    },
+    "body": "# CSA shares\n\nOur **summer CSA** runs June through October with weekly pickup at the farm barn or the Hartland farmers market table.\n\n## 2026 options\n\n- **Full share** — feeds 3–4 omnivores; includes weekly flowers in peak season\n- **Half share** — feeds 1–2; same crops, half the volume\n- **Egg add-on** — one dozen pasture eggs every other week\n\nFull shares are listed in the **catalog** when seats remain. Payment is collected at signup through Square; members use **auth** to view pickup calendars (coming in a later phase — login is enabled on this preset for pack coverage).\n\nNot ready to commit? Shop the market stand items in the catalog or ask about **wholesale** for your restaurant."
+  }
+]

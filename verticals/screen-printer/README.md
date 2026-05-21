@@ -28,6 +28,8 @@ BOUND_TENANT_ID=demo-screen-printer
 PAYMENT_PROVIDER=stripe
 ```
 
+Verify seeded data: `npm run test:screen-printer-preset`.
+
 Restart `npm run dev`, then walk:
 
 | Pack | URL | Expect |

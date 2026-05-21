@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "slug": "wholesale-inquiry",
+    "title": "Wholesale inquiry",
+    "submitButtonLabel": "Send wholesale inquiry",
+    "fields": [
+      { "name": "business_name", "type": "text", "required": true },
+      { "name": "contact_name", "type": "text", "required": true },
+      { "name": "email", "type": "email", "required": true },
+      { "name": "phone", "type": "text", "required": true },
+      { "name": "business_type", "type": "select", "required": true, "options": ["Restaurant", "Grocery / market", "Institution", "Other food business"] },
+      { "name": "delivery_or_pickup", "type": "select", "required": true, "options": ["Farm pickup", "We deliver (local)", "Either"] },
+      { "name": "products_interested", "type": "textarea", "required": true },
+      { "name": "estimated_weekly_volume", "type": "text", "required": false },
+      { "name": "notes", "type": "textarea", "required": false }
+    ]
+  }
+]

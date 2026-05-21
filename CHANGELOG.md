@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Phase 4.5: `farm-source` preset (8 inventory items, 3 pages, wholesale form, auth on); content route `/csa` — completes four-preset roster.
 - Phase 4.5: `food-truck` preset (8 menu items, 3 pages, catering form); content route `/locations`.
 - Phase 4.5: `bar-restaurant` preset (8 menu items, 3 pages, private-event form); content route `/events`; shared `verify-vertical-preset.ts`.
 - Phase 4.4: `screen-printer` preset (8 products, 3 pages, project-quote form); `BOUND_TENANT_ID` seam; content routes `/home`, `/portfolio`.

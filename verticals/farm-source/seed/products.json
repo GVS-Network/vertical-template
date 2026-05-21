@@ -1,1 +1,106 @@
-[]
+[
+  {
+    "name": "Summer CSA — Full Share",
+    "slug": "summer-csa-full-share",
+    "sku": "CSA-FULL-01",
+    "price": 62500,
+    "stock": 12,
+    "status": "active",
+    "attributes": {
+      "season": "summer",
+      "csaShare": true,
+      "originLot": "CSA-2026-FULL"
+    }
+  },
+  {
+    "name": "Pasture-Raised Eggs (Dozen)",
+    "slug": "pasture-eggs-dozen",
+    "sku": "EGG-DZN-02",
+    "price": 700,
+    "stock": 48,
+    "status": "active",
+    "attributes": {
+      "season": "year-round",
+      "csaShare": false,
+      "originLot": "BARN-A-0426"
+    }
+  },
+  {
+    "name": "Mixed Salad Greens (5oz)",
+    "slug": "mixed-salad-greens",
+    "sku": "GRN-MIX-03",
+    "price": 550,
+    "stock": 30,
+    "status": "active",
+    "attributes": {
+      "season": "spring",
+      "csaShare": false,
+      "originLot": "GH-3-0426"
+    }
+  },
+  {
+    "name": "Raw Wildflower Honey (12oz)",
+    "slug": "wildflower-honey-12oz",
+    "sku": "HON-12-04",
+    "price": 1400,
+    "stock": 24,
+    "status": "active",
+    "attributes": {
+      "season": "summer",
+      "csaShare": false,
+      "originLot": "HIVE-02-2025"
+    }
+  },
+  {
+    "name": "Grass-Fed Ground Beef (1 lb)",
+    "slug": "grass-fed-ground-beef",
+    "sku": "BEEF-GRD-05",
+    "price": 950,
+    "stock": 18,
+    "status": "active",
+    "attributes": {
+      "season": "year-round",
+      "csaShare": false,
+      "originLot": "FREEZER-B-118"
+    }
+  },
+  {
+    "name": "Whole Chicken (Frozen, ~4 lb)",
+    "slug": "whole-chicken-frozen",
+    "sku": "CHK-WHL-06",
+    "price": 2200,
+    "stock": 10,
+    "status": "active",
+    "attributes": {
+      "season": "year-round",
+      "csaShare": false,
+      "originLot": "FREEZER-P-044"
+    }
+  },
+  {
+    "name": "Saturday Market Flower Bouquet",
+    "slug": "market-flower-bouquet",
+    "sku": "FLR-BQT-07",
+    "price": 1800,
+    "stock": 15,
+    "status": "active",
+    "attributes": {
+      "season": "summer",
+      "csaShare": false,
+      "originLot": "FIELD-F-0426"
+    }
+  },
+  {
+    "name": "Maple Syrup (Pint, Grade A)",
+    "slug": "maple-syrup-pint",
+    "sku": "MAP-PNT-08",
+    "price": 1600,
+    "stock": 36,
+    "status": "active",
+    "attributes": {
+      "season": "winter",
+      "csaShare": false,
+      "originLot": "SUGAR-2026-B"
+    }
+  }
+]

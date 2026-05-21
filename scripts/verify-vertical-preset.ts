@@ -51,6 +51,14 @@ const EXPECTATIONS: Record<string, PresetExpectation> = {
     pageSlugs: ['home', 'about', 'locations'],
     formSlug: 'catering',
   },
+  'farm-source': {
+    tenantId: 'demo-farm-source',
+    brandingName: 'Black Oak Farm',
+    provider: 'square',
+    productCount: 8,
+    pageSlugs: ['home', 'about', 'csa'],
+    formSlug: 'wholesale-inquiry',
+  },
 };
 
 async function httpGet(
@@ -160,6 +168,13 @@ async function main(): Promise<void> {
   }
   if (config.payment.provider !== expected.provider) {
     throw new Error(`expected provider ${expected.provider}`);
+  }
+
+  if (presetKey === 'farm-source' && !config.features.auth) {
+    throw new Error('farm-source must have auth feature on');
+  }
+  if (presetKey === 'bar-restaurant' && config.features.auth) {
+    throw new Error('bar-restaurant must have auth feature off');
   }
 
   await disconnectDatabase();
