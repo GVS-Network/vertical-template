@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Docs
 
 - Phase 0.3: verified cursor rules at `/.cursorrules` and `/.cursor/rules/*.mdc` (see `docs/phase-0-cursor-rules-verification.md`). Locked Phase 0 decisions: Tailwind strip Phase 5; `.nvmrc` in 0.5; demo items through 0.7 only.
+- Phase 0.4: verified `docs/` doc family and §02 links; added `doc-system.css` link to three briefs (see `docs/phase-0-docs-verification.md`).
 
 ## [0.1.0] — 2026-05-21
 
