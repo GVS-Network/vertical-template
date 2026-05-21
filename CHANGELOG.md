@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - `scripts/doctor.ts` and `npm run doctor` — Node, env key parity, Mongo connectivity (3s timeout).
+- Phase 0.7 dev-loop verification (`docs/phase-0-dev-loop-verification.md`) — install, doctor, dev, client 5173, health `/api/health` confirmed.
 
 ## [0.1.0] — 2026-05-21
 
