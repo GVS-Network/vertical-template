@@ -185,7 +185,15 @@
 │       ├── 80-versioning-and-docs.mdc         <span class="dim">alwaysApply: true</span>
 │       └── 99-claude-collaboration.mdc        <span class="dim">alwaysApply: true</span>
 │
+├── <span class="accent">scripts/</span>
+│   └── doctor.ts                              <span class="dim">npm run doctor — env + Mongo check</span>
+│
 └── CHANGELOG.md                               <span class="dim">← template versioning, see rules/80</span></div>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Before <code>npm run dev</code>, run <code>npm run doctor</code></strong> from the repo root. It verifies Node &gt;= 20, that every key in each <code>.env.example</code> exists in the matching <code>.env</code> (root, server, client), and that <code>MONGODB_URI</code> connects within 3 seconds. It does not validate Auth0 or payment credentials — only presence and Mongo reachability.</p>
+    </div>
   </section>
 
   <!-- ===================== -->

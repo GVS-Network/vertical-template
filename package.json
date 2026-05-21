@@ -14,11 +14,16 @@
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
     "lint": "cd client && npm run lint && cd ../server && npm run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "clean": "rm -rf client/dist server/dist client/node_modules server/node_modules node_modules"
+    "clean": "rm -rf client/dist server/dist client/node_modules server/node_modules node_modules",
+    "doctor": "tsx scripts/doctor.ts"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "prettier": "^3.2.5"
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.3.1",
+    "prettier": "^3.2.5",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": ">=20.0.0"
