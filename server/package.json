@@ -1,6 +1,6 @@
 {
   "name": "vertical-template-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Express API server with TypeScript and MongoDB",
   "main": "dist/index.js",
   "scripts": {

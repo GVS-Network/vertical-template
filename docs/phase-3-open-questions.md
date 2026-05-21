@@ -1,7 +1,8 @@
 # Open questions for Phase 3 (from Phase 2 close)
 
-**Status:** Closed in Prompt 3.1 (2026-05-21).  
-**Authoritative answers:** [`server/src/features/payments/README.md`](../server/src/features/payments/README.md)
+**Status:** Phase 3 closed @ `v0.4.0` (2026-05-21).  
+**Authoritative answers:** [`server/src/features/payments/README.md`](../server/src/features/payments/README.md)  
+**Phase 4 entry:** [`docs/phase-4-open-questions.md`](phase-4-open-questions.md)
 
 ---
 
@@ -27,8 +28,6 @@ Do not re-litigate in provider PRs unless new facts contradict the pack README.
 
 ---
 
-## Phase 4 preview (not resolved here)
+## Phase 4 preview
 
-- Which vertical defaults to which provider for go-to-market order (brief §04 already lists defaults).
-- Read-sync from Square POS into catalog stock.
-- Dual-provider per site (thesis-level).
+Moved to **`docs/phase-4-open-questions.md`** (P4-1 go-to-market / provider defaults is the lead question).

@@ -6,21 +6,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-05-21
+
+Phase 3 (Payments) closed. Stripe and Square adapters behind `getPaymentProvider`, checkout Sessions / Square Payment Links, signature-verified webhooks with `WebhookEventLog` idempotency, Square inventory push, doctor provider checks.
+
+### Phase 3 — closed (prompt log)
+
+| Prompt | Outcome |
+|--------|---------|
+| **3.1** | Open questions in `server/src/features/payments/README.md` — one provider per site, Square inventory push |
+| **3.2** | `PaymentProvider` + `WebhookEvent` contract (`server/src/types/payment-provider.ts`) |
+| **3.3** | `server/src/providers/stripe.ts` — Checkout Sessions, webhooks, `test:stripe-happy-path` |
+| **3.4** | `server/src/providers/square.ts` — Orders + Payment Links, HMAC webhooks, `syncInventory`, Square smokes |
+| **3.5** | `WebhookEventLog` model + idempotent webhook pipeline, `test:webhook-idempotency` |
+| **3.6** | `scripts/doctor.ts` — provider env + live API credential checks |
+| **3.7** | Docs + tag `v0.4.0`; `docs/phase-4-open-questions.md` |
+
 ### Added
 
-- Phase 3.6: `npm run doctor` validates payment provider env + live Stripe/Square API credentials when `features.payments` is on; WARN when `provider: none`.
-- Phase 3.5: `WebhookEventLog` model (`tenantId`, `provider`, `eventId`, `eventType`, `processedAt`, optional `payloadHash`); unique index on `(tenantId, provider, eventId)`; webhook handler idempotency + signature verification; `npm run test:webhook-idempotency`.
-- Phase 3.4: Square provider (`server/src/providers/square.ts`) — Orders + Payment Links checkout, HMAC webhook verify/parse, `syncInventory` push to Square Catalog Inventory; `square` dependency; `npm run test:square-happy-path` and `test:square-sync-inventory`.
-- Phase 3.3: Stripe provider (`server/src/providers/stripe.ts`), checkout Sessions, webhook verify/parse, `npm run test:stripe-happy-path`; `stripe` dependency.
+- **Stripe provider** — `createCheckout` (Checkout Sessions), `verifyWebhook` / `parseWebhookEvent`, `syncInventory` → `NotSupported`.
+- **Square provider** — `createCheckout` (Order + Payment Link), HMAC webhooks, `syncInventory` push to Catalog Inventory API.
+- **`WebhookEventLog`** Mongoose model — `tenantId`, `provider`, `eventId`, `eventType`, `processedAt`, optional `payloadHash`; compound **unique** index on `(tenantId, provider, eventId)`.
+- **Webhook pipeline** — `POST /api/payments/webhook/:provider`: verify signature → dedupe by `eventId` → apply `order.paid` / `order.failed` / `order.refunded`.
+- **Dependencies (server):** `stripe` ^17.7.0 (resolved **17.7.0**), `square` ^43.2.1 (resolved **43.2.1**).
+- **Smokes:** `test:stripe-happy-path`, `test:square-happy-path`, `test:square-sync-inventory`, `test:webhook-idempotency`.
+- **Doctor:** payment provider env validation + Stripe balance / Square locations API ping when `features.payments` is on.
 
 ### Changed
 
-- Phase 3.3: `POST /api/payments/checkout/intent` returns `{ url, orderId, providerRef }`; webhook route applies `order.paid` → `markOrderPaid`; raw body on `/api/payments/webhook/*`.
-- Phase 3.2: `PaymentProvider` + `WebhookEvent` contract (`server/src/types/payment-provider.ts`).
+- `getPaymentProvider(siteConfig)` returns Stripe or Square adapter (no longer throws for configured providers).
+- `POST /api/payments/checkout/intent` → `{ url, orderId, providerRef }`; attaches `paymentRef` on order.
+- Raw body parser on `/api/payments/webhook/*` for signature verification.
+- `PAYMENT_PROVIDER` in `server/.env` overrides `defaultSiteConfig.payment.provider` for local dev.
+- Root, client, server `package.json` → **0.4.0**.
+
+### Schema / migration — `WebhookEventLog`
+
+- **Additive only.** New MongoDB collection `webhookeventlogs` (Mongoose default pluralization); no changes to `Order` or existing collections.
+- **No data migration** required for upgrades from v0.3.0 — collection and unique index are created on first deploy / first `WebhookEventLog` insert.
+- **Operational note:** Point webhooks at the new handler **before** relying on idempotency in production; events delivered only to the pre-3.5 stub could have updated orders without a log row (acceptable for dev; re-send or reconcile in prod if cutover mid-flight).
+- **Race-safe dedupe:** duplicate concurrent deliveries may hit unique-index `11000`; handler treats that as idempotent **200**.
 
 ### Docs
 
-- Phase 3.1: resolved open questions in `server/src/features/payments/README.md` (one provider per site, Square inventory push, adapter paths, webhooks).
+- `docs/phase-3-handoff.md`, `docs/phase-3-close-verification.md`
+- `docs/phase-4-open-questions.md` — vertical presets, provider defaults, go-to-market order
+- `docs/contexts/repo-context.html` §05, `glossary.html`, `stack-context.html`, `session-starter.html`
+- Build docs family **v0.4.0** in `docs/README.html`
 
 ## [0.3.0] — 2026-05-21
 
@@ -78,80 +110,3 @@ Phase 2 (Feature packs) closed. Five toggle-mounted packs on server and client, 
 - `docs/phase-2-handoff.md`, `docs/phase-3-open-questions.md`, `docs/phase-2-pack-compliance-audit.md`.
 - `docs/contexts/repo-context.html` §05 — `features/*` file map; `glossary.html` — concrete feature-pack shape.
 - `docs/contexts/stack-context.html`, `session-starter.html` — Phase 2 complete @ v0.3.0.
-- Build docs family → **v0.3.0** (`docs/README.html`).
-
-## [0.2.0] — 2026-05-21
-
-Phase 1 (SiteConfig & seams) closed. One TypeScript shape, two seams, defaulted tenant infrastructure. No feature packs yet.
-
-### Phase 1 — closed (prompt log)
-
-| Prompt | Outcome |
-|--------|---------|
-| **1.1** | Open questions resolved (`docs/phase-1-prompt-1.1-resolutions.md`) |
-| **1.2** | `SiteConfig` / `ThemeTokens` types; demo User/Item/routes removed |
-| **1.3** | `defaultSiteConfig` (client + server) |
-| **1.4** | `contract:check` script |
-| **1.5** | `getSiteConfig(req)`, `attachSiteConfig`, health reads `site` |
-| **1.6** | `getPaymentProvider` stub + `PaymentProvider` interface |
-| **1.7** | `scoped()`, `tenantIdSchemaDefinition`; audit doc (zero live schemas) |
-| **1.8** | Docs + tag `v0.2.0` |
-
-### Added
-
-- Twin `SiteConfig` types + `defaultSiteConfig`; `scripts/contract-check.ts` on doctor/prebuild.
-- `server/src/seams/get-site-config.ts`, `get-payment-provider.ts`; `middleware/site-config.ts`.
-- `server/src/db/scoped.ts`, `tenant-schema.ts` — tenant query discipline for phase 2 models.
-- `PaymentProvider` type-only interface; throwing `getPaymentProvider(siteConfig)` until phase 3.
-
-### Changed
-
-- Root, client, server `package.json` → `0.2.0`.
-- Demo CRUD and dashboard removed; minimal shell + `/api/health` only.
-
-### Docs
-
-- Glossary, repo-context §05 file map, stack-context status, session-starter standing rules; `70-multi-tenant-seams.mdc` aligned with `scoped()` + payment seam paths.
-- `docs/phase-1-handoff.md`, `docs/phase-2-open-questions.md`.
-
-## [0.1.0] — 2026-05-21
-
-Phase 0 (Bootstrap) closed. Template is a owned fork of baseapp with docs, cursor rules, doctor script, and a verified dev loop. No SiteConfig, feature packs, or Type A/B/C taxonomy work yet.
-
-### Phase 0 — closed (prompt log)
-
-| Prompt | Outcome |
-|--------|---------|
-| **0.1** Inventory | `docs/inventory.md` — stack audit vs `stack-context.html` |
-| **0.2** Stack-context | `stack-context.html` v0.1.1; env names, installed vs planned deps, phase-0 removal callouts |
-| **0.3** Cursor rules | Verified `/.cursorrules` + 10 `.mdc` files; decisions locked (Tailwind→P5, `.nvmrc`→0.5, demo items→drop at P1) |
-| **0.4** Build docs | `docs/` family verified; §02 links OK; `doc-system.css` on briefs |
-| **0.5** Version cut | `vertical-template` @ 0.1.0, `.nvmrc`, removed `express-jwt` |
-| **0.6** Doctor | `scripts/doctor.ts`, `npm run doctor` |
-| **0.7** Dev loop | install:all, doctor, dev (5173/3001), `/api/health` green |
-| **0.8** Close | This entry; tag `v0.1.0` |
-
-### Added
-
-- Forked [baseapp](https://github.com/misterlinderman/baseapp) into [GVS-Network/vertical-template](https://github.com/GVS-Network/vertical-template).
-- Installed `docs/` family (README, three briefs, contexts, rules, phase prompts, `assets/doc-system.css`).
-- Installed cursor rules (`.cursorrules` and `.cursor/rules/*.mdc`).
-- `docs/inventory.md`, phase-0 verification notes (`phase-0-*-verification.md`).
-- `scripts/doctor.ts` and `npm run doctor` — Node, env key parity, Mongo connectivity (3s timeout).
-- `.nvmrc` — Node 20.
-
-### Changed
-
-- `docs/contexts/stack-context.html` reconciled against fork (v0.1.1); Phase 0 decisions in §07.
-- Root, client, and server `package.json` identity → `vertical-template` @ `0.1.0`.
-- Node engine requirement → `>=20.0.0`.
-- Archived upstream baseapp markdown under `docs/baseapp-upstream/`.
-- `docs/README.html` §03 — doctor callout.
-
-### Removed
-
-- Unused `express-jwt` server dependency (auth uses `express-oauth2-jwt-bearer` only).
-
-### Docs
-
-- Docs set version: **v0.1.0** (see `docs/README.html` header).

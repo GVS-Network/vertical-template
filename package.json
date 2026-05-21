@@ -1,6 +1,6 @@
 {
   "name": "vertical-template",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "MERN vertical SaaS template — multi-tenant-ready starter for small businesses",
   "private": true,
   "scripts": {
@@ -20,7 +20,10 @@
     "doctor": "tsx scripts/doctor.ts",
     "test:registry": "npm run test:registry --prefix server",
     "test:pack-compliance": "npm run test:pack-compliance --prefix server",
-    "test:stripe-happy-path": "npm run test:stripe-happy-path --prefix server"
+    "test:stripe-happy-path": "npm run test:stripe-happy-path --prefix server",
+    "test:square-happy-path": "npm run test:square-happy-path --prefix server",
+    "test:square-sync-inventory": "npm run test:square-sync-inventory --prefix server",
+    "test:webhook-idempotency": "npm run test:webhook-idempotency --prefix server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

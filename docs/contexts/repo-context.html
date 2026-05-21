@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Repository Context · v0.3.0</span>
+      <span>Repository Context · v0.4.0</span>
     </div>
     <h1 class="doc-title">The <em>codebase family</em>.</h1>
     <p class="doc-subtitle">Three repositories, one lineage. What lives where, what each is for, and which conventions cross repo boundaries unchanged.</p>
@@ -200,7 +200,7 @@
     <span class="section-num">05 — Reference: file map</span>
     <h2>What lives where in the template</h2>
 
-<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.3.0 — phase 2 closed</span>
+<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.4.0 — phase 3 closed</span>
 ├── client/
 │   ├── src/
 │   │   ├── types/
@@ -221,7 +221,7 @@
 │   ├── src/
 │   │   ├── seams/
 │   │   │   ├── get-site-config.ts
-│   │   │   └── get-payment-provider.ts  <span class="dim">throws until phase 3</span>
+│   │   │   └── get-payment-provider.ts  <span class="dim">stripe | square factory</span>
 │   │   ├── shared/
 │   │   │   ├── write-guards.ts          <span class="dim">catalog/content write JWT</span>
 │   │   │   └── dev-seeds.ts             <span class="dim">SKIP_PACK_SEEDS for smokes</span>
@@ -233,7 +233,8 @@
 │   │   │   └── auth.ts                  <span class="dim">re-export → features/auth</span>
 │   │   ├── types/                       <span class="dim">site-config, payment-provider, theme-tokens</span>
 │   │   ├── routes/health.ts
-│   │   ├── providers/                   <span class="dim">phase 3 — stripe.ts, square.ts</span>
+│   │   ├── providers/                   <span class="dim">stripe.ts, square.ts (SDKs only here)</span>
+│   │   ├── scripts/                     <span class="dim">stripe/square happy-path smokes</span>
 │   │   ├── features/
 │   │   │   ├── _pack-pattern.md         <span class="dim">source of truth</span>
 │   │   │   ├── registry.ts              <span class="dim">boot-time toggle gate (b)</span>
@@ -242,7 +243,11 @@
 │   │   │   ├── catalog/                 <span class="dim">Product, /api/catalog</span>
 │   │   │   ├── content/                 <span class="dim">Page, Post, /api/content</span>
 │   │   │   ├── intake/                  <span class="dim">FormDefinition, Submission</span>
-│   │   │   ├── payments/                <span class="dim">Order; checkout 501; webhook stub</span>
+│   │   │   ├── payments/
+│   │   │   │   ├── providers/           <span class="dim">README → server/src/providers/</span>
+│   │   │   │   ├── schemas/             <span class="dim">order, webhook-event-log</span>
+│   │   │   │   ├── webhook-event-log.ts
+│   │   │   │   └── webhook-idempotency.smoke.ts
 │   │   │   └── auth/                    <span class="dim">requireAuth, /api/auth/me</span>
 │   │   ├── app.ts                       <span class="dim">createApp() for tests + index</span>
 │   │   └── index.ts
@@ -250,12 +255,12 @@
 │
 ├── scripts/
 │   ├── contract-check.ts
-│   └── doctor.ts
+│   └── doctor.ts                        <span class="dim">+ payment provider cred checks (3.6)</span>
 │
 ├── docs/
 ├── .cursor/rules/
 ├── CHANGELOG.md
-└── package.json                         <span class="dim">dev, doctor, test:registry, test:pack-compliance</span></div>
+└── package.json                         <span class="dim">dev, doctor, registry/pack/webhook smokes</span></div>
   </section>
 
   <!-- ===================== -->

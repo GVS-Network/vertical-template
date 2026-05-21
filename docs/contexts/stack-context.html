@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Stack Context · v0.3.0</span>
+      <span>Stack Context · v0.4.0</span>
     </div>
     <h1 class="doc-title">The <em>stack</em>, pinned.</h1>
     <p class="doc-subtitle">What's installed, what's chosen, what's expressly forbidden. Read before suggesting a library; read again before adding a dependency. Reconciled against <code>docs/inventory.md</code> (Phase 0, Prompt 0.2).</p>
@@ -67,7 +67,7 @@
       </div>
       <div class="decision-row">
         <div class="key">Payments</div>
-        <div class="val"><p><strong>Planned (Phase 3).</strong> Stripe (Payment Links) and Square behind <code>PaymentProvider</code> — not installed in the fork yet.</p></div>
+        <div class="val"><p><strong>Installed (Phase 3).</strong> <code>stripe</code> <strong>17.7.0</strong> (Checkout Sessions) and <code>square</code> <strong>43.2.1</strong> behind <code>PaymentProvider</code> — SDK imports only in <code>server/src/providers/</code>.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">Assets</div>
@@ -126,7 +126,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Installed (phase 3+).</strong> stripe ^17 · square ^43 (server). <strong>Approved when their phase lands:</strong> zod · cloudinary · vitest · express-async-errors.</p>
+      <p><strong>Installed (server, pinned in lockfile).</strong> <code>stripe</code> ^17.7.0 → <strong>17.7.0</strong> · <code>square</code> ^43.2.1 → <strong>43.2.1</strong>. <strong>Approved when their phase lands:</strong> zod · cloudinary · vitest · express-async-errors.</p>
     </div>
     <div class="callout discipline">
       <span class="icon">→</span>
@@ -224,7 +224,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Phase 2 complete (v0.3.0).</strong> Five feature packs under <code>features/</code>, registry toggle at boot, <code>scopedForTenant</code>, compliance smokes. Payment adapters still phase 3 — checkout returns 501 via <code>getPaymentProvider</code> stub.</p>
+      <p><strong>Phase 3 complete (v0.4.0).</strong> Stripe + Square adapters, idempotent webhooks (<code>WebhookEventLog</code>), doctor provider checks. Checkout + webhooks live when env is configured.</p>
     </div>
     <div class="callout risk">
       <span class="icon">!</span>

@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Glossary · v0.3.0</span>
+      <span>Glossary · v0.4.0</span>
     </div>
     <h1 class="doc-title">Words that mean <em>specific things</em> here.</h1>
     <p class="doc-subtitle">Project-internal vocabulary. When Claude (or anyone) uses these terms in a PR or a prompt, they carry the definitions below — not the generic ones.</p>
@@ -162,7 +162,15 @@
       </div>
       <div class="decision-row">
         <div class="key">PaymentProvider</div>
-        <div class="val"><p>Type-only interface in <code>server/src/types/payment-provider.ts</code> (phase 1). Factory seam: <code>getPaymentProvider(siteConfig)</code> in <code>server/src/seams/get-payment-provider.ts</code> — throws until phase 3. Adapters land under <code>server/src/providers/</code> later.</p></div>
+        <div class="val"><p>Interface in <code>server/src/types/payment-provider.ts</code>: <code>createCheckout</code>, <code>verifyWebhook</code>, <code>parseWebhookEvent</code>, optional <code>syncInventory</code>. Factory: <code>getPaymentProvider(siteConfig)</code>. Implementations: <code>server/src/providers/stripe.ts</code>, <code>square.ts</code> only.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">provider</div>
+        <div class="val"><p>In payments code, <strong>payment provider</strong> — the single active vendor for a site: <code>SiteConfig.payment.provider</code> is <code>'stripe'</code>, <code>'square'</code>, or <code>'none'</code>. Not the B2B-network sense of “provider” (concept-brief phase 3). Routes never branch on vendor; they call <code>getPaymentProvider()</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">WebhookEventLog</div>
+        <div class="val"><p>Mongoose model in <code>features/payments/schemas/webhook-event-log.ts</code>. Records processed webhook <code>eventId</code> per <code>(tenantId, provider)</code> with a unique compound index. Duplicate provider deliveries → HTTP 200, no second <code>markOrder*</code>. Also called <strong>webhook event log</strong> in prompts.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">isFieldActive(field, formState)</div>
@@ -207,8 +215,8 @@
     <h2>How this glossary updates</h2>
     <p>This is a working document. When a phase prompt introduces a new term that's specific to the project, that term lands here in the same PR. When a term changes meaning (or stops being used), it moves into §05 with a note explaining what replaced it.</p>
 
-    <h4>Open questions — Phase 3</h4>
-    <p>See <code>docs/phase-3-open-questions.md</code> (payments scaffold fill-in, provider adapters, webhook idempotency).</p>
+    <h4>Open questions — Phase 4</h4>
+    <p>See <code>docs/phase-4-open-questions.md</code> — lead: vertical preset → payment provider defaults and go-to-market order (P4-1).</p>
 
     <h4>Anticipated additions</h4>
     <div class="open-q">
