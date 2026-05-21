@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 4 — Verticals · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 4</span>
+      <span>Verticals · v0.4.0 → v0.5.0</span>
+    </div>
+    <h1 class="doc-title">Phase 4 — <em>Verticals</em>.</h1>
+    <p class="doc-subtitle">Four presets: <code>bar-restaurant</code>, <code>food-truck</code>, <code>farm-source</code>, <code>screen-printer</code>. Each is a directory of files — SiteConfig overrides, sample content, vertical-specific attribute extensions, payment-provider defaults — and an <code>init-vertical</code> script that stamps a fresh project from a chosen preset.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 3 closed, tagged <code>v0.4.0</code>. Both providers green, webhooks idempotent.</li>
+      <li>You have at least <strong>one real-world reference</strong> per vertical — an existing site or operator you can point at and say "this is what this preset should look like when it lands". For most of us, that's askanddeliverwebapp's existing clients.</li>
+      <li>You've re-read the concept brief's go-to-market section. The order of verticals is itself a thesis.</li>
+    </ul>
+
+    <div class="callout opportunity">
+      <span class="icon"></span>
+      <p><strong>Presets are the product.</strong> The template is plumbing; the verticals are what you sell. The single most consequential decision in this phase is what each preset's <em>opinionated defaults</em> are. Spend the time.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — What this phase produces</span>
+    <h2>Deliverables</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>verticals/ folder</strong><span class="why">presets live here</span></div>
+        <div class="val"><p>One subfolder per vertical: <code>verticals/bar-restaurant/</code>, <code>food-truck/</code>, <code>farm-source/</code>, <code>screen-printer/</code>. Each ships <code>site-config.preset.ts</code>, <code>seed/</code> (sample content, products), and <code>README.md</code>.</p></div>
+        </div>
+      <div class="decision-row">
+        <div class="key"><strong>Per-vertical attribute extensions</strong><span class="why">leveraged Product.attributes</span></div>
+        <div class="val"><p>Each preset declares its <code>productAttributesSchema</code> (e.g. bar-restaurant adds <code>{ allergens, spiceLevel }</code>; screen-printer adds <code>{ printSides, garmentBlank }</code>). The Product schema's existing <code>Mixed</code> attributes field accepts these; no schema change.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>init-vertical script</strong><span class="why">stamps a tenant</span></div>
+        <div class="val"><p><code>npm run init:vertical -- --preset=food-truck --tenant=greenline</code>. Reads preset, applies SiteConfig, seeds DB for that tenantId, sets payment-provider default. Idempotent.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Payment-provider defaults per vertical</strong><span class="why">opinionated</span></div>
+        <div class="val"><p>bar-restaurant → Square (POS). food-truck → Square. farm-source → Stripe (online-first). screen-printer → Stripe. Documented as a default, not a hard rule.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Sample content per vertical</strong><span class="why">credibility on day one</span></div>
+        <div class="val"><p>Each preset's <code>seed/</code> has 5-10 real-feeling Products, 2-3 Pages (Home, About, Menu/Catalog), 1 sample FormDefinition. No lorem ipsum.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>doctor.ts grows again</strong><span class="why">tenant awareness</span></div>
+        <div class="val"><p>If a non-default tenantId is bound (via env <code>BOUND_TENANT_ID</code>), doctor confirms that tenant exists in DB and its preset is known.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — The four verticals at a glance</span>
+    <h2>What each preset opinions look like</h2>
+
+    <div class="vertical-grid">
+      <div class="vertical-card">
+        <span class="label">Vertical 01</span>
+        <h5>bar-restaurant</h5>
+        <p class="spec"><span class="k">payments:</span> Square (POS reality)</p>
+        <p class="spec"><span class="k">packs on:</span> catalog, content, intake, payments</p>
+        <p class="spec"><span class="k">attrs:</span> allergens, spiceLevel, dietaryTags</p>
+        <p class="spec"><span class="k">content:</span> menu page, hours, reservations form</p>
+      </div>
+      <div class="vertical-card">
+        <span class="label">Vertical 02</span>
+        <h5>food-truck</h5>
+        <p class="spec"><span class="k">payments:</span> Square</p>
+        <p class="spec"><span class="k">packs on:</span> catalog, content, intake, payments</p>
+        <p class="spec"><span class="k">attrs:</span> dailyAvailable, locationToday</p>
+        <p class="spec"><span class="k">content:</span> location-of-the-day, menu, booking</p>
+      </div>
+      <div class="vertical-card">
+        <span class="label">Vertical 03</span>
+        <h5>farm-source</h5>
+        <p class="spec"><span class="k">payments:</span> Stripe (online subs)</p>
+        <p class="spec"><span class="k">packs on:</span> all five</p>
+        <p class="spec"><span class="k">attrs:</span> season, csaShare, originLot</p>
+        <p class="spec"><span class="k">content:</span> CSA signup, weekly post, farmer bios</p>
+      </div>
+      <div class="vertical-card">
+        <span class="label">Vertical 04</span>
+        <h5>screen-printer</h5>
+        <p class="spec"><span class="k">payments:</span> Stripe (deposits)</p>
+        <p class="spec"><span class="k">packs on:</span> catalog, content, intake, payments, auth</p>
+        <p class="spec"><span class="k">attrs:</span> printSides, garmentBlank, minQty</p>
+        <p class="spec"><span class="k">content:</span> quote-request form, portfolio gallery</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-4 prompt sequence</h2>
+
+    <h3>Prompt 4.1 — Carry forward + decide vertical order</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 4.1</span>
+Resolve OPEN_QUESTIONS from Phase 3. Then make one new decision and document it:
+
+In what order are we BUILDING the four presets in this phase? We are not building them all at the same time. The first one will reveal flaws in the preset pattern; the fourth will be the cleanest. Pick the order BASED ON:
+
+  (a) which vertical do we have the most operator knowledge of right now (i.e. an active client engagement);
+  (b) which vertical's preset will most stress-test the pattern (probably farm-source — all five packs).
+
+Document the chosen order in verticals/README.md. Each subsequent prompt assumes that order.</div>
+
+    <h3>Prompt 4.2 — Establish the preset pattern</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 4.2</span>
+Create verticals/_preset-pattern.md and verticals/README.md.
+
+Pattern: every vertical/&lt;name&gt;/ ships:
+  1. <span class="hl">site-config.preset.ts</span>: exports `preset: Partial&lt;SiteConfig&gt;` merged onto defaultSiteConfig.
+  2. <span class="hl">product-attributes.schema.ts</span>: Zod schema for that vertical's Product.attributes shape.
+  3. <span class="hl">seed/</span>: products.json, pages.json, forms.json (plain data, no code).
+  4. <span class="hl">README.md</span>: who this preset is for, what it assumes, what a fresh project gets.
+  5. <span class="hl">brand-stub.ts</span>: empty ThemeTokens override for now (phase 5 fills it).
+
+Verticals/registry.ts exports all four presets keyed by SiteConfig['vertical'].
+
+Commit: <span class="hl">"phase-4: preset pattern + registry"</span>.</div>
+
+    <h3>Prompt 4.3 — Build init-vertical script</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 4.3</span>
+Create scripts/init-vertical.ts.
+
+Signature: <span class="hl">npm run init:vertical -- --preset=&lt;key&gt; --tenant=&lt;id&gt; [--force]</span>.
+
+Steps:
+  1. Validate preset key against verticals/registry.ts.
+  2. Validate tenant id ([a-z0-9-]+, no reserved words like 'default' unless --force).
+  3. Create a Tenant document (we will introduce the Tenant model in phase 7; for phase 4, a placeholder collection is fine — just a `_tenants` collection with { _id: tenantId, preset, createdAt }).
+  4. For every model, seed the preset's data into that tenantId. Pages, products, FormDefinitions — all stamped with tenantId.
+  5. Idempotent: re-running with the same args is a no-op (don't double-seed). With --force, wipe and re-seed.
+  6. Print a summary table at the end: what was created.
+
+Add it to package.json scripts.
+
+Test by running for each preset against a fresh local DB; confirm seeds show up scoped to the right tenant.
+
+Commit: <span class="hl">"phase-4: init-vertical script + idempotency"</span>.</div>
+
+    <h3>Prompt 4.4 — Build preset #1 (per order from 4.1)</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 4.4</span>
+Build the FIRST vertical preset per the order decided in 4.1.
+
+Create:
+  verticals/&lt;preset-1&gt;/site-config.preset.ts
+  verticals/&lt;preset-1&gt;/product-attributes.schema.ts
+  verticals/&lt;preset-1&gt;/seed/products.json (8 entries, real-feeling, NO lorem)
+  verticals/&lt;preset-1&gt;/seed/pages.json (3 entries: home, about, plus one vertical-specific)
+  verticals/&lt;preset-1&gt;/seed/forms.json (1 entry)
+  verticals/&lt;preset-1&gt;/brand-stub.ts (empty ThemeTokens override)
+  verticals/&lt;preset-1&gt;/README.md
+
+Then:
+  - npm run init:vertical -- --preset=&lt;preset-1&gt; --tenant=demo-&lt;preset-1&gt;
+  - Boot the app with BOUND_TENANT_ID=demo-&lt;preset-1&gt;.
+  - Walk every pack's main page and confirm the seeded content is what shows up.
+
+If you find any place where the preset pattern doesn't accommodate this vertical's reality, STOP and update the pattern first, then continue. Don't fork the pattern.
+
+Commit: <span class="hl">"phase-4: preset &lt;preset-1&gt;"</span>.</div>
+
+    <h3>Prompt 4.5 — Build presets #2, #3, #4</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 4.5</span>
+Repeat the structure of 4.4 for each remaining vertical, one at a time, in the order from 4.1.
+
+Per vertical:
+  1. Build all five preset files.
+  2. Run init-vertical against a fresh tenant.
+  3. Walk the live app for that tenant.
+  4. If the pattern needed any tweak, that tweak applies to ALL existing verticals — go back and update them in the same commit.
+  5. Commit each vertical separately: <span class="hl">"phase-4: preset &lt;name&gt;"</span>.
+
+DO NOT batch them. We want the diff per vertical to be readable in isolation.</div>
+
+    <h3>Prompt 4.6 — Vertical-aware doctor</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 4.6</span>
+Extend scripts/doctor.ts:
+
+  - If env.BOUND_TENANT_ID is set:
+      - confirm a _tenants document exists for it.
+      - confirm its preset key matches a registered vertical.
+      - confirm at least one seeded record exists per pack the preset declares "on".
+
+If BOUND_TENANT_ID is unset, doctor behaves as before (default tenant).
+
+Commit: <span class="hl">"phase-4: tenant-aware doctor checks"</span>.</div>
+
+    <h3>Prompt 4.7 — Close the phase</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 4.7</span>
+Doc update pass:
+
+  - Append Phase 4 entry to CHANGELOG with the order-of-build and every preset shipped.
+  - Bump package.json to 0.5.0.
+  - Update repo-context.html §05 file map to include verticals/ and scripts/init-vertical.ts.
+  - Update glossary.html: "preset", "vertical", and the relationship to tenantId.
+  - Update README.html doc-meta version.
+  - List OPEN_QUESTIONS for Phase 5 — especially: which preset's brand identity is closest to "ready" (will become the test case for the visual system)?
+
+Tag <span class="hl">v0.5.0</span>. Fresh-clone test.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 4 is done when…</h2>
+    <ul>
+      <li>All four preset folders exist and conform to the preset pattern.</li>
+      <li><code>npm run init:vertical -- --preset=X --tenant=Y</code> works for every preset, idempotently.</li>
+      <li>Booting the app with <code>BOUND_TENANT_ID=demo-X</code> shows X's seeded content.</li>
+      <li>Switching <code>BOUND_TENANT_ID</code> between two tenants in the same DB shows no leakage (the <code>scoped()</code> investment from Phase 1 pays off here).</li>
+      <li>Each vertical's payment-provider default reads correctly through <code>getPaymentProvider</code>.</li>
+      <li>Tagged <code>v0.5.0</code>.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="icon"></span>
+      <p><strong>The big tenant-leakage test.</strong> Seed two tenants. Hit one tenant's product list endpoint with the other tenant's bound id. Confirm zero overlap. This is the cheapest insurance you'll ever buy against a phase-7 horror story.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status &amp; handoff to Phase 5</span>
+    <h2>What's true at the end of Phase 4</h2>
+    <p>The template is no longer generic — it's <strong>four opinionated SaaSes that happen to share 70% of their code</strong>. Phase 5 is where they start to look as different as they should.</p>
+
+    <h4>What Phase 5 will pick up</h4>
+    <ul>
+      <li>The four-layer token system from the visual-system brief: foundation → vertical → tenant pick → tenant override.</li>
+      <li>The contrast validator + the leaf-only override rule.</li>
+      <li>CSS variable emission so the same React app renders as four (then many) visually distinct sites.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">Open question to carry forward</span>
+      <p>Each preset shipped a <code>brand-stub.ts</code> that is empty. Phase 5's first prompt has to decide: do we ship a <em>opinionated brand default</em> per vertical (e.g. food-truck = bold, high-contrast, primary brand red), or stay neutral and force every client to pick? The concept brief leans opinionated; confirm before phase 5.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

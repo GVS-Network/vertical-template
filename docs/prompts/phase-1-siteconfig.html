@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 — SiteConfig &amp; Seams · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 1</span>
+      <span>SiteConfig &amp; Seams · v0.1.0 → v0.2.0</span>
+    </div>
+    <h1 class="doc-title">Phase 1 — <em>SiteConfig &amp; seams</em>.</h1>
+    <p class="doc-subtitle">Establish the one TypeScript shape every vertical and every client will fill in differently — and the two seams (<code>getSiteConfig</code>, <code>getPaymentProvider</code>) that everything else hangs off of. Thread <code>tenantId</code> through every model so the phase-7 multi-tenant jump is a six-change swap, not a rewrite.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 0 is closed and tagged <code>v0.1.0</code>. <code>npm run doctor</code> and <code>npm run dev</code> both pass.</li>
+      <li>You have re-read the <strong>template architecture brief</strong>, especially the SiteConfig section and the six-change phase-2 jump (which we now call phase-7 to match this build doc's numbering).</li>
+      <li>You have re-read <code>contexts/glossary.html</code> — specifically the Type A / Type B / Type C taxonomy.</li>
+    </ul>
+
+    <div class="callout discipline">
+      <span class="icon"></span>
+      <p><strong>The dual-file contract starts now.</strong> Every time <code>SiteConfig</code> or <code>ThemeTokens</code> changes, two files must be touched in the same commit: the type and a default. Cursor rule <code>50-siteconfig-contract.mdc</code> enforces this; do not silently override it.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — What this phase produces</span>
+    <h2>Deliverables</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>types/site-config.ts</strong><span class="why">the one shape</span></div>
+        <div class="val"><p>The canonical <code>SiteConfig</code> type: vertical, branding placeholder, feature flags (all five packs stubbed off), payment provider hint, contact info, locale. Plus <code>ThemeTokens</code> sibling for the visual system layer.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>types/site-config.defaults.ts</strong><span class="why">the dual-file partner</span></div>
+        <div class="val"><p>A <code>defaultSiteConfig</code> object that satisfies the type. Any new required field added to the type must get a default here in the same commit — that is the contract.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>server/seams/get-site-config.ts</strong><span class="why">seam #1</span></div>
+        <div class="val"><p><code>getSiteConfig(req)</code>. In phase 1 it returns <code>defaultSiteConfig</code> every time. In phase 7 it switches to host-based lookup. Nothing else changes about its callers.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>server/seams/get-payment-provider.ts</strong><span class="why">seam #2 (stub)</span></div>
+        <div class="val"><p><code>getPaymentProvider(siteConfig)</code>. In phase 1 it throws <code>NotImplementedYet</code>. Phase 3 fills it in. The seam exists so callers can be written today.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>tenantId on every model</strong><span class="why">forward investment</span></div>
+        <div class="val"><p>Every Mongoose schema gets a <code>tenantId: string</code> field, indexed, defaulted to <code>'default'</code>. Every query goes through a helper that scopes by tenantId. This is the single largest investment in phase 7 being cheap.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>scripts/contract-check.ts</strong><span class="why">enforced by CI</span></div>
+        <div class="val"><p>A script that asserts: every field in <code>SiteConfig</code> has a corresponding entry in <code>defaultSiteConfig</code>. Runs in CI; fails the build if the contract breaks.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Change taxonomy in this phase</span>
+    <h2>What kind of changes are we making?</h2>
+    <p>Per the template architecture brief, every template change is classified A, B, or C. Phase 1 is dominated by Type-A and one careful Type-C.</p>
+
+    <div class="change-types">
+      <div class="change-type A">
+        <span class="tag">Type A</span>
+        <h5>Adding fields to SiteConfig</h5>
+        <p>Adding <code>vertical</code>, <code>contact</code>, <code>features</code>, <code>locale</code> to the type. Pure additive, defaulted, no caller has to change. Most of phase 1 is this.</p>
+      </div>
+      <div class="change-type B">
+        <span class="tag">Type B</span>
+        <h5>(deferred to phase 5)</h5>
+        <p>Visual tokens get added in phase 5. We declare <code>ThemeTokens</code> as an empty interface here but do not propagate to overrides yet.</p>
+      </div>
+      <div class="change-type C">
+        <span class="tag">Type C</span>
+        <h5>Threading tenantId</h5>
+        <p>Touching every model, every query, every controller is a Type-C change — it ripples. We do it once, here, deliberately, so phase 7 doesn't have to.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-1 prompt sequence</h2>
+
+    <h3>Prompt 1.1 — Carry forward open questions</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.1</span>
+Open the OPEN_QUESTIONS from Phase 0's close (in CHANGELOG.md or in the previous session's notes).
+
+For each open question, decide one of three things:
+  1. <span class="hl">Resolve now</span> — answer it before we touch SiteConfig.
+  2. <span class="hl">Defer with a written rationale</span> — note which later phase will pick it up.
+  3. <span class="hl">Drop</span> — explain why it's no longer relevant.
+
+Do not start any Phase 1 work until every open question has one of these three outcomes.</div>
+
+    <h3>Prompt 1.2 — Draft the SiteConfig type</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.2</span>
+Create types/site-config.ts. Based on template-architecture-brief.html, the shape should include AT MINIMUM:
+
+  - vertical: 'bar-restaurant' | 'food-truck' | 'farm-source' | 'screen-printer' | 'generic'
+  - tenantId: string  (defaulted 'default' until phase 7)
+  - features: { catalog: boolean; content: boolean; intake: boolean; payments: boolean; auth: boolean }
+  - payment: { provider: 'stripe' | 'square' | 'none' }
+  - branding: { name: string; tagline?: string }
+  - contact: { email?: string; phone?: string; address?: string }
+  - locale: { currency: string; timezone: string; lang: string }
+
+Also create types/theme-tokens.ts with an EMPTY interface ThemeTokens — phase 5 fills it.
+
+Do NOT add any field that doesn't appear in the brief or in this prompt. If you think one is missing, FLAG IT for me, don't sneak it in.</div>
+
+    <h3>Prompt 1.3 — Defaults file (the dual-file partner)</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.3</span>
+Create types/site-config.defaults.ts exporting <span class="hl">defaultSiteConfig: SiteConfig</span> with sensible neutral values:
+
+  - vertical: 'generic'
+  - tenantId: 'default'
+  - features: all five FALSE  (we toggle them on per-vertical in phase 4)
+  - payment.provider: 'none'
+  - branding: { name: 'Untitled Site' }
+  - contact: { } (all optional)
+  - locale: { currency: 'USD', timezone: 'America/Chicago', lang: 'en-US' }
+
+This file MUST satisfy the type as written. If TS complains, the type is the source of truth — adjust defaults, not the type, unless we discussed it.
+
+Commit both files together: <span class="hl">"phase-1: SiteConfig type + defaults (dual-file contract established)"</span>.</div>
+
+    <h3>Prompt 1.4 — Build the contract check</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.4</span>
+Create scripts/contract-check.ts. It must:
+
+  1. Read types/site-config.ts and extract every top-level field of SiteConfig (including nested required fields).
+  2. Read types/site-config.defaults.ts and confirm defaultSiteConfig has every required field.
+  3. Exit non-zero if any required field is missing a default.
+
+Wire it into:
+  - package.json scripts: <span class="hl">"contract:check": "tsx scripts/contract-check.ts"</span>
+  - package.json prebuild hook so CI catches contract drift before deploy
+  - scripts/doctor.ts so local dev also catches it
+
+Then deliberately break the contract (add a required field with no default), run the check, confirm it fails. Then fix it. Commit: <span class="hl">"phase-1: contract-check script + doctor wiring"</span>.</div>
+
+    <h3>Prompt 1.5 — getSiteConfig seam</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.5</span>
+Create server/seams/get-site-config.ts:
+
+  export function getSiteConfig(req: Request): SiteConfig {
+    return defaultSiteConfig;
+  }
+
+That is the ENTIRE implementation for phase 1. The signature accepting <code>req</code> is the whole point — phase 7 changes the body to read req.hostname and look up a Tenant document. No caller changes.
+
+Wire it into one place: a middleware that attaches <span class="hl">req.siteConfig = getSiteConfig(req)</span>. Add the type augmentation to a types/express.d.ts file.
+
+Find one existing route in baseapp (any one) and refactor it to read <code>req.siteConfig.branding.name</code> instead of a hardcoded string, just to prove the seam flows end-to-end.
+
+Commit: <span class="hl">"phase-1: getSiteConfig seam + req.siteConfig middleware"</span>.</div>
+
+    <h3>Prompt 1.6 — getPaymentProvider stub seam</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.6</span>
+Create server/seams/get-payment-provider.ts:
+
+  export function getPaymentProvider(siteConfig: SiteConfig): PaymentProvider {
+    throw new Error('NotImplementedYet: payments arrive in phase 3');
+  }
+
+Define a PaymentProvider interface (charge, refund, listProducts, syncInventory) but leave it as <span class="hl">a type-only declaration</span>. No implementations yet.
+
+This seam exists so phase-2 feature-pack scaffolding can be written against a stable signature.
+
+Commit: <span class="hl">"phase-1: getPaymentProvider stub seam + PaymentProvider interface"</span>.</div>
+
+    <h3>Prompt 1.7 — Thread tenantId through every model</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.7</span>
+This is the Type-C change of Phase 1. Do it carefully.
+
+  1. Find every Mongoose schema in the repo.
+  2. For each, add <span class="hl">tenantId: { type: String, required: true, default: 'default', index: true }</span>.
+  3. Add a compound index of (tenantId, &lt;the primary lookup field&gt;) where it makes sense.
+  4. Create server/db/scoped.ts exporting a helper <span class="hl">scoped(Model, req)</span> that returns Model with a tenantId filter pre-baked. Use it everywhere instead of raw Model.find / Model.findOne.
+  5. Update every controller/service that queries a model to use the helper.
+  6. Run all tests (if any). Fix what breaks.
+
+Produce a list of every file you touched and why. Commit as ONE commit: <span class="hl">"phase-1: thread tenantId through all models (Type-C, defaulted 'default')"</span>.
+
+If you find a model you can't safely scope (e.g. system-wide config), call it out — do not silently exclude it.</div>
+
+    <h3>Prompt 1.8 — Update docs</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 1.8</span>
+Per build-docs/rules/documentation-maintenance.html doc update matrix, this phase has touched:
+
+  - Type contract → update glossary if any term shifted
+  - Seams → ensure repo-context.html §05 file map shows server/seams/
+  - tenantId rule → already in cursor rule 70-multi-tenant-seams.mdc; verify it still reads correctly given what we actually built
+
+Append a Phase 1 entry to CHANGELOG.md. Bump package.json to 0.2.0.
+
+List any new OPEN_QUESTIONS for Phase 2 — especially any place where a feature pack will have to interact with tenantId in a way we didn't fully figure out yet.
+
+Commit: <span class="hl">"phase-1: close v0.2.0"</span>. Tag <span class="hl">v0.2.0</span>.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 1 is done when…</h2>
+    <ul>
+      <li><code>types/site-config.ts</code> and <code>types/site-config.defaults.ts</code> both exist; <code>contract:check</code> passes.</li>
+      <li><code>req.siteConfig</code> is populated on every request and at least one route reads from it.</li>
+      <li><code>getPaymentProvider</code> exists as a throwing stub; nothing calls it yet.</li>
+      <li>Every Mongoose schema has <code>tenantId</code>; every query goes through <code>scoped()</code>.</li>
+      <li><code>npm run doctor</code> includes the contract check and still passes.</li>
+      <li>The fresh-clone test from phase 0 still works.</li>
+      <li>The commit <code>v0.2.0</code> is tagged.</li>
+    </ul>
+
+    <div class="callout risk">
+      <span class="icon"></span>
+      <p><strong>The shape of phase 1 sets the shape of every later phase.</strong> If <code>SiteConfig</code> is sloppy here, every vertical preset will paper over it with hacks, and the phase-7 multi-tenant jump will not be six changes — it'll be sixty. Spend the extra hour now.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status &amp; handoff to Phase 2</span>
+    <h2>What's true at the end of Phase 1</h2>
+    <p>There is one shape, two seams, and one defaulted tenant. The template is now a MERN that knows it is going to become many sites — even though right now it is only one. Phase 2 stops talking about shape and starts building behavior.</p>
+
+    <h4>What Phase 2 will pick up</h4>
+    <ul>
+      <li>The five feature packs (<code>catalog</code>, <code>content</code>, <code>intake</code>, <code>payments</code>, <code>auth</code>), each scaffolded as a self-contained module.</li>
+      <li>Toggle-mounting: feature packs read <code>req.siteConfig.features.*</code> and silently skip when off.</li>
+      <li>Each pack ships a schema, a service, a controller, a router, and a client component family.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">Open question to carry forward</span>
+      <p>Should feature packs read SiteConfig directly, or should the server middleware filter them out before the request even reaches the pack's router? Phase 2's first prompt resolves this.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

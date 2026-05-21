@@ -1,0 +1,59 @@
+---
+description: Client-side conventions for Vite + React + TS code under client/.
+globs:
+  - "client/**/*"
+---
+
+# Client Conventions
+
+## Stack
+Vite 5, React 18, React Router 6, TypeScript strict. No state library mandated; reach for Context before reaching for Zustand/Redux. If a third party state need genuinely emerges, propose a brief revision first.
+
+## Routing
+React Router 6. Routes live in `client/src/App.tsx`. **Shared routes mount before per-tenant `Custom*.tsx` routes** so per-build pages override gracefully:
+
+```tsx
+<Route path="/" element={<HomePage />} />
+<Route path="/menu" element={<MenuPage />} />
+{/* per-build customs mounted last */}
+<Route path="/about" element={<CustomAboutPage />} />
+```
+
+## Styling
+- **Use CSS variables**. Token values live in `:root` and are emitted by `resolveTokens()`. Components consume `var(--color-brand-primary)`, `var(--space-4)`, etc.
+- **No hardcoded hexes, rems, pxes outside `client/src/theme/`.** The build will fail on hardcoded color values found in component CSS.
+- **No Tailwind.** It bypasses the registry. CSS modules are fine; their values reference the variables.
+
+## Feature packs (client side)
+Each lives in `client/src/features/<id>/`. Each exports route components and shared UI pieces. The feature pack reads `useSiteConfig()` to check whether it should render.
+
+```tsx
+function MenuPage() {
+  const config = useSiteConfig();
+  if (!config.features.catalog.enabled) return null;
+  // ...
+}
+```
+
+## Theme consumption
+Components do not import token values. They consume them as CSS variables. The one place that imports tokens is the resolver — everywhere else, the variables are already on the document.
+
+## `site.config.ts` and `site.theme.ts`
+These two files are **Type C** (per-build, never propagated). They are the only client-side files that legitimately differ between builds before phase 7.
+
+- `site.config.ts` overrides parts of the vertical preset's `SiteConfig`.
+- `site.theme.ts` makes L3 picks (palette ID, pairing ID, density) and L4 overrides (raw values that win the resolver's last step).
+
+Anything else under `client/src/` is core (Type A) and changes only via upstream pulls.
+
+## Per-build custom pages
+Per-tenant pages go in `client/src/pages/Custom*.tsx`. They are the seam for "a client needs a page core doesn't have." They:
+- Are mounted in `App.tsx` after the shared routes.
+- Consume the same `useSiteConfig()` and theme variables.
+- Are *not* feature packs and do not require a brief.
+
+## When to ask before coding
+- Adding a global state provider.
+- Adding a route at the root level (not under a feature pack or as a Custom*).
+- Adding a font import (custom fonts go through L4 override, not `<link>` tags).
+- Anything that touches `:root` or global CSS outside the resolver's output.

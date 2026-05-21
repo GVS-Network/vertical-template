@@ -1,0 +1,73 @@
+---
+description: How to collaborate effectively in this codebase — voice, pacing, and the things to flag instead of solve.
+alwaysApply: true
+---
+
+# Collaboration Conventions
+
+This is a long-running project with deliberate architecture. The mode of work matters as much as the code.
+
+## Pacing
+
+- **Big change** (new top-level folder, new dependency, new feature pack, schema migration, anything that touches a brief): **propose in chat first.** Describe what you want to add, why, where it sits. Wait for approval. Then code.
+- **Medium change** (within an existing feature pack, no new shape): one shot, show the diff, summarize what changed in 2–3 sentences. Don't narrate every file.
+- **Small change** (fix, typo, lint, obvious refactor): just do it. The diff is the explanation.
+
+## Voice
+
+- Be direct. Avoid "Great question!" / "Certainly!" / "I'd be happy to" preamble.
+- Don't apologize unless something actually went wrong.
+- Don't restate what was just asked back to me. Start with the answer or the action.
+- When refusing or pushing back, say why in one sentence and offer the alternative.
+
+## Reading the briefs
+
+Before any non-trivial work, open the relevant brief. The briefs explain decisions already worked through. **Re-reading them is faster than re-deriving them.**
+
+Reference briefs in code comments when a non-obvious choice is motivated by one:
+
+```ts
+// see template-architecture-brief §03 — single seam for phase 2
+export function getSiteConfig(req: Request): SiteConfig { ... }
+```
+
+## What to flag rather than solve
+
+Some things look like coding decisions but are actually thesis-level. **Flag, don't solve:**
+
+- "We could just add tenantId resolution from a cookie/JWT/subdomain..." — this is the multi-tenancy strategy, locked until phase 7.
+- "We could let tenants add their own palette colors..." — this breaks the registry rule.
+- "We could merge two feature packs..." — pack structure is brief-locked.
+- "We could replace Auth0 with Clerk now..." — exit path is planned, not actioned.
+- "We could skip the contract-check script for this PR..." — the script's existence is load-bearing.
+- "We could rename tenantId to workspaceId to match the agency app..." — the rename is *for phase 4*, not for stylistic preference.
+
+When in doubt: ask. The cost of asking is one round-trip; the cost of silently making a thesis-level change is much higher.
+
+## What to surface unprompted
+
+- Anywhere you notice an existing query without a `tenantId` filter.
+- Anywhere you notice a Stripe or Square SDK import outside `providers/`.
+- Anywhere a hardcoded design value (hex, font name, raw spacing) appears outside `theme/`.
+- Anywhere the same shape of override appears in two clients' `site.theme.ts` files — that is the registry "second-use" signal.
+- Anywhere a "TODO: tenant filter" or similar deferral exists.
+
+You don't have to fix these in the current PR. Flag them in the PR description so they make the issue tracker.
+
+## Asking before doing
+
+The clearest signal you should ask first: **a request asks you to bend a rule.** "Just for now," "to unblock me," "we'll fix it later." The rules in this folder were specifically chosen to survive those moments. Surface the tension; let me decide.
+
+## How to handle ambiguity
+
+When a request is unclear, default to the brief that owns the area:
+
+- Tenant/feature-pack/SiteConfig question → `template-architecture-brief.html`.
+- Theme/style/visual question → `visual-system-brief.html`.
+- Go-to-market, vertical-roster, or strategic question → `platform-concept-brief.html`.
+
+If the brief doesn't answer it, the answer is probably "ask, this is a thesis-level call we haven't made yet."
+
+## Endings
+
+When a phase prompt's acceptance criteria are met, say so plainly and stop. Don't add "Would you like me to also...?" suggestions unrelated to the phase. The next prompt will come from me.

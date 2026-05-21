@@ -1,0 +1,75 @@
+---
+description: Server-side conventions for Express + Mongoose code under server/.
+globs:
+  - "server/**/*"
+---
+
+# Server Conventions
+
+## Stack
+Express 4, Mongoose 8, TypeScript strict. `express-async-errors` imported once in `server/src/index.ts`. Errors caught at the route boundary, not deep.
+
+## Tenant context — the single seam
+**Every route reads tenant context through `getSiteConfig(req)`.**
+
+```ts
+// ✅ correct
+router.get('/menu', async (req, res) => {
+  const config = getSiteConfig(req);
+  if (!config.features.catalog.enabled) return res.status(404).send();
+  ...
+});
+```
+
+```ts
+// ❌ forbidden — bypasses the seam
+router.get('/menu', async (req, res) => {
+  const tenantId = process.env.TENANT_ID;  // no
+  ...
+});
+```
+
+The seam's body is a singleton today. In phase 7 it returns per-request from `req.tenantConfig`. **Callers never change.** That is the entire point.
+
+## Mongoose models
+Every schema declares `tenantId`, indexed compound with its natural key:
+
+```ts
+const schema = new Schema({
+  tenantId: { type: String, required: true, default: 'default' },
+  // ...
+});
+schema.index({ tenantId: 1, slug: 1 }, { unique: true });
+```
+
+**Every query filters on `tenantId`**, even in single-tenant mode. Today the filter is always `{ tenantId: 'default' }`; that is not optional.
+
+## Payments
+- Interface: `server/src/providers/PaymentProvider.ts`.
+- Adapters: `stripe.ts`, `square.ts`. Selected by `SiteConfig.features.payments.provider`.
+- Routes call `getPaymentProvider()`. They do not know which provider is active.
+- Stripe and Square SDKs are imported only in their adapter files. Importing them elsewhere is a build error.
+
+## Auth
+Auth0 via `express-oauth2-jwt-bearer`. The library is wrapped in `server/src/middleware/auth.ts` — routes import the wrapped middleware, not the library. This keeps the planned Auth0 → Clerk/WorkOS swap local to one file.
+
+## Feature packs (server side)
+Each lives in `server/src/features/<id>/`. Each exports a `router` from `index.ts`. The main `server/src/index.ts` conditionally mounts on `SiteConfig.features.<id>.enabled`:
+
+```ts
+const config = loadSiteConfig();
+if (config.features.catalog.enabled) {
+  app.use('/api/catalog', require('@/features/catalog').router);
+}
+```
+
+A disabled feature pack contributes **zero** API surface — not a 404, not a stub. The route does not exist.
+
+## Validation
+Inbound payloads validated with `zod` at the route boundary. Reject early. Never trust client input shape — the contract is the zod schema, not the TypeScript type.
+
+## When to ask before coding
+- New top-level folder (`features/`, `providers/`, etc.).
+- New Mongoose model (especially one without an agency-app counterpart).
+- New external API call.
+- Anything that changes the shape of `SiteConfig`.

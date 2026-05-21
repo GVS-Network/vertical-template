@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 — Feature Packs · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 2</span>
+      <span>Feature Packs · v0.2.0 → v0.3.0</span>
+    </div>
+    <h1 class="doc-title">Phase 2 — <em>Feature packs</em>.</h1>
+    <p class="doc-subtitle">Build five self-contained, toggle-mounted feature packs: <code>catalog</code>, <code>content</code>, <code>intake</code>, <code>payments</code>, <code>auth</code>. Each ships schema + service + controller + router + client components, owns its own folder, reads <code>req.siteConfig.features.*</code> at the door, and stays invisible when its flag is off.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 1 is closed, tagged <code>v0.2.0</code>. <code>contract:check</code> passes.</li>
+      <li><code>req.siteConfig</code> is populated and at least one route reads from it.</li>
+      <li>Every Mongoose model has <code>tenantId</code>; the <code>scoped()</code> helper works.</li>
+      <li>You have decided how feature toggles gate routes (resolved from Phase 1's open question).</li>
+    </ul>
+
+    <div class="callout discipline">
+      <span class="icon"></span>
+      <p><strong>One pack at a time.</strong> Resist the urge to scaffold all five in one go. Each pack lands as its own commit with its own checks. If pack #2 reveals a flaw in the pack pattern, you want to fix it once before stamping it five times.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — What this phase produces</span>
+    <h2>Deliverables</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>The pack pattern</strong><span class="why">documented before any pack is built</span></div>
+        <div class="val"><p>A short <code>server/features/_pack-pattern.md</code> describing the folder shape, the required exports, and how a pack registers itself with the app. Every pack conforms.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>features/catalog</strong><span class="why">products + inventory shape</span></div>
+        <div class="val"><p>Schema for Product (name, sku, price, stock, vertical-flexible attributes), service layer, REST controller, mounting router. Client list and detail components.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>features/content</strong><span class="why">pages, posts, media</span></div>
+        <div class="val"><p>Page + Post schemas (slug, body, status, hero). MDX-or-rich-text-store decision documented. Client: page renderer, post list.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>features/intake</strong><span class="why">forms &amp; submissions</span></div>
+        <div class="val"><p>FormDefinition + Submission schemas. Generic field renderer on client. Email-or-store-only decision documented per vertical's needs (defer email integration to a later pack-internal phase if needed).</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>features/payments</strong><span class="why">scaffold only, no provider</span></div>
+        <div class="val"><p>Order schema, checkout intent endpoint, webhook receiver shell. All provider-specific code stays in <code>features/payments/providers/*</code> — empty in phase 2. Phase 3 fills these.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>features/auth</strong><span class="why">Auth0 wiring</span></div>
+        <div class="val"><p>Per stack-context, Auth0 via <code>express-oauth2-jwt-bearer</code>. Pack exports a <code>requireAuth</code> middleware. Client has a login button + a useSession hook. Tenant scoping respected.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Toggle-mounting</strong><span class="why">the central invariant</span></div>
+        <div class="val"><p>A <code>server/features/registry.ts</code> reads <code>siteConfig.features</code> and mounts only the packs that are on. Off packs do not run middleware, do not register routes, do not load their client JS.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — The pack pattern</span>
+    <h2>What every pack looks like</h2>
+
+    <div class="concept-panel">
+      <h4>Folder shape</h4>
+      <p>Each pack lives under <code>server/features/&lt;pack&gt;/</code> on the server and <code>client/features/&lt;pack&gt;/</code> on the client. Inside each:</p>
+    </div>
+
+    <div class="worked">
+      <h4>SERVER SIDE — features/&lt;pack&gt;/</h4>
+      <div class="worked-step">
+        <div class="n">1</div>
+        <div class="body"><strong>schemas/</strong> — Mongoose models. Each includes <code>tenantId</code> and uses <code>scoped()</code> for all queries.</div>
+      </div>
+      <div class="worked-step">
+        <div class="n">2</div>
+        <div class="body"><strong>service.ts</strong> — Pure functions over schemas. No req/res. Easy to test in isolation.</div>
+      </div>
+      <div class="worked-step">
+        <div class="n">3</div>
+        <div class="body"><strong>controller.ts</strong> — Express handlers. Thin. Calls service, returns JSON.</div>
+      </div>
+      <div class="worked-step">
+        <div class="n">4</div>
+        <div class="body"><strong>router.ts</strong> — Express router exporting a function that takes <code>siteConfig</code> and returns the router (or null if the feature is off).</div>
+      </div>
+      <div class="worked-step">
+        <div class="n">5</div>
+        <div class="body"><strong>index.ts</strong> — Pack entrypoint: <code>export default {{ key: 'catalog', register(app, siteConfig) }}</code>.</div>
+      </div>
+    </div>
+
+    <div class="worked">
+      <h4>CLIENT SIDE — features/&lt;pack&gt;/</h4>
+      <div class="worked-step">
+        <div class="n">1</div>
+        <div class="body"><strong>components/</strong> — Pack-owned components. No global selectors; everything namespaced.</div>
+      </div>
+      <div class="worked-step">
+        <div class="n">2</div>
+        <div class="body"><strong>hooks/</strong> — Data hooks calling the pack's API. Use a shared fetcher.</div>
+      </div>
+      <div class="worked-step">
+        <div class="n">3</div>
+        <div class="body"><strong>routes.tsx</strong> — Route definitions to be merged into the app router only when the feature flag is on.</div>
+      </div>
+      <div class="worked-step">
+        <div class="n">4</div>
+        <div class="body"><strong>index.ts</strong> — Exports <code>routes</code> and any host-facing components other packs might compose.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-2 prompt sequence</h2>
+
+    <h3>Prompt 2.1 — Carry forward open questions</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.1</span>
+Resolve every OPEN_QUESTION from Phase 1's close before any code change. Same three outcomes as before: resolve, defer-with-rationale, or drop.
+
+Specifically: <span class="hl">decide where feature toggling happens</span>. Two options:
+  (a) Each pack's router.ts returns null when its flag is off; app skips null routers.
+  (b) The registry filters packs before they're loaded; off packs never construct their router.
+
+Pick one, document why, then proceed. The whole phase depends on this decision.</div>
+
+    <h3>Prompt 2.2 — Write the pack pattern doc</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.2</span>
+Create server/features/_pack-pattern.md documenting:
+
+  - Folder shape (server and client) — match phase-2-feature-packs.html §03.
+  - Required exports.
+  - How a pack registers itself with the app via server/features/registry.ts.
+  - The toggle-mount rule (whichever (a) or (b) won in 2.1).
+  - The tenantId rule (every schema includes it; every query goes through scoped()).
+  - Naming convention: features.catalog, features.content, features.intake, features.payments, features.auth (kebab nowhere).
+
+This doc is the source of truth other prompts will reference. Commit: <span class="hl">"phase-2: pack pattern (foundation)"</span>.</div>
+
+    <h3>Prompt 2.3 — Build the registry</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.3</span>
+Create server/features/registry.ts. Responsibilities:
+
+  1. Import every pack's index.ts.
+  2. Read req.siteConfig.features at request boot.
+  3. For each pack whose flag is true, call register(app, siteConfig).
+  4. For each pack whose flag is false, log <span class="hl">[feature:off] catalog (etc)</span> at boot ONCE — not per request.
+
+Also create a tiny test: spin up the app with features all-false, hit one route from each pack's namespace, confirm <span class="hl">404</span> (not 500, not "Cannot find module").
+
+Commit: <span class="hl">"phase-2: feature registry + toggle-mount test"</span>.</div>
+
+    <h3>Prompt 2.4 — features/catalog</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.4</span>
+Scaffold features/catalog per the pack pattern.
+
+Server:
+  - Product schema: tenantId, name, slug, sku, price (cents, integer), stock (number, nullable), status ('active'|'draft'|'archived'), attributes (Mixed — vertical extensions live here).
+  - service.ts: listProducts(filter), getProductBySlug(slug), createProduct, updateProduct.
+  - controller.ts: GET /api/catalog/products, GET /api/catalog/products/:slug, POST + PUT (auth-required when auth pack is on; for now, gate with a TODO).
+  - router.ts wired into registry.
+
+Client:
+  - ProductList, ProductCard, ProductDetail components.
+  - useProducts hook.
+  - routes.tsx with /catalog and /catalog/:slug.
+
+Seed: insert 3 sample products at startup if tenantId='default' has zero. NOT a migration; a dev convenience guarded by NODE_ENV !== 'production'.
+
+Commit: <span class="hl">"phase-2: features/catalog"</span>.</div>
+
+    <h3>Prompt 2.5 — features/content</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.5</span>
+Scaffold features/content per the pack pattern.
+
+Two schemas — Page (slug, title, body, hero, status) and Post (slug, title, body, publishedAt, tags, status). Both tenant-scoped.
+
+<span class="hl">Decision to document inline</span>: how is "body" stored? Options: (1) raw markdown string, (2) MDX with allowed-component allowlist, (3) Lexical/Tiptap JSON. Pick the simplest that doesn't paint us into a corner. Document the choice and the trade-offs in features/content/README.md.
+
+Client: PageRenderer, PostList, PostDetail. Route examples: /about (page by slug), /blog, /blog/:slug.
+
+Commit: <span class="hl">"phase-2: features/content + body-format decision"</span>.</div>
+
+    <h3>Prompt 2.6 — features/intake</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.6</span>
+Scaffold features/intake per the pack pattern.
+
+Schemas:
+  - FormDefinition: tenantId, slug, title, fields (array of { name, type, required, options? }), submitButtonLabel.
+  - Submission: tenantId, formSlug, data (Mixed), createdAt, ip (optional), processed (boolean).
+
+Controller routes: GET /api/intake/forms/:slug (read def), POST /api/intake/forms/:slug (create submission).
+
+Client: GenericFormRenderer that takes a FormDefinition and renders fields. useFormDefinition hook. Route: /forms/:slug.
+
+Email-out is OUT OF SCOPE for this prompt — leave a clear TODO with a "later" tag pointing at "intake-notifications" as a future pack-internal feature.
+
+Commit: <span class="hl">"phase-2: features/intake (no email-out yet)"</span>.</div>
+
+    <h3>Prompt 2.7 — features/payments (scaffold only)</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.7</span>
+Scaffold features/payments per the pack pattern, but WITHOUT any provider implementation. That is Phase 3.
+
+  - Order schema: tenantId, items (denormalized product snapshots — name, sku, price, qty), status, total, paymentRef, provider ('stripe'|'square'|null), createdAt.
+  - service.ts: createOrderDraft(items), getOrderById, markOrderPaid(orderId, paymentRef).
+  - controller.ts routes:
+       POST /api/payments/checkout/intent  → calls getPaymentProvider() which still THROWS — that's intentional.
+       POST /api/payments/webhook/:provider  → empty 200 response with a TODO logged.
+
+Client: a CheckoutButton component that posts to /intent and surfaces the NotImplementedYet error in the UI as <span class="hl">"Payments configured in a later phase"</span> — proves the pack mounts when the flag is on.
+
+Commit: <span class="hl">"phase-2: features/payments (provider-less scaffold)"</span>.</div>
+
+    <h3>Prompt 2.8 — features/auth</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.8</span>
+Scaffold features/auth using Auth0 via express-oauth2-jwt-bearer (per stack-context.html).
+
+Server:
+  - requireAuth middleware that validates the JWT using the Auth0 issuer + audience from env.
+  - GET /api/auth/me — returns the decoded user + tenantId from siteConfig.
+
+Env additions (update .env.example): AUTH0_ISSUER_BASE_URL, AUTH0_AUDIENCE.
+
+Client:
+  - LoginButton + LogoutButton (universal login redirect — no custom UI).
+  - useSession hook backed by /api/auth/me.
+
+Update other packs' controllers: replace the TODO auth gates from prompts 2.4-2.7 with requireAuth where appropriate. List every line you changed in a "auth wiring delta" report so I can review.
+
+Commit: <span class="hl">"phase-2: features/auth + wire requireAuth into other packs"</span>.</div>
+
+    <h3>Prompt 2.9 — Pack-pattern compliance audit</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.9</span>
+Walk every pack against server/features/_pack-pattern.md and report compliance. For each pack:
+
+  - Does it have all the required exports?
+  - Does every schema include tenantId?
+  - Does every query go through scoped()?
+  - Does the pack silently skip when its flag is off (verify: toggle one off, restart, confirm 404 on its routes)?
+  - Are there any cross-pack imports? (Should be zero. Packs talk only via documented seams.)
+
+Fix any non-compliance in this commit, not by special-casing the pattern. If something genuinely can't conform, flag it and we'll evolve the pattern.
+
+Commit: <span class="hl">"phase-2: pack compliance audit + fixes"</span>.</div>
+
+    <h3>Prompt 2.10 — Close the phase</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 2.10</span>
+Per build-docs/rules/documentation-maintenance.html, do the doc-update pass:
+
+  - Append Phase 2 entry to CHANGELOG.md listing every pack and any pack-pattern revisions.
+  - Bump package.json to 0.3.0.
+  - Update repo-context.html §05 file map to show features/* tree.
+  - Update glossary.html if any term shifted ("feature pack" should now have a concrete shape, not just a definition).
+  - List OPEN_QUESTIONS for Phase 3 — especially anything about how the payments pack scaffold should be filled in.
+
+Tag <span class="hl">v0.3.0</span>. Run the fresh-clone test.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 2 is done when…</h2>
+    <ul>
+      <li>All five packs exist under <code>server/features/</code> and <code>client/features/</code>.</li>
+      <li>Toggling any feature in <code>defaultSiteConfig.features</code> off cleanly removes that pack's routes (404, not 500).</li>
+      <li>No pack imports from another pack. Packs talk via SiteConfig, seams, or shared <code>types/</code> only.</li>
+      <li>Every pack's schema is <code>tenantId</code>-scoped and every query uses <code>scoped()</code>.</li>
+      <li>The <code>payments</code> pack mounts when toggled on but cleanly fails the checkout intent with a recognizable "phase-3 needed" message.</li>
+      <li>Tagged <code>v0.3.0</code>.</li>
+    </ul>
+
+    <div class="callout opportunity">
+      <span class="icon"></span>
+      <p><strong>You now have a horizontal MERN with five packs.</strong> This is the most reusable artifact in the whole template. Even if vertical SaaS as a thesis pivots tomorrow, what you've built in phase 2 is independently valuable.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status &amp; handoff to Phase 3</span>
+    <h2>What's true at the end of Phase 2</h2>
+    <p>Five packs scaffolded, toggle-mounted, pattern-compliant. <strong>Payments mounts but cannot charge.</strong> That is exactly where it should be — the seam exists, the order shape exists, only the provider is missing.</p>
+
+    <h4>What Phase 3 will pick up</h4>
+    <ul>
+      <li>Implementing <code>getPaymentProvider</code> behind a single interface.</li>
+      <li>Stripe provider (Payment Links flow — no PCI surface) and Square provider (with inventory sync).</li>
+      <li>Webhook handlers that hit <code>markOrderPaid</code>.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">Open question to carry forward</span>
+      <p>The body-format decision from intake/content (markdown vs rich JSON) — does it implicate the eventual visual system in any way? Worth re-checking before phase 5.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

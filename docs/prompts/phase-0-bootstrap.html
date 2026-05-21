@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 0 — Bootstrap · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 0</span>
+      <span>Bootstrap · Template v0.0.0 → v0.1.0</span>
+    </div>
+    <h1 class="doc-title">Phase 0 — <em>Bootstrap</em>.</h1>
+    <p class="doc-subtitle">Fork <code>baseapp</code> into <code>vertical-template</code>, install the doc family and the cursor rules, verify the dev loop boots end-to-end. Nothing about verticals or SiteConfig yet — just a running MERN that we own and that knows how to talk to Claude.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li><strong>You have read</strong> the three reference briefs (concept, template, visual system) at least once.</li>
+      <li><strong>You have read</strong> all four context docs: <code>repo-context</code>, <code>stack-context</code>, <code>glossary</code>, <code>session-starter</code>.</li>
+      <li><strong>You have access</strong> to the <code>baseapp</code> repo (Anthropic's frozen MERN starter we forked from) and to <code>askanddeliverwebapp</code> for reference patterns.</li>
+      <li><strong>You have Node 20</strong> and a clean shell. No global Mongo or Stripe CLI required yet.</li>
+    </ul>
+
+    <div class="callout discipline">
+      <span class="icon"></span>
+      <p><strong>One commit per prompt.</strong> Phase 0 is the easiest place to install the habit. If you do nine commits in this phase, you should be able to look at the log and reconstruct which prompt produced which change. If you can't, the discipline is already drifting.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — What this phase produces</span>
+    <h2>Deliverables</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>Forked repo</strong><span class="why">vertical-template, owned by us</span></div>
+        <div class="val"><p>A new GitHub repo <code>vertical-template</code> initialized from <code>baseapp</code>, with origin pointing to our org. No upstream sync — baseapp is frozen; we own the divergence.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Doc family installed</strong><span class="why">build-docs/ in repo root</span></div>
+        <div class="val"><p>The entire <code>build-docs/</code> folder (this doc, contexts, rules HTMLs, phase prompts) committed at the repo root. Plus the three reference briefs copied to <code>build-docs/briefs/</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Cursor rules installed</strong><span class="why">both formats</span></div>
+        <div class="val"><p><code>.cursorrules</code> at repo root (legacy/fallback) <em>and</em> <code>.cursor/rules/*.mdc</code> (modern, globbed). Both committed.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>CHANGELOG.md</strong><span class="why">starts at v0.1.0</span></div>
+        <div class="val"><p>Root-level <code>CHANGELOG.md</code> with one entry: <code>v0.1.0 — Bootstrap. Forked baseapp, installed build-docs, cursor rules, verified dev loop.</code></p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Dev loop boots</strong><span class="why">verified manually</span></div>
+        <div class="val"><p><code>npm run dev</code> brings up both client and server. The baseapp's default landing page renders. No errors in either terminal. Mongo connects.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>doctor.ts script</strong><span class="why">first build-time check</span></div>
+        <div class="val"><p><code>scripts/doctor.ts</code> exists and runs. For phase 0 it only verifies Node version, env vars present, Mongo reachable. It will grow with every phase.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Prompts to run, in order</span>
+    <h2>The phase-0 prompt sequence</h2>
+
+    <p>Open a fresh Cursor session. Paste the <a href="../contexts/session-starter.html">session starter</a> first (with <code>PHASE=0</code>). Then run these prompts one at a time. Wait for Claude to finish each before sending the next. Commit between each.</p>
+
+    <h3>Prompt 0.1 — Repo fork &amp; inventory</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.1</span>
+We are at the start of <span class="hl">Phase 0 (Bootstrap)</span> of the vertical-template build.
+
+Before any code changes, do an inventory pass:
+
+1. Read every file in the repo root (package.json, tsconfig*, .env.example, README, etc).
+2. Read the top-level structure of /server, /client, and any other top-level folders.
+3. Read the existing baseapp README in full if one exists.
+
+Then produce a <span class="hl">single markdown report</span> in build-docs/inventory.md with:
+  - What stack/tools baseapp is actually running (versions from package.json, not from memory).
+  - Every top-level folder, one-line purpose.
+  - Anything that contradicts what stack-context.html claims (we want to learn from the diff, not paper over it).
+  - Anything baseapp already has that the template will need to keep (auth scaffolding, error middleware, etc).
+  - Anything baseapp has that the template will need to <span class="hl">remove or replace</span> (placeholder routes, demo content, hardcoded styling).
+
+Do not change any code yet. This is a read-only pass.</div>
+
+    <h3>Prompt 0.2 — Reconcile stack-context with reality</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.2</span>
+Based on inventory.md, propose edits to build-docs/contexts/stack-context.html so it matches what is <span class="hl">actually in the repo right now</span>, not what we thought we'd inherit.
+
+Specifically:
+  - If a dependency version differs, update stack-context.
+  - If baseapp uses a lib we marked "forbidden", flag it; do not silently bless it. List it in a <span class="hl">"to remove in phase 0"</span> callout we will resolve before phase end.
+  - If stack-context references something baseapp doesn't have yet, leave it; we'll add it when its phase comes.
+
+Output: a diff for stack-context.html plus a short "what changed and why" note I will paste into the CHANGELOG.</div>
+
+    <h3>Prompt 0.3 — Install the cursor rules</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.3</span>
+Copy the cursor rule files I have in build-docs/.cursor/rules/ and build-docs/.cursorrules into the actual cursor-active locations:
+
+  - /.cursorrules (repo root, legacy format)
+  - /.cursor/rules/*.mdc (modern globbed format)
+
+After copying, verify:
+  - Every .mdc file has valid frontmatter (description, globs OR alwaysApply).
+  - No two .mdc files claim the same globs without a clear reason.
+  - .gitignore does NOT exclude .cursor/ — these rules are part of the project.
+
+Then commit with message: <span class="hl">"phase-0: install cursor rules (legacy + modern)"</span>.</div>
+
+    <h3>Prompt 0.4 — Install build-docs and reference briefs</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.4</span>
+Copy the entire build-docs/ folder I have prepared into the repo root. Then copy the three reference briefs (platform-concept-brief.html, template-architecture-brief.html, visual-system-brief.html) into build-docs/briefs/.
+
+After copying:
+  - Open build-docs/README.html and verify every relative link in §02 (the doc family index) resolves to an actual file.
+  - If any link is broken, fix the path; do not delete the card.
+  - Make sure build-docs/assets/doc-system.css is one file, referenced consistently from every HTML.
+
+Commit: <span class="hl">"phase-0: install build-docs and reference briefs"</span>.</div>
+
+    <h3>Prompt 0.5 — CHANGELOG and version files</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.5</span>
+Create a root-level CHANGELOG.md following Keep-a-Changelog format. Seed it with one entry:
+
+<span class="hl">## [0.1.0] — &lt;today's date&gt;
+### Added
+- Forked baseapp into vertical-template.
+- Installed build-docs/ family (README, contexts, rules, phase prompts).
+- Installed cursor rules (.cursorrules and .cursor/rules/*.mdc).
+- Stack-context reconciled against actual repo state.</span>
+
+Also bump package.json version to 0.1.0 (it is currently whatever baseapp left it at).
+
+Commit: <span class="hl">"phase-0: cut v0.1.0"</span>.</div>
+
+    <h3>Prompt 0.6 — Create scripts/doctor.ts</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.6</span>
+Create scripts/doctor.ts. Its job is to fail loudly if the local dev environment is wrong. For phase 0 it must check:
+
+  1. Node version is &gt;= 20 (read process.versions.node).
+  2. All env vars listed in .env.example are present in .env (read both files, compare keys).
+  3. MONGODB_URI connects (attempt a Mongoose connect with a 3s timeout).
+
+It must NOT check feature-pack-specific or vertical-specific things yet — those get added by their own phases.
+
+Wire it into package.json as <span class="hl">"doctor": "tsx scripts/doctor.ts"</span> and add a note in README.html (the build-docs one) under §03 about running it.
+
+Commit: <span class="hl">"phase-0: scripts/doctor.ts (env+mongo check)"</span>.</div>
+
+    <h3>Prompt 0.7 — Verify dev loop end-to-end</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.7</span>
+Walk me through verifying the dev loop boots cleanly. Specifically:
+
+  1. Run <span class="hl">npm install</span>. Report any peer-dep warnings or version conflicts.
+  2. Run <span class="hl">npm run doctor</span>. It must pass.
+  3. Run <span class="hl">npm run dev</span>. Server must come up on its expected port; client must come up on its expected port.
+  4. Hit the client URL in a browser. The baseapp default page must render.
+  5. Hit one server health endpoint (if baseapp ships one) or create a minimal GET /api/health that returns { ok: true } if none exists.
+
+If anything is broken, FIX the smallest thing that unblocks the loop. Do NOT start refactoring baseapp's structure — that is later phases' work. Phase 0 is "it runs".
+
+After all five checks pass, commit any fixes: <span class="hl">"phase-0: dev loop green"</span>.</div>
+
+    <h3>Prompt 0.8 — Close the phase</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 0.8</span>
+We are closing Phase 0. Do the doc-update pass per build-docs/rules/documentation-maintenance.html:
+
+  1. Append a "Phase 0 — closed" entry to CHANGELOG.md listing every prompt run and its outcome.
+  2. Update build-docs/README.html doc-meta version to v0.1.0 if not already there.
+  3. List, in a short note for me, any <span class="hl">open questions or surprises</span> from this phase that should inform phase 1 (these go into the next session-starter's OPEN_QUESTIONS slot).
+  4. Confirm: no Type-A, Type-B, or Type-C change taxonomy work was done this phase (that starts in phase 1). If any happened accidentally, flag it.
+
+Commit: <span class="hl">"phase-0: close v0.1.0"</span> and tag the commit <span class="hl">v0.1.0</span>.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Acceptance criteria</span>
+    <h2>Phase 0 is done when…</h2>
+    <ul>
+      <li><code>npm install &amp;&amp; npm run doctor &amp;&amp; npm run dev</code> works from a fresh clone.</li>
+      <li><code>build-docs/</code> exists at repo root with every file from the prepared family.</li>
+      <li><code>.cursorrules</code> exists at repo root <em>and</em> <code>.cursor/rules/</code> contains all <code>.mdc</code> files.</li>
+      <li><code>CHANGELOG.md</code> exists with a v0.1.0 entry that accurately reflects what shipped.</li>
+      <li><code>package.json</code> version is <code>0.1.0</code>.</li>
+      <li>The commit <code>v0.1.0</code> is tagged.</li>
+      <li>You can hand this repo to someone else, point them at <code>build-docs/README.html</code>, and they could get oriented without asking you anything.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="icon"></span>
+      <p><strong>The "fresh clone" test.</strong> Before tagging v0.1.0, clone the repo into a different directory, run the three commands above, and confirm it works. If it doesn't, something in your local dev env is masking a missing file. Fix that before tagging.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">05 — Status &amp; handoff to Phase 1</span>
+    <h2>What's true at the end of Phase 0</h2>
+    <p>The template is a forked, renamed, version-tagged copy of baseapp with the doc family and cursor rules installed and a verified dev loop. <strong>No template-specific logic exists yet.</strong> It is still functionally baseapp.</p>
+
+    <h4>What Phase 1 will pick up</h4>
+    <ul>
+      <li>The <code>SiteConfig</code> type, the <code>getSiteConfig(req)</code> seam, the dual-file contract discipline.</li>
+      <li>Threading <code>tenantId</code> through every Mongoose model (defaulted to <code>'default'</code> until phase 7).</li>
+      <li>The first real Type-A vs Type-B vs Type-C decisions.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">Open question to carry forward</span>
+      <p>Did anything in <code>baseapp</code> surprise us that the template should explicitly preserve or explicitly remove? Phase 1's first prompt should resolve this before touching SiteConfig.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

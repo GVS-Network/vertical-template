@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack Context — Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Context</span>
+      <span>Stack Context · v0.1.0</span>
+    </div>
+    <h1 class="doc-title">The <em>stack</em>, pinned.</h1>
+    <p class="doc-subtitle">What's installed, what's chosen, what's expressly forbidden. Read before suggesting a library; read again before adding a dependency.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Core stack</span>
+    <h2>What MERN means here</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">Runtime</div>
+        <div class="val"><p>Node 20 LTS. Use <code>node --version</code> matching <code>.nvmrc</code> at repo root.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Language</div>
+        <div class="val"><p>TypeScript on both sides. <code>strict: true</code>. No <code>any</code> without an inline justification comment. Prefer <code>unknown</code> + narrowing.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Client</div>
+        <div class="val"><p>Vite 5 · React 18 · React Router 6. No Next.js (Vite + React Router is the inherited choice; do not change without a brief revision).</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Server</div>
+        <div class="val"><p>Express 4 · Mongoose 8 · MongoDB Atlas (managed). No Fastify, no Hono, no swap. <code>express-oauth2-jwt-bearer</code> for Auth0 JWT verification.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Identity</div>
+        <div class="val"><p>Auth0. Short-term decision per the concept brief. Wrap usage in the auth feature pack so the swap to Clerk/WorkOS is local.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Payments</div>
+        <div class="val"><p>Stripe (via Payment Links) and Square (with inventory). Behind <code>PaymentProvider</code> — application code never imports a vendor SDK directly.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Assets</div>
+        <div class="val"><p>Cloudinary. Same account/conventions as <code>askanddeliverwebapp</code>'s PortfolioProject uploads.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Styling</div>
+        <div class="val"><p>CSS variables emitted by <code>resolveTokens()</code> into <code>:root</code>. No Tailwind (would bypass the registry). No CSS-in-JS for theme values. Component-scoped CSS modules are fine; their values reference the variables.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — Dev tooling</span>
+    <h2>What runs locally</h2>
+
+    <h4>Root scripts (npm run …)</h4>
+    <ul>
+      <li><code>dev</code> — concurrently runs <code>client:dev</code> + <code>server:dev</code></li>
+      <li><code>build</code> — production build of both sides</li>
+      <li><code>init:vertical -- --vertical=&lt;id&gt; --tenant=&lt;slug&gt;</code> — scaffolds a new build from a preset</li>
+      <li><code>contract:check</code> — verifies <code>client/src/types/site-config.ts</code> ≡ <code>server/src/types/site-config.ts</code> (and same for <code>theme-tokens.ts</code>)</li>
+      <li><code>doctor</code> — env/health check; runs before <code>dev</code></li>
+      <li><code>test</code> — vitest, both sides</li>
+      <li><code>lint</code>, <code>typecheck</code> — standard</li>
+    </ul>
+
+    <h4>CI gates (every PR)</h4>
+    <ul>
+      <li><code>typecheck</code> · <code>lint</code> · <code>test</code> · <code>contract:check</code></li>
+      <li>Theme validator runs on any <code>site.theme.ts</code> or <code>theme.preset.ts</code> change</li>
+      <li>Doc-maintenance check (see <a href="../rules/documentation-maintenance.html">rules/documentation-maintenance.html</a>)</li>
+    </ul>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Allowed dependencies</span>
+    <h2>What's in the toolbox, what to ask before adding</h2>
+
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Already approved.</strong> express · mongoose · react · react-router-dom · vite · typescript · zod · concurrently · express-oauth2-jwt-bearer · stripe · square · cloudinary · vitest · dotenv.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Requires a brief reference before adding.</strong> Any state library (Redux, Zustand), any UI kit (MUI, Chakra, shadcn), any ORM swap, any routing change, any styling-system change. The brief is your justification — if no brief covers it, write one or don't add it.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Forbidden without a thesis update.</strong> Tailwind · Next.js · server-side rendering frameworks · GraphQL · Prisma · monorepo tooling (Nx, Turborepo, pnpm workspaces) · any analytics SDK that adds runtime cost · any auth provider that isn't the planned Auth0 → Clerk/WorkOS migration target.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Environment</span>
+    <h2>What needs to be present for things to run</h2>
+
+    <h4>Required env vars (server)</h4>
+    <ul>
+      <li><code>NODE_ENV</code> · <code>PORT</code> · <code>MONGO_URI</code></li>
+      <li><code>AUTH0_DOMAIN</code> · <code>AUTH0_AUDIENCE</code></li>
+      <li><code>STRIPE_SECRET_KEY</code> (when payments enabled with stripe)</li>
+      <li><code>SQUARE_ACCESS_TOKEN</code> · <code>SQUARE_LOCATION_ID</code> (when payments enabled with square)</li>
+      <li><code>CLOUDINARY_URL</code></li>
+      <li><code>TENANT_ID</code> — defaults to <code>'default'</code> until phase 7</li>
+    </ul>
+
+    <h4>Required env vars (client)</h4>
+    <ul>
+      <li><code>VITE_API_BASE</code></li>
+      <li><code>VITE_AUTH0_DOMAIN</code> · <code>VITE_AUTH0_CLIENT_ID</code> · <code>VITE_AUTH0_AUDIENCE</code></li>
+      <li><code>VITE_TENANT_ID</code> — mirrors server; phase 7 removes this in favor of runtime fetch</li>
+    </ul>
+
+    <p><code>npm run doctor</code> verifies presence and basic shape (URL formats, non-empty values). It does not validate credentials — that's <code>dev</code>'s first request.</p>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Code conventions</span>
+    <h2>House style for both sides</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">Imports</div>
+        <div class="val"><p>Absolute imports rooted at <code>@/</code> on both sides (tsconfig <code>paths</code>). Group: external → <code>@/types</code> → <code>@/features</code> → local. No deep imports across feature-pack boundaries.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Files</div>
+        <div class="val"><p>kebab-case for files (<code>site-config.ts</code>). PascalCase for component files (<code>IntakeForm.tsx</code>). One default export per component file. Hooks live next to the components that own them, not in a global <code>hooks/</code> folder.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Types</div>
+        <div class="val"><p><code>interface</code> for object shapes that callers extend, <code>type</code> for unions and aliases. Schema validation via <code>zod</code>. Mongoose schemas always have a matching <code>z.object()</code> for inbound validation.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Async</div>
+        <div class="val"><p>async/await throughout. Errors caught at the route boundary, not deep. <code>express-async-errors</code> imported once in <code>server/src/index.ts</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Tests</div>
+        <div class="val"><p>Vitest. Co-located <code>*.test.ts</code> next to the unit under test. Integration tests in <code>tests/integration/</code> at the side where they run.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Comments</div>
+        <div class="val"><p>Comment <em>why</em>, not <em>what</em>. A reference to the brief that motivated a non-obvious choice (<code>// see template-architecture-brief §03 — single seam for phase 2</code>) is worth more than three lines explaining the code.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">06 — Anti-patterns specific to this codebase</span>
+    <h2>Things Claude should refuse</h2>
+
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Editing core code from a client build.</strong> Per the template brief: client builds add <code>Custom*.tsx</code> files and override via <code>site.config.ts</code> / <code>site.theme.ts</code>. They do not edit feature packs, types, the resolver, or middleware.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Reaching past <code>getSiteConfig(req)</code>.</strong> No route reads tenant context any other way. No <code>process.env.TENANT_ID</code> in route handlers. No direct config imports in feature packs. One seam, one entry.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Importing Stripe or Square SDKs outside <code>server/src/providers/</code>.</strong> The abstraction exists for a reason. If a route needs payment behavior, it calls <code>getPaymentProvider()</code>.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Adding a model without <code>tenantId</code>.</strong> Every Mongoose schema declares it, indexed compound with its natural key. Single-tenant means the value is <code>'default'</code>, not absent.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Adding a token category outside the registry.</strong> Per the visual brief: leaf-level overrides only. A tenant can override <code>color.brand.primary</code>; they cannot introduce <code>color.brand.tertiary</code>. The category shape is platform-owned.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Hardcoding a CSS value that has a token.</strong> If <code>--color-brand-primary</code> exists, use <code>var(--color-brand-primary)</code>. Hardcoded hexes outside <code>theme/</code> are a build error.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">07 — Status</span>
+    <h2>What's pinned today, what changes later</h2>
+    <p>v0.1.0 pins Node 20, React 18, Vite 5, Express 4, Mongoose 8, Auth0 via <code>express-oauth2-jwt-bearer</code>, Stripe + Square as the two payment adapters, Cloudinary for assets. The forbidden list is firmer than the allowed list — adding tools is a thesis-level decision; removing them is local.</p>
+
+    <h4>Updates this context will receive</h4>
+    <div class="open-q">
+      <span class="q-label">Q · Version bumps</span>
+      <p>React 19, Vite 6, Mongoose updates — pin to specific majors here when adopted. Driven by upstream changes in baseapp first.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Auth0 exit</span>
+      <p>When the migration to Clerk or WorkOS happens (concept brief, architecture decisions §06), this context gets a "Identity, post-migration" row and §06's auth pattern updates.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Third payment adapter</span>
+      <p>If/when Toast or Clover lands, add a row to §03 and document the adapter conventions inline.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Context · Stack</span>
+    <span>The "before you write code" baseline</span>
+  </footer>
+
+</article>
+</body>
+</html>

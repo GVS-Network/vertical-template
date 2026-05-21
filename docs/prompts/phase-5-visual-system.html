@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 5 — Visual System · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 5</span>
+      <span>Visual System · v0.5.0 → v0.6.0</span>
+    </div>
+    <h1 class="doc-title">Phase 5 — <em>Visual system</em>.</h1>
+    <p class="doc-subtitle">Implement the four-layer token resolution from the visual-system brief: <em>foundation → vertical → tenant pick → tenant override</em>. Build <code>resolveTokens()</code>, the contrast validator, and CSS variable emission. Enforce leaf-only overrides. Phase 5 turns one React app into many visually distinct sites.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 4 closed, tagged <code>v0.5.0</code>. All four presets stamp cleanly.</li>
+      <li>You have re-read the <strong>visual system brief</strong> in full. The four-layer model and leaf-only rule should be top of mind.</li>
+      <li>The Phase-4 open question is resolved: opinionated brand defaults per vertical, or neutral. Phase 5's prompts assume <strong>opinionated</strong> (per concept brief) unless overridden.</li>
+    </ul>
+
+    <div class="callout discipline">
+      <span class="icon"></span>
+      <p><strong>The brief is the spec.</strong> Don't reinvent the resolution model in code. If you find yourself wanting a fifth layer, or a "smart" merge, stop — that's a brief revision, not a code change. Either escalate or stay strict.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — What this phase produces</span>
+    <h2>Deliverables</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>ThemeTokens (filled in)</strong><span class="why">the leaves</span></div>
+        <div class="val"><p><code>types/theme-tokens.ts</code> stops being empty. Concrete leaf tokens: <code>color.bg</code>, <code>color.ink</code>, <code>color.accent</code>, <code>type.heading.family</code>, <code>type.body.family</code>, <code>radius.md</code>, <code>shadow.sm</code>, etc. Every token is a primitive (string/number).</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Four foundation layers</strong><span class="why">files, not magic</span></div>
+        <div class="val"><p><code>theme/foundation.tokens.ts</code> (neutral defaults), <code>theme/verticals/&lt;v&gt;.tokens.ts</code> (one per preset), <code>theme/tenants/&lt;t&gt;.pick.ts</code> (the curated pick list), <code>theme/tenants/&lt;t&gt;.override.ts</code> (rare, leaf-only).</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>resolveTokens()</strong><span class="why">the merge function</span></div>
+        <div class="val"><p>Pure function: <code>(siteConfig, tenantId) → ResolvedTokens</code>. Reads the four layers in order, deep-merges, enforces leaf-only rule on the override layer.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Contrast validator</strong><span class="why">accessibility guardrail</span></div>
+        <div class="val"><p>For every text-on-bg pair declared in tokens, compute WCAG contrast ratio. Fail CI (and doctor) if below 4.5:1 for body text. Warn under 7:1 (AAA).</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>CSS variable emission</strong><span class="why">how tokens reach the DOM</span></div>
+        <div class="val"><p>Server-side: tokens are resolved per request and emitted as a <code>&lt;style&gt;:root{--…}&lt;/style&gt;</code> in the HTML head. Client React reads <code>var(--color-accent)</code> in styles. No JS state for tokens.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Per-vertical opinionated brand</strong><span class="why">credibility on day one</span></div>
+        <div class="val"><p>Each <code>theme/verticals/*.tokens.ts</code> is a real, considered brand expression — not a placeholder. A food-truck preset boots looking like a food truck, not like generic SaaS.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — The four-layer model (recap)</span>
+    <h2>Resolution order, leaf-only at the bottom</h2>
+
+    <div class="lineage-panel">
+      <h4>How a token gets its final value</h4>
+      <p>The visual-system brief defines four layers, applied in this order: <strong>foundation</strong> (neutral defaults that exist for every token), then <strong>vertical</strong> (the preset's opinionated overrides — typography, palette, voice), then <strong>tenant pick</strong> (the client chooses from a curated set of options — like picking from a swatch book), then <strong>tenant override</strong> (the rare leaf-level escape hatch when a client needs one thing changed exactly). Each layer can only set <em>leaves</em>. No layer can rewrite the structure of the tree.</p>
+    </div>
+
+    <div class="lineage-row">
+      <div class="repo"><span class="badge">1</span><span>foundation.tokens.ts</span></div>
+      <div>Every leaf defaulted. The contract: if every other file disappeared, this would still render a valid site.</div>
+    </div>
+    <div class="lineage-row">
+      <div class="repo"><span class="badge">2</span><span>verticals/&lt;v&gt;.tokens.ts</span></div>
+      <div>Opinionated per vertical. Overrides foundation leaves. Cannot introduce new leaves the type doesn't know about.</div>
+    </div>
+    <div class="lineage-row">
+      <div class="repo"><span class="badge">3</span><span>tenants/&lt;t&gt;.pick.ts</span></div>
+      <div>Client picks from curated options. Each pick is a named bundle (e.g. <code>palette: 'forest'</code>) which expands to leaf changes.</div>
+    </div>
+    <div class="lineage-row">
+      <div class="repo"><span class="badge">4</span><span>tenants/&lt;t&gt;.override.ts</span></div>
+      <div>Rare. Leaf-only. Validator enforces. Every override here is a story we have to tell.</div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-5 prompt sequence</h2>
+
+    <h3>Prompt 5.1 — Carry forward + opinionated decision</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.1</span>
+Resolve OPEN_QUESTIONS from Phase 4. Confirm the opinionated-brand-per-vertical decision in writing. If you (the operator) want to overrule the brief and go neutral, that decision goes in CHANGELOG with a written rationale; otherwise, opinionated.
+
+Also decide: are the verticals' brand directions documented somewhere outside code? (A figma file, a mood board, a doc?) If not, before writing tokens, write <span class="hl">theme/verticals/&lt;each&gt;.brief.md</span> — one paragraph per vertical describing the brand voice in words. Tokens come from briefs.</div>
+
+    <h3>Prompt 5.2 — Fill in ThemeTokens type</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.2</span>
+Replace the empty ThemeTokens interface (from Phase 1) with the full leaf-token set. Reference the visual-system brief's "tokens registry" section.
+
+Minimum leaves (every value a primitive):
+  color.bg, color.bg.panel, color.ink, color.ink.soft, color.ink.muted, color.rule, color.accent, color.accent.soft, color.green, color.amber, color.blue, color.danger
+  type.heading.family, type.heading.weight, type.heading.tracking, type.body.family, type.body.weight, type.mono.family
+  size.base, size.h1, size.h2, size.h3, size.body, size.small, size.mono
+  space.xs, space.sm, space.md, space.lg, space.xl
+  radius.sm, radius.md, radius.lg
+  shadow.sm, shadow.md
+  motion.duration.fast, motion.duration.med, motion.ease
+
+Update types/theme-tokens.ts. EVERY leaf MUST appear in foundation.tokens.ts in the next prompt. The dual-file contract from Phase 1 now also covers theme.
+
+Commit: <span class="hl">"phase-5: ThemeTokens type (full leaf set)"</span>.</div>
+
+    <h3>Prompt 5.3 — foundation.tokens.ts</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.3</span>
+Create theme/foundation.tokens.ts exporting <span class="hl">const foundation: ThemeTokens</span> with neutral, accessible, sensible defaults. Goal: a site rendered with ONLY foundation tokens should look quiet, legible, and unobjectionable. Like a well-typeset blank page.
+
+Reference points (not prescriptions):
+  - color.bg: a neutral off-white or cream
+  - color.ink: dark, but not pure #000 (1a1a1a-ish)
+  - color.accent: ONE accent that passes 4.5:1 on bg
+  - type.heading.family: a serif by default (Fraunces, Georgia stack)
+  - type.body.family: a humanist sans (Inter Tight, system stack)
+
+Update scripts/contract-check.ts to assert: every leaf in ThemeTokens has a value in foundation.tokens.ts (same dual-file rule as SiteConfig).
+
+Commit: <span class="hl">"phase-5: foundation tokens + contract check"</span>.</div>
+
+    <h3>Prompt 5.4 — Per-vertical token files</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.4</span>
+For each vertical, create theme/verticals/&lt;v&gt;.tokens.ts exporting <span class="hl">const verticalTokens: DeepPartial&lt;ThemeTokens&gt;</span>.
+
+Build them ONE AT A TIME, in the order the brand briefs were strongest. After each, hot-reload and look at the rendered demo tenant for that vertical.
+
+The tokens should be opinionated:
+  - bar-restaurant: warm, low-light, ink-on-cream, serif headings.
+  - food-truck: high-contrast, punchy accent, condensed sans headings.
+  - farm-source: green-leaning, earthy, paper-bag textures via accent-soft.
+  - screen-printer: print-shop bold, almost monospace headlines, ink black.
+
+DO NOT introduce new leaves. If you find one you need, STOP, update ThemeTokens, update foundation, then continue — never silently extend.
+
+Commit per vertical: <span class="hl">"phase-5: theme/verticals/&lt;v&gt;.tokens.ts"</span>.</div>
+
+    <h3>Prompt 5.5 — Tenant pick + override files (stubs)</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.5</span>
+For the demo tenants seeded in Phase 4, create:
+
+  theme/tenants/demo-&lt;v&gt;.pick.ts — empty for now (no picks), exporting <span class="hl">const pick: DeepPartial&lt;ThemeTokens&gt; = {}</span>.
+  theme/tenants/demo-&lt;v&gt;.override.ts — empty for now, exporting <span class="hl">const override: DeepPartial&lt;ThemeTokens&gt; = {}</span>.
+
+The point is to prove the file conventions and the registry. Real tenants in Phase 6 will populate these.
+
+Add theme/tenants/registry.ts that imports all of them keyed by tenantId.
+
+Commit: <span class="hl">"phase-5: tenant pick + override file stubs"</span>.</div>
+
+    <h3>Prompt 5.6 — resolveTokens()</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.6</span>
+Create theme/resolve.ts exporting:
+
+  export function resolveTokens(siteConfig: SiteConfig, tenantId: string): ThemeTokens
+
+Steps:
+  1. Start with foundation.
+  2. Deep-merge verticals[siteConfig.vertical] on top.
+  3. Deep-merge tenants[tenantId].pick on top.
+  4. Deep-merge tenants[tenantId].override on top, BUT FIRST validate it:
+     - Every key path in override must terminate at a leaf in ThemeTokens.
+     - Any non-leaf path → throw with a clear error pointing at the offending file.
+  5. Return the resolved tokens.
+
+Write unit tests for:
+  - foundation-only resolves correctly.
+  - vertical overrides foundation leaf-by-leaf.
+  - pick adds bundled leaf changes.
+  - override at non-leaf throws.
+  - override at leaf wins.
+
+Commit: <span class="hl">"phase-5: resolveTokens + leaf-only validator + tests"</span>.</div>
+
+    <h3>Prompt 5.7 — Contrast validator</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.7</span>
+Create theme/validate-contrast.ts.
+
+Given ResolvedTokens, compute WCAG contrast for these pairs:
+  - color.ink on color.bg
+  - color.ink.soft on color.bg
+  - color.bg on color.accent (button text scenario)
+  - color.ink on color.bg.panel
+
+Rules:
+  - body text pairs (ink/bg, ink/panel) must be &gt;= 4.5:1 — fail otherwise.
+  - accent pairs must be &gt;= 3.0:1 (large text) — warn under 4.5:1, fail under 3.0:1.
+
+Wire it into:
+  - scripts/doctor.ts: validate resolved tokens for every (vertical × demo-tenant) combo.
+  - resolveTokens()'s test suite.
+  - CI prebuild.
+
+Commit: <span class="hl">"phase-5: contrast validator + CI wiring"</span>.</div>
+
+    <h3>Prompt 5.8 — CSS variable emission</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.8</span>
+Create theme/emit-css-vars.ts:
+
+  export function emitCssVars(tokens: ThemeTokens): string
+
+Outputs a string like:
+  :root {
+    --color-bg: #f5f1ea;
+    --color-ink: #1a1a1a;
+    --color-accent: #b8451f;
+    /* ... etc ... */
+  }
+
+Wire it into the server's HTML response:
+  - On each request, after resolveTokens(siteConfig, tenantId), call emitCssVars and inject into the &lt;head&gt; as a &lt;style&gt; element BEFORE any other styles.
+  - The client's components reference var(--…) only. No JS reading tokens at runtime.
+
+Convert at least one existing pack's component (pick something visible like ProductCard) to use the CSS variables instead of hardcoded values. Walk a demo tenant for each vertical and confirm visual differentiation.
+
+Commit: <span class="hl">"phase-5: CSS var emission + first component converted"</span>.</div>
+
+    <h3>Prompt 5.9 — Convert remaining components</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.9</span>
+Audit every component across all five packs (client/features/&lt;pack&gt;/components/) and convert hardcoded colors, fonts, spacings to var(--…) references.
+
+Rules:
+  - One commit per pack. <span class="hl">"phase-5: convert client/features/&lt;pack&gt; to CSS vars"</span>.
+  - If a component uses a value not in ThemeTokens, that's a signal — either it's a one-off legitimately, or a leaf is missing. Decide deliberately each time.
+  - Visual regression: take a screenshot of each main page per vertical before and after; eyeball.
+
+End-of-prompt report: which components were converted, which were left as-is and why.</div>
+
+    <h3>Prompt 5.10 — Close the phase</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 5.10</span>
+Doc update pass:
+
+  - Append Phase 5 entry to CHANGELOG.
+  - Bump package.json to 0.6.0.
+  - Update repo-context.html §05 file map to include theme/ tree.
+  - Update glossary.html: every term from the visual-system brief — token, leaf, pick, override, resolution, foundation, vertical layer — should have a concise entry.
+  - Update README.html doc-meta version.
+  - List OPEN_QUESTIONS for Phase 6 — especially: what's the workflow when a client wants something the pick list doesn't offer?
+
+Tag <span class="hl">v0.6.0</span>. Fresh-clone test.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 5 is done when…</h2>
+    <ul>
+      <li><code>ThemeTokens</code> is fully populated; <code>contract:check</code> covers it.</li>
+      <li><code>foundation.tokens.ts</code> + four vertical token files all exist.</li>
+      <li><code>resolveTokens()</code> exists, has tests, and rejects non-leaf overrides.</li>
+      <li>The contrast validator fails CI on bad palettes and is wired into <code>doctor</code>.</li>
+      <li>Booting the same React app with different <code>BOUND_TENANT_ID</code>s renders four visually distinct sites.</li>
+      <li>Components reference <code>var(--…)</code> rather than hardcoded values.</li>
+      <li>Tagged <code>v0.6.0</code>.</li>
+    </ul>
+
+    <div class="callout opportunity">
+      <span class="icon"></span>
+      <p><strong>This is the demo moment.</strong> By the end of phase 5, you can sit a prospective client in front of a laptop and show them: same template, four wildly different sites, instantly. That's the pitch the concept brief promised.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status &amp; handoff to Phase 6</span>
+    <h2>What's true at the end of Phase 5</h2>
+    <p>Four-layer token resolution works. Contrast is enforced. Every component flows from tokens. The template is fully <em>themeable</em>, but no real client has shaped it yet. Phase 6 brings a real engagement through the template end-to-end.</p>
+
+    <h4>What Phase 6 will pick up</h4>
+    <ul>
+      <li>Driving an actual client build through the template — the concept-brief's "stage 1" moment.</li>
+      <li>Populating one real <code>tenants/&lt;name&gt;.pick.ts</code> and possibly <code>.override.ts</code>.</li>
+      <li>Discovering everything the template assumes that turns out not to be true.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">Open question to carry forward</span>
+      <p>When a client request can't be satisfied by foundation+vertical+pick+leaf-override — i.e. it wants a <em>structural</em> change — is the answer (a) escalate to the vertical layer (changes everyone in that vertical), (b) introduce a new pick option, or (c) say "no, that's not what this template does"? Phase 6 will surface this; we need the policy ready.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

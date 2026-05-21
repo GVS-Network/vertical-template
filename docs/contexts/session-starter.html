@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Starter — Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Context</span>
+      <span>Session Starter · v0.1.0</span>
+    </div>
+    <h1 class="doc-title">Paste this <em>at the top</em> of every Cursor session.</h1>
+    <p class="doc-subtitle">A repeatable opening prompt that primes Claude with the briefs it should re-read, the phase the build is in, and the discipline that's currently in force.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Why this exists</span>
+    <h2>The cost of cold-starting every chat</h2>
+    <p>Cursor auto-loads <code>.cursorrules</code> and matched <code>.cursor/rules/*.mdc</code> files. Those carry the standing rules. They do not carry: <em>where this build is in the phase plan</em>, <em>which open questions are live</em>, <em>which client (if any) is the current build</em>, and <em>what is forbidden in this specific session</em>.</p>
+    <p>The session starter fills that gap. It costs five seconds to paste and saves a half hour of corrections downstream.</p>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — Before pasting</span>
+    <h2>Fill in the four variables</h2>
+    <p>The prompt below has four placeholders. Replace them before pasting; don't trust Claude to infer them.</p>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">{PHASE}</div>
+        <div class="val"><p>The build-doc phase you're working in. <code>phase-0-bootstrap</code> through <code>phase-7-multi-tenant</code>. If you're between phases (closing one, opening the next), state both.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">{TEMPLATE_VERSION}</div>
+        <div class="val"><p>Current <code>CHANGELOG.md</code> top entry, e.g. <code>v0.3.2</code>. If unreleased, use <code>v0.3.2-dev</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">{CLIENT_BUILD}</div>
+        <div class="val"><p>If working on a per-client build (phase 6+), the tenant slug. Otherwise <code>none — template work</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">{OPEN_QUESTIONS}</div>
+        <div class="val"><p>One-line summaries of any live decisions not yet locked. Pulled from the briefs' or contexts' <code>open-q</code> sections that are <em>currently relevant</em>. If none, write <code>none open</code>.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — The prompt</span>
+    <h2>Copy from here</h2>
+
+    <div class="prompt-block"><span class="prompt-label">Session Starter · paste verbatim into Cursor chat</span>You are working in the vertical-template repo with me. Before you write or modify any code, read these documents in this order and treat them as the authoritative project context. Do not summarize them back to me — just confirm you have loaded each.
+
+<span class="hl">REQUIRED READING</span> (open each in this session before responding to the next prompt):
+
+1. <span class="hl">docs/platform-concept-brief.html</span>
+   The thesis. Vertical SaaS for small businesses. Staged go-to-market. The 40% shared core. Read §03 (the platform concept) and §06 (architecture decisions) at minimum.
+
+2. <span class="hl">docs/template-architecture-brief.html</span>
+   The template's seams. SiteConfig, feature packs, the six-change phase-2 jump. Read §02 (the one object), §03 (decisions), §06 (the phase-2 jump).
+
+3. <span class="hl">docs/visual-system-brief.html</span>
+   The token registry. Four-layer resolution, guarded overrides, Type-A/B/C propagation. Read §02 (architecture) and §05 (override discipline).
+
+4. <span class="hl">docs/contexts/repo-context.html</span>
+   The three-repo family: baseapp, askanddeliverwebapp, vertical-template. Patterns inherited; patterns aligned.
+
+5. <span class="hl">docs/contexts/stack-context.html</span>
+   What's pinned, what's allowed, what's forbidden. Anti-patterns specific to this codebase.
+
+6. <span class="hl">docs/contexts/glossary.html</span>
+   Project vocabulary. When I or you use these terms, they carry the definitions in this file.
+
+<span class="hl">SESSION STATE</span>
+
+  · Build phase:        {PHASE}
+  · Template version:   {TEMPLATE_VERSION}
+  · Client build:       {CLIENT_BUILD}
+  · Open questions:     {OPEN_QUESTIONS}
+
+<span class="hl">STANDING RULES</span> (also enforced by .cursor/rules; restating for emphasis)
+
+  · You are working on the template repo. Match agency-app patterns when in doubt;
+    do not invent a second convention for something the agency app has solved.
+
+  · Every Mongoose model gets tenantId (single-tenant value: 'default').
+  · Every route reads tenant context through getSiteConfig(req). No exceptions.
+  · Payments go through getPaymentProvider(). Stripe/Square SDKs are not imported
+    outside server/src/providers/.
+  · Theme values come from resolveTokens()-emitted CSS variables. No hardcoded
+    hexes outside theme/ files.
+  · Client builds (Type C) never edit core code (Type A). If a one-off seems like
+    a general need, generalize into core — don't fork.
+  · Dual-type files (site-config.ts, theme-tokens.ts) stay byte-identical across
+    client/ and server/. The contract:check script enforces this in CI.
+
+<span class="hl">DOCUMENTATION DISCIPLINE</span>
+
+  Every code change either:
+    (a) is covered by an existing brief / context — proceed and link it in PR
+    (b) requires a doc update — write it in the same PR as the code
+    (c) needs a brief revision — stop and surface the question; this is a thesis
+        edit, not an implementation detail
+
+  When you touch one of these files, mention which:
+    · CHANGELOG.md             — every code change, append under current version
+    · docs/contexts/glossary   — new project-specific terms
+    · docs/contexts/stack      — dependency adds/swaps, env var changes
+    · docs/contexts/repo       — cross-repo flow changes
+    · docs/prompts/phase-N     — outcomes / acceptance criteria proven or revised
+    · docs/*-brief.html        — only when a thesis decision changes (rare)
+
+<span class="hl">HOW WE WORK</span>
+
+  · I will point you at a phase prompt (docs/prompts/phase-N-*.html). Read its
+    "Prompts to run, in order" section, then we go one prompt at a time.
+  · You propose the change in chat first if it spans more than one file or
+    introduces a new concept. I approve, then you write the code.
+  · You ask before adding any dependency not listed in docs/contexts/stack
+    §03 "Allowed dependencies."
+  · You ask before adding a new file at the top level (verticals/, features/,
+    providers/, scripts/). New folders need a place in the docs/contexts/repo
+    file map.
+
+Confirm by listing the six documents you've loaded and the phase + version
+of this session. Then wait for the next prompt.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Variants</span>
+    <h2>Short forms for specific cases</h2>
+
+    <h3>After-restart resumption</h3>
+    <p>When Cursor restarts mid-phase, full reload is overkill. Paste this instead:</p>
+
+    <div class="prompt-block"><span class="prompt-label">Resume · after Cursor restart, same phase</span>Resuming the previous session. Phase: {PHASE}. Template: {TEMPLATE_VERSION}.
+Re-read docs/prompts/{PHASE}.html and the last 3 commits on this branch.
+Confirm the next prompt in that phase doc that we have not completed, then wait.</div>
+
+    <h3>Client-build context</h3>
+    <p>When working on a per-client build instead of the template itself (phase 6+):</p>
+
+    <div class="prompt-block"><span class="prompt-label">Client build · per-tenant work</span>This session is per-client build work for tenant {CLIENT_BUILD}.
+
+Standing rule: we work in Type-C territory only.
+  · Allowed: site.config.ts, site.theme.ts, Custom*.tsx files, branded assets.
+  · Forbidden: any file under features/, providers/, theme/ (other than presets),
+    middleware/, types/, getSiteConfig.ts, resolveTokens.ts.
+
+If you find yourself wanting to edit a forbidden file, STOP and tell me. The
+answer is one of:
+  · the change goes into core (template PR, this client pulls the new tag)
+  · the change is wrong (this client doesn't need it)
+  · the rule needs revision (open question, escalate)
+
+Confirm and wait for the next prompt.</div>
+
+    <h3>Brief-revision sessions</h3>
+    <p>When the work is editing a brief, not writing code:</p>
+
+    <div class="prompt-block"><span class="prompt-label">Thesis-edit session · brief revision</span>This session is editing docs/{BRIEF}.html — a thesis revision, not implementation.
+
+Rules for this session:
+  · No code changes. If you propose one, stop and remind me we're in thesis mode.
+  · Bump the brief's version in the header. Bump docs/README.html version.
+  · Add a CHANGELOG entry under "thesis" for the date.
+  · Cross-reference: any other doc that depends on the section being edited
+    must be flagged and either updated in the same PR or filed as a follow-up.
+
+Reason for revision: {REASON}
+
+Confirm and wait for the specific change.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Hygiene</span>
+    <h2>Keeping the starter honest</h2>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Update the starter when the doc list changes.</strong> Adding a context, retiring one, restructuring the prompts directory — all of these require editing this file. The doc-maintenance rule will warn you in CI.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Don't add per-session detail here.</strong> If the variable list grows beyond five or six fields, the starter is taking on responsibility that belongs in the phase prompts. Push detail down, not up.</p>
+    </div>
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>You can save this as a Cursor "Composer template" or text snippet.</strong> The exact mechanism evolves with Cursor; the prompt body is what matters.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status</span>
+    <h2>What this prompt expects of itself</h2>
+    <p>v0.1.0 — the initial prompt and three variants (resume, client-build, brief-revision). Six required-reading docs. Four variables. The standing-rules block restates discipline already in <code>.cursor/rules/</code> because rules and primes work better redundant than absent.</p>
+
+    <h4>Updates over time</h4>
+    <div class="open-q">
+      <span class="q-label">Q · Phase 7 starter</span>
+      <p>When multi-tenant ships, the standing rules add tenant-resolution boundaries and the "tenantId === 'default'" line gets edited or removed. A fourth variant for "tenant admin operations" may be needed.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Skill-attached prompts</span>
+      <p>Recurring prompt patterns may graduate into <code>docs/skills/</code>. When that happens, the required-reading list grows and this file documents which skills auto-attach to which Cursor file globs.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Context · Session Starter</span>
+    <span>Paste at the top of every chat</span>
+  </footer>
+
+</article>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 6 — First Client · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 6</span>
+      <span>First Client · v0.6.0 → v0.7.0</span>
+    </div>
+    <h1 class="doc-title">Phase 6 — <em>First client</em>.</h1>
+    <p class="doc-subtitle">Drive one real client engagement through the template end-to-end. This is the "stage 1" moment from the concept brief — single tenant, deployed to its own infrastructure, real domain, real money, real customer. The template will lie to you about a half-dozen things; this phase is where you catch them.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 5 closed, tagged <code>v0.6.0</code>. Visual system end-to-end.</li>
+      <li>You have <strong>a real client signed</strong> — not a hypothetical. The whole point of phase 6 is realness.</li>
+      <li>The client falls into one of the four verticals. (If they don't, defer them to a later phase; don't invent a fifth vertical mid-build.)</li>
+      <li>You have a content intake mechanism with the client — even if it's a shared doc. The template can't render what doesn't exist.</li>
+    </ul>
+
+    <div class="callout risk">
+      <span class="icon"></span>
+      <p><strong>Phase 6 is a single-tenant deploy.</strong> We are NOT introducing multi-tenant routing yet. This client gets their own deploy of the template (forked or branched), with <code>tenantId='default'</code> on its own DB. Phase 7 is when we collapse multiple deploys into one.</p>
+    </div>
+
+    <div class="callout discipline">
+      <span class="icon"></span>
+      <p><strong>Discoveries become brief revisions, not template hacks.</strong> When the client wants something the template can't do cleanly, the first response is "is this a brief problem or a template problem?" — not "let me add a special-case branch".</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — What this phase produces</span>
+    <h2>Deliverables</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>A live, paying-customer site</strong><span class="why">the whole point</span></div>
+        <div class="val"><p>Real domain, real SSL, real payment provider (live mode, not test), real content. Used by real customers. Operator can see it in their analytics dashboard the morning after launch.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>One real tenant pick file</strong><span class="why">visual system exercised</span></div>
+        <div class="val"><p><code>theme/tenants/&lt;client&gt;.pick.ts</code> populated with the client's curated picks (palette choice, type family choice from offered options). Possibly one leaf override.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>A discoveries log</strong><span class="why">structured feedback</span></div>
+        <div class="val"><p><code>build-docs/discoveries/&lt;client&gt;-phase-6.md</code> capturing every "this didn't work" / "this surprised us" / "this was easier than expected" moment. Input to potential brief revisions.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Brief revision proposals</strong><span class="why">if warranted</span></div>
+        <div class="val"><p>If discoveries surface contradictions with the briefs, write proposed revisions per the protocol in <code>documentation-maintenance.html</code>. Do not silently change the briefs; propose, decide, then change.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>An operational runbook for this client</strong><span class="why">post-launch</span></div>
+        <div class="val"><p>One-pager: how to update content, how to add a product, how to refund through Square/Stripe dashboard, where to look when something breaks. Lives in <code>build-docs/clients/&lt;client&gt;.md</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>doctor.ts gains a live-mode check</strong><span class="why">production hardening</span></div>
+        <div class="val"><p>When <code>NODE_ENV=production</code>, doctor verifies all webhooks are reachable, payment provider is in live mode (not test), and Mongo backups are configured.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Change taxonomy in this phase</span>
+    <h2>What kind of changes are we making?</h2>
+
+    <div class="change-types">
+      <div class="change-type A">
+        <span class="tag">Type A</span>
+        <h5>Client tenant files</h5>
+        <p>Creating <code>theme/tenants/&lt;client&gt;.pick.ts</code> and seed content is additive. No existing code path changes. This is the right kind of change for a client-specific phase.</p>
+      </div>
+      <div class="change-type B">
+        <span class="tag">Type B</span>
+        <h5>(careful here)</h5>
+        <p>If the client needs a token that doesn't exist, the brief discipline kicks in. Either escalate to vertical-tokens (changes everyone), or add a leaf to ThemeTokens (Type B — ripples to every layer). Do not silently inline.</p>
+      </div>
+      <div class="change-type C">
+        <span class="tag">Type C</span>
+        <h5>Discovered structural needs</h5>
+        <p>If the client surfaces a need for a structural template change (e.g. orders need a "scheduled pickup date"), it's Type C. Document, propose, decide whether to do it now (delays launch) or after (carry as debt with explicit deadline).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-6 prompt sequence</h2>
+
+    <p>Phase 6 mixes prompts with operator-only work (talking to the client, picking a domain, etc). Prompts are flagged <span class="pill green">CLAUDE</span> or <span class="pill amber">OPERATOR</span>.</p>
+
+    <h3>Prompt 6.1 <span class="pill amber">OPERATOR</span> — Sign the client + write a project brief</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.1 — operator task</span>
+Before any prompt to Claude, you (the operator) must:
+
+  1. Have the client signed (or have explicit OK to use them as the phase-6 test).
+  2. Write a one-page project brief: client name, vertical, what they sell, who their customers are, what content they have ready, what payment provider they want, what domain, what launch date.
+  3. Confirm the client's vertical IS one of the four. If not, STOP — do not invent a fifth vertical here.
+
+Save the brief at build-docs/clients/&lt;client&gt;.brief.md. Every following prompt assumes it exists.</div>
+
+    <h3>Prompt 6.2 <span class="pill green">CLAUDE</span> — Stand up the client's instance</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.2</span>
+We have a real client at build-docs/clients/&lt;client&gt;.brief.md. Read it.
+
+This is a single-tenant deploy. Steps:
+
+  1. Confirm the client's vertical key matches a registered preset.
+  2. Decide infrastructure path: separate deploy of the template (current state), OR add the client as a tenant in a future shared deploy (NOT YET — that's phase 7). For phase 6, separate deploy.
+  3. Choose a tenant id (kebab-case, no reserved words).
+  4. Run init:vertical -- --preset=&lt;v&gt; --tenant=&lt;client-tenant-id&gt; against a NEW database (not the dev one).
+  5. Walk the seeded app for that tenant. Note any seed content that needs replacing with the client's actual content.
+
+Report what was created and what content is still placeholder.</div>
+
+    <h3>Prompt 6.3 <span class="pill amber">OPERATOR</span> — Content intake</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.3 — operator task</span>
+Get real content from the client. Bare minimum:
+
+  - Real product/menu list with real prices.
+  - Real "About" copy (1-3 paragraphs in their voice).
+  - Real photos (or commit to using stock as a stopgap, with replacement timeline).
+  - Real contact info, hours, location.
+  - Logo file (vector if possible).
+
+Put it all in a structured form Claude can read: a single content.intake.md or a folder under build-docs/clients/&lt;client&gt;/content/.
+
+Until this is done, no further Claude prompts. The template can't render fake content into a real launch.</div>
+
+    <h3>Prompt 6.4 <span class="pill green">CLAUDE</span> — Load the real content</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.4</span>
+We now have real content at build-docs/clients/&lt;client&gt;/content/.
+
+  1. Replace the seeded Products in the client's tenant with the real product list.
+  2. Update the Page records (Home, About, etc) with real copy.
+  3. Upload logo + photos to whatever asset host we're using (per stack-context).
+  4. Update the FormDefinition for "Contact" or equivalent.
+
+For each replacement, log what was placeholder before and what is real now.
+
+Do NOT change any code. Only data. If any required content is missing, list it (don't hallucinate replacements).
+
+Commit: <span class="hl">"phase-6: real content for &lt;client&gt;"</span>.</div>
+
+    <h3>Prompt 6.5 <span class="pill green">CLAUDE</span> — Real brand picks</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.5</span>
+The client has visual preferences. Create theme/tenants/&lt;client&gt;.pick.ts based on those.
+
+Process:
+  1. Read theme/verticals/&lt;v&gt;.tokens.ts to see what's vertical-default for this client.
+  2. List what the client wants different (from the brief or from a call).
+  3. For each difference: is it expressible as a curated pick (a named option we offer) or does it need a leaf override?
+     - If pick: add it to the pick file.
+     - If override: add it to &lt;client&gt;.override.ts, BUT only if it's a single leaf. If it's structural, FLAG IT and we'll decide whether to escalate or refuse.
+  4. Run the contrast validator against the resolved tokens. If it fails, the client's preference is breaking accessibility — surface that with options.
+  5. Render the site and screenshot the home page. Save the screenshot to build-docs/clients/&lt;client&gt;/screenshots/.
+
+Commit: <span class="hl">"phase-6: brand picks + (maybe) leaf overrides for &lt;client&gt;"</span>.</div>
+
+    <h3>Prompt 6.6 <span class="pill green">CLAUDE</span> — Pre-flight checks</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.6</span>
+Before any deploy, run a pre-flight pass against the client's tenant:
+
+  1. doctor.ts — must pass with the client's env.
+  2. contract:check — must pass.
+  3. contrast validator on resolved tokens for &lt;client&gt; — must pass.
+  4. Walk every page in the rendered app, log any 404, 500, broken image, or "lorem".
+  5. Confirm payment provider is configured (test mode is fine right now; live mode toggle in 6.8).
+  6. Confirm Auth0 (if auth pack is on) has the right callback URLs configured for the client's domain.
+
+Produce a pre-flight report. Do not proceed if any check fails.</div>
+
+    <h3>Prompt 6.7 <span class="pill amber">OPERATOR</span> — Deploy to staging</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.7 — operator task</span>
+Deploy the client's instance to a staging URL (e.g. clientname.staging.&lt;your-domain&gt;.com). SSL configured.
+
+Walk the client through it. Capture their feedback in build-docs/clients/&lt;client&gt;/feedback-staging.md.
+
+Iterate via additional content prompts or pick adjustments (NOT code changes — code changes mean a template-level discovery; route those through 6.10).</div>
+
+    <h3>Prompt 6.8 <span class="pill amber">OPERATOR</span> — Production cutover</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.8 — operator task</span>
+Production cutover. Steps:
+
+  1. Point the client's real domain at production infra.
+  2. Issue SSL certificate.
+  3. Switch payment provider from test to live mode. Update STRIPE_SECRET_KEY / SQUARE_ACCESS_TOKEN, etc.
+  4. Update Stripe / Square webhook URLs to the live domain.
+  5. Run doctor in production mode — confirm webhook signatures verify against live keys.
+  6. Smoke-test: make a real $1 purchase. Refund it from the provider dashboard. Confirm order flips to refunded in our DB.
+
+Commit any env or runbook changes to build-docs/clients/&lt;client&gt;.md.
+
+Tag the production deploy with the template version: <span class="hl">v0.7.0-client-&lt;name&gt;</span>.</div>
+
+    <h3>Prompt 6.9 <span class="pill green">CLAUDE</span> — Write the runbook</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.9</span>
+Create build-docs/clients/&lt;client&gt;.md as a runbook. Sections:
+
+  - Tenant info (id, vertical, deploy URL, infra notes).
+  - Payment provider details (which one, account id, where to refund, where to view payouts).
+  - Content edit workflow (where pages live in the admin, who has access).
+  - Common operations: add a product, change hours, post an update, replace a photo.
+  - Troubleshooting: known false alarms, where logs are, how to escalate.
+  - Contact: who at the client to call, who internally owns this account.
+
+This is the doc the operator (or a teammate) will open at 9am Monday when the client emails about a typo. Make it scannable.</div>
+
+    <h3>Prompt 6.10 <span class="pill green">CLAUDE</span> — Discoveries log + brief revision proposals</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.10</span>
+Throughout phases 6.1-6.9 you (and the operator) have noticed things. Some are minor. Some contradict the briefs. Write them up.
+
+Create build-docs/discoveries/&lt;client&gt;-phase-6.md with sections:
+
+  ## What worked as the briefs predicted
+  ## What was easier than expected
+  ## What was harder than expected
+  ## What surprised us
+  ## What contradicted a brief
+  ## Recommended brief revisions (one per contradiction)
+
+For each "recommended brief revision" propose:
+  - Which brief (concept / template / visual-system).
+  - What sentence/section changes.
+  - Why this change does not weaken the brief's thesis.
+
+Do NOT change any brief yet. Proposals are reviewed by the operator before any brief is edited.</div>
+
+    <h3>Prompt 6.11 <span class="pill green">CLAUDE</span> — Close the phase</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.11</span>
+Doc update pass:
+
+  - Append Phase 6 entry to CHANGELOG. Include: client name (or codename if not public), vertical, what brand picks were made, what discoveries surfaced.
+  - Bump package.json to 0.7.0.
+  - Update repo-context.html §05 to show theme/tenants/&lt;client&gt;.*.ts and build-docs/clients/&lt;client&gt;.*.
+  - Update README.html doc-meta version.
+  - List OPEN_QUESTIONS for Phase 7 — especially: any place where the single-tenant deploy revealed assumptions the multi-tenant model will have to address.
+
+Tag <span class="hl">v0.7.0</span>. The fresh-clone test now needs to also verify that an init:vertical for the client's vertical still produces a coherent demo (not the client's real data — never seed production data into the template).</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 6 is done when…</h2>
+    <ul>
+      <li>The client's site is live at its real domain, with SSL, in payment provider <strong>live mode</strong>.</li>
+      <li>At least one real customer transaction has gone through end-to-end (operator and Claude both verify in their respective dashboards).</li>
+      <li><code>theme/tenants/&lt;client&gt;.pick.ts</code> exists with real picks; <code>.override.ts</code> exists (possibly empty, possibly one leaf).</li>
+      <li>The runbook at <code>build-docs/clients/&lt;client&gt;.md</code> is written and scannable.</li>
+      <li>The discoveries log exists with at least one entry per section.</li>
+      <li>Brief revisions, if any, are proposed (not yet applied) in the discoveries log.</li>
+      <li>Tagged <code>v0.7.0</code> and <code>v0.7.0-client-&lt;name&gt;</code>.</li>
+    </ul>
+
+    <div class="callout opportunity">
+      <span class="icon"></span>
+      <p><strong>This is the proof.</strong> Concept + template + visual system have produced a real working site for a real paying customer. Phase 7 collapses the single-tenant deploy into a multi-tenant one — but that's a refactor with a known target. The hard part is over.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status &amp; handoff to Phase 7</span>
+    <h2>What's true at the end of Phase 6</h2>
+    <p>One real client live, single-tenant. The template knows how to take itself the last mile from "demo" to "production". Phase 7 is the architectural step everyone was supposed to be afraid of, which we de-risked starting at Phase 1.</p>
+
+    <h4>What Phase 7 will pick up</h4>
+    <ul>
+      <li>The six discrete multi-tenant changes from the template architecture brief: Tenant model, host middleware, <code>getSiteConfig</code> swap, SSL strategy, client config admin, ops dashboard.</li>
+      <li>Migrating the phase-6 client from "their own deploy" to "shared multi-tenant deploy" — same DB rows, just routed via host.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">Open question to carry forward</span>
+      <p>Did the phase-6 client need anything that <code>tenantId</code> on every model doesn't already buy us? Phase 7's first prompt audits this — if there's a surprise here, better to find it before flipping the host-based routing on.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

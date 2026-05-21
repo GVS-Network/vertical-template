@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 3 — Payments · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 3</span>
+      <span>Payments · v0.3.0 → v0.4.0</span>
+    </div>
+    <h1 class="doc-title">Phase 3 — <em>Payments</em>.</h1>
+    <p class="doc-subtitle">Implement <code>getPaymentProvider</code> behind one interface, with two providers: Stripe (Payment Links, no PCI surface) and Square (with inventory sync). Webhooks reconcile orders. The payments feature pack stays exactly as it was — only the seam fills in.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 2 closed, tagged <code>v0.3.0</code>. All five packs pass pattern audit.</li>
+      <li>The <code>payments</code> pack mounts cleanly and fails checkout intent with the expected <code>NotImplementedYet</code> error.</li>
+      <li>You have <strong>both</strong> a Stripe test account and a Square sandbox account set up. Don't start this phase without them.</li>
+      <li>You have read the Stripe Payment Links docs and Square Orders/Inventory docs at least once recently.</li>
+    </ul>
+
+    <div class="callout risk">
+      <span class="icon"></span>
+      <p><strong>Real money, real care.</strong> This phase touches the only code path in the template that can lose customer money. Idempotency, webhook signature verification, and replay protection are non-negotiable. Don't move fast through prompts 3.5 and 3.6.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — What this phase produces</span>
+    <h2>Deliverables</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>The PaymentProvider interface (final)</strong><span class="why">single contract</span></div>
+        <div class="val"><p>From Phase 1's stub: <code>createCheckout(order)</code>, <code>verifyWebhook(req)</code>, <code>parseWebhookEvent(req)</code>, plus optional <code>syncInventory(products)</code>. Optional methods return <code>NotSupported</code> in providers that can't.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Stripe provider</strong><span class="why">Payment Links flow</span></div>
+        <div class="val"><p>Uses Stripe Checkout Payment Links. We do not collect card data. Order → Payment Link → redirect → webhook → <code>markOrderPaid</code>. No PCI surface in the template.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Square provider</strong><span class="why">with inventory</span></div>
+        <div class="val"><p>Uses Square Orders API + Checkout. Implements optional <code>syncInventory</code> to push stock changes into Square's catalog (since Square is many small businesses' POS source of truth).</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Webhook receivers</strong><span class="why">signature-verified, idempotent</span></div>
+        <div class="val"><p><code>POST /api/payments/webhook/stripe</code> and <code>/square</code>. Verify signatures. Deduplicate by event ID. Update orders idempotently. Log every event.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>getPaymentProvider implementation</strong><span class="why">seam closes</span></div>
+        <div class="val"><p>Reads <code>siteConfig.payment.provider</code>; returns the right concrete provider. Throws a recognizable error if <code>'none'</code> and a payments-pack route is called.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>doctor.ts grows</strong><span class="why">env checks</span></div>
+        <div class="val"><p>If <code>payments</code> feature flag is on, doctor checks that the relevant provider's env vars are present and that a test call to the provider's API succeeds.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Change taxonomy in this phase</span>
+    <h2>What kind of changes are we making?</h2>
+
+    <div class="change-types">
+      <div class="change-type A">
+        <span class="tag">Type A</span>
+        <h5>Filling the seam</h5>
+        <p>Adding the Stripe and Square implementations is additive. The seam signature does not change. No caller has to change.</p>
+      </div>
+      <div class="change-type B">
+        <span class="tag">Type B</span>
+        <h5>(none in this phase)</h5>
+        <p>No visual-token work.</p>
+      </div>
+      <div class="change-type C">
+        <span class="tag">Type C</span>
+        <h5>Order schema additions</h5>
+        <p>The Order schema may grow a <code>providerPayload</code> field. If so, it ripples to every read site. Do it once, deliberately, with a migration note in CHANGELOG.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-3 prompt sequence</h2>
+
+    <h3>Prompt 3.1 — Carry forward open questions</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 3.1</span>
+Resolve OPEN_QUESTIONS from Phase 2's close. Then add to that list:
+
+  - Do we want to support BOTH providers simultaneously per site (e.g. Stripe for online, Square for in-person), or is it one-per-site?
+  - For Square, do we MUTATE Square inventory or only READ it? The brief implies sync; pick a direction and document.
+
+Resolve both before any code. Document the answers in features/payments/README.md.</div>
+
+    <h3>Prompt 3.2 — Lock the PaymentProvider interface</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 3.2</span>
+Open server/seams/get-payment-provider.ts. Replace the stub with the final interface:
+
+  interface PaymentProvider {
+    key: 'stripe' | 'square';
+    createCheckout(order: Order): Promise&lt;{ url: string; providerRef: string }&gt;;
+    verifyWebhook(req: Request): boolean;
+    parseWebhookEvent(req: Request): WebhookEvent;
+    syncInventory?(products: Product[]): Promise&lt;void&gt;;
+  }
+
+  type WebhookEvent =
+    | { type: 'order.paid'; providerRef: string; eventId: string }
+    | { type: 'order.failed'; providerRef: string; eventId: string }
+    | { type: 'order.refunded'; providerRef: string; eventId: string }
+    | { type: 'unknown'; eventId: string };
+
+Leave getPaymentProvider() body still throwing — providers come next.
+
+Commit: <span class="hl">"phase-3: lock PaymentProvider interface"</span>.</div>
+
+    <h3>Prompt 3.3 — Stripe provider implementation</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 3.3</span>
+Create features/payments/providers/stripe.ts implementing PaymentProvider.
+
+  - createCheckout(order): create a Stripe Checkout Session using line items derived from order.items. Return { url, providerRef: session.id }.
+  - verifyWebhook(req): use stripe.webhooks.constructEvent with STRIPE_WEBHOOK_SECRET; return boolean.
+  - parseWebhookEvent(req): map Stripe events:
+       checkout.session.completed → order.paid
+       checkout.session.expired   → order.failed
+       charge.refunded            → order.refunded
+       (everything else)          → unknown
+  - syncInventory: NOT implemented. Throw NotSupported.
+
+Env additions: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET.
+
+Wire it into getPaymentProvider when siteConfig.payment.provider === 'stripe'.
+
+Test the full happy path against Stripe TEST mode: create an order, hit /intent, get a URL, complete checkout, watch the webhook fire, confirm order.status flips to 'paid'.
+
+Commit: <span class="hl">"phase-3: Stripe provider + happy-path test"</span>.</div>
+
+    <h3>Prompt 3.4 — Square provider implementation</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 3.4</span>
+Create features/payments/providers/square.ts implementing PaymentProvider.
+
+  - createCheckout(order): create a Square Order, then a Checkout link. Return { url, providerRef: orderId }.
+  - verifyWebhook(req): verify Square's HMAC signature using SQUARE_WEBHOOK_SIGNATURE_KEY.
+  - parseWebhookEvent(req): map Square events:
+       order.updated (state PAID)     → order.paid
+       order.updated (state CANCELED) → order.failed
+       refund.created                 → order.refunded
+       (else)                         → unknown
+  - syncInventory(products): for each product with sku, push stock to Square Catalog Inventory API. Idempotent.
+
+Env additions: SQUARE_ACCESS_TOKEN, SQUARE_LOCATION_ID, SQUARE_WEBHOOK_SIGNATURE_KEY, SQUARE_ENV ('sandbox'|'production').
+
+Wire into getPaymentProvider when siteConfig.payment.provider === 'square'.
+
+Test against Square SANDBOX: same happy path as Stripe, plus run syncInventory against one product and confirm stock appears in Square dashboard.
+
+Commit: <span class="hl">"phase-3: Square provider + inventory sync"</span>.</div>
+
+    <h3>Prompt 3.5 — Webhook handlers (with idempotency)</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 3.5</span>
+THIS IS THE MONEY-CRITICAL PROMPT. Read it carefully and do not skip steps.
+
+Update features/payments/controller.ts webhook routes:
+
+  POST /api/payments/webhook/:provider
+    1. Look up provider via getPaymentProvider on a synthesized siteConfig matching :provider (since webhooks don't carry tenant). For phase 3, this means we accept the param as the lookup key; phase 7 will revisit.
+    2. Call provider.verifyWebhook(req). If false → 400 + log.
+    3. Call provider.parseWebhookEvent(req).
+    4. Check WebhookEventLog (new model: tenantId, provider, eventId — unique index on (provider, eventId)). If already seen → 200 (idempotent acknowledge), do nothing else.
+    5. Insert WebhookEventLog row.
+    6. Apply event:
+         order.paid     → service.markOrderPaid(providerRef, eventId)
+         order.failed   → service.markOrderFailed(providerRef)
+         order.refunded → service.markOrderRefunded(providerRef)
+         unknown        → just log
+    7. Return 200.
+
+Test:
+  - Send the same Stripe event twice. Confirm order moves to paid exactly once.
+  - Send a tampered signature. Confirm 400.
+  - Send an unknown event type. Confirm 200 and a log entry.
+
+Commit: <span class="hl">"phase-3: webhook handlers with idempotency + signature verification"</span>.</div>
+
+    <h3>Prompt 3.6 — Doctor checks for payments</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 3.6</span>
+Extend scripts/doctor.ts:
+
+  - If features.payments is true on defaultSiteConfig:
+      - If payment.provider === 'stripe': require STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET. Hit a trivial Stripe API endpoint to confirm credentials.
+      - If payment.provider === 'square': require SQUARE_ACCESS_TOKEN, SQUARE_LOCATION_ID, SQUARE_WEBHOOK_SIGNATURE_KEY, SQUARE_ENV. Hit a trivial Square API endpoint.
+      - If payment.provider === 'none' but the pack is on: print a WARN (not a fail).
+
+Confirm doctor still passes when payments feature is off.
+
+Commit: <span class="hl">"phase-3: doctor checks for payment providers"</span>.</div>
+
+    <h3>Prompt 3.7 — Close the phase</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 3.7</span>
+Doc update pass per documentation-maintenance.html:
+
+  - Append Phase 3 entry to CHANGELOG. Include explicit note about the WebhookEventLog model addition (schema migration consequences if any).
+  - Bump package.json to 0.4.0.
+  - Update repo-context.html §05: add features/payments/providers/, scripts updates.
+  - Update glossary.html: "provider" and "webhook event log" should now have entries.
+  - Update stack-context.html: confirm Stripe + Square versions installed match what was pinned.
+  - List OPEN_QUESTIONS for Phase 4 — especially "which vertical defaults to which provider, and what does that say about our go-to-market order".
+
+Tag <span class="hl">v0.4.0</span>. Fresh-clone test.</div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 3 is done when…</h2>
+    <ul>
+      <li>End-to-end Stripe TEST checkout works: order → /intent → URL → pay → webhook → <code>status: 'paid'</code>.</li>
+      <li>End-to-end Square SANDBOX checkout works, same flow.</li>
+      <li>Sending the same webhook twice flips the order to paid <strong>exactly once</strong>.</li>
+      <li>A tampered webhook signature returns 400.</li>
+      <li><code>syncInventory</code> works for Square; throws <code>NotSupported</code> for Stripe.</li>
+      <li><code>doctor</code> verifies provider creds when payments is on.</li>
+      <li>Tagged <code>v0.4.0</code>.</li>
+    </ul>
+
+    <div class="callout discipline">
+      <span class="icon"></span>
+      <p><strong>Both providers, both green, both webhooks idempotent.</strong> This is the single best signal that the seam pattern from Phase 1 was worth it. If filling it in here was painful, that's information — note it for the brief revision.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status &amp; handoff to Phase 4</span>
+    <h2>What's true at the end of Phase 3</h2>
+    <p>The template can take real money two ways, with two webhook surfaces, idempotent, signature-verified. Phase 4 is where this stops being a generic stack and starts being <strong>verticals</strong>.</p>
+
+    <h4>What Phase 4 will pick up</h4>
+    <ul>
+      <li>Four vertical presets: <code>bar-restaurant</code>, <code>food-truck</code>, <code>farm-source</code>, <code>screen-printer</code>.</li>
+      <li><code>scripts/init-vertical.ts</code> that stamps out a fresh tenant config from a preset.</li>
+      <li>Per-vertical feature flags, payment-provider defaults, sample content.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">Open question to carry forward</span>
+      <p>For Square inventory sync — should it run on a cron, on every product mutation, or only on manual trigger? The verticals (especially bar-restaurant and food-truck) will surface this choice fast.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

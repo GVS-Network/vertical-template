@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform Concept Brief — Multi-Tenant Vertical SaaS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --bg-panel: #faf7f2;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-muted: #7a756e;
+    --rule: #d9d2c5;
+    --accent: #b8451f;
+    --accent-soft: #e8d8c8;
+    --highlight: #f4e8d8;
+    --green: #3d5a3d;
+    --amber: #a87a1f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 16px;
+    padding: 0;
+  }
+
+  .doc {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 64px 56px 96px;
+    background: var(--bg);
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 28px;
+    margin-bottom: 48px;
+  }
+
+  .doc-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+
+  .doc-meta .tag {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 4px 10px;
+    letter-spacing: 0.1em;
+  }
+
+  h1.doc-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  h1.doc-title em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .doc-subtitle {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-weight: 400;
+    max-width: 640px;
+  }
+
+  /* Section structure */
+  section {
+    margin-bottom: 56px;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: var(--ink-soft);
+  }
+
+  p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  ul, ol {
+    margin: 14px 0 14px 4px;
+    padding-left: 22px;
+    color: var(--ink-soft);
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+
+  li::marker {
+    color: var(--accent);
+  }
+
+  /* Concept summary panel */
+  .concept-panel {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+
+  .concept-panel h4 {
+    margin-top: 0;
+    color: var(--accent);
+  }
+
+  .concept-panel p:last-child { margin-bottom: 0; }
+
+  /* Categorization grid */
+  .vertical-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 20px 0;
+  }
+
+  .vertical-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    padding: 18px 18px 16px;
+  }
+
+  .vertical-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .vertical-card h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .vertical-card ul {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 13px;
+  }
+
+  .vertical-card li {
+    margin-bottom: 4px;
+    color: var(--ink-soft);
+  }
+
+  /* Phase timeline */
+  .phase {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 28px;
+    padding: 22px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  .phase:last-child { border-bottom: none; }
+
+  .phase-marker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .phase-marker .num {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .phase-body h3 {
+    margin-top: 0;
+    font-size: 18px;
+  }
+
+  .phase-body p {
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  /* Dialogue blocks */
+  .dialogue {
+    margin: 20px 0;
+  }
+
+  .exchange {
+    margin-bottom: 28px;
+  }
+
+  .speaker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .speaker.claude { color: var(--accent); }
+
+  /* Risk / opportunity callouts */
+  .callout {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 14px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    align-items: start;
+  }
+
+  .callout .icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .callout.opportunity .icon { background: var(--green); }
+  .callout.risk .icon { background: var(--accent); }
+  .callout.discipline .icon { background: var(--amber); }
+
+  .callout p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  .callout strong { color: var(--ink); }
+
+  /* Decisions table */
+  .decisions {
+    margin: 20px 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .decision-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 32px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .decision-row .key {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .decision-row .val {
+    font-size: 15px;
+    color: var(--ink-soft);
+  }
+
+  /* Status badge */
+  .status-section {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 32px 36px;
+    margin: 32px 0 0;
+  }
+
+  .status-section h2 {
+    color: var(--bg);
+    border-bottom-color: rgba(245, 241, 234, 0.2);
+    margin-bottom: 24px;
+  }
+
+  .status-section h3, .status-section h4 {
+    color: var(--bg);
+  }
+
+  .status-section p {
+    color: rgba(245, 241, 234, 0.85);
+  }
+
+  .status-section ul { color: rgba(245, 241, 234, 0.85); }
+  .status-section .section-num { color: var(--accent-soft); }
+
+  .open-q {
+    background: rgba(245, 241, 234, 0.05);
+    border-left: 2px solid var(--accent-soft);
+    padding: 14px 18px;
+    margin: 12px 0;
+  }
+
+  .open-q .q-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-soft);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .open-q p { margin: 0; font-size: 14.5px; }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .doc { padding: 40px 24px 64px; }
+    h1.doc-title { font-size: 36px; }
+    .vertical-grid { grid-template-columns: 1fr; }
+    .phase { grid-template-columns: 1fr; gap: 8px; }
+    .decision-row { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Project Context</span>
+      <span>Concept Brief · v1</span>
+    </div>
+    <h1 class="doc-title">A multi-tenant <em>vertical SaaS</em> for very small businesses.</h1>
+    <p class="doc-subtitle">From a portfolio of bespoke client websites toward a configurable platform with an opinionated ops backend and an eventual B2B network.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Origin</span>
+    <h2>The pattern that triggered the idea</h2>
+    <p>Across recent client work, the same scaffolding keeps reappearing: brand-presence website, common content types, an intake form with conditional logic, and — for some — commerce or inventory tied to Square. Different industries, near-identical underlying needs.</p>
+
+    <h4>Client landscape</h4>
+    <div class="vertical-grid">
+      <div class="vertical-card">
+        <span class="label">Product</span>
+        <h5>Tangible producers</h5>
+        <ul>
+          <li>Farm-to-table operations</li>
+          <li>Etsy-style creators</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <span class="label">Hybrid</span>
+        <h5>Product + service</h5>
+        <ul>
+          <li>Screen printers</li>
+          <li>Small carpentry / contractors</li>
+          <li>Bars &amp; restaurants</li>
+          <li>Food trucks</li>
+        </ul>
+      </div>
+      <div class="vertical-card">
+        <span class="label">Service</span>
+        <h5>Pure service providers</h5>
+        <ul>
+          <li>Marketing &amp; graphic design</li>
+          <li>Web design</li>
+          <li>Videography &amp; photography</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>Current delivery model</h4>
+    <p>Today these clients receive WordPress, Squarespace, or Shopify builds — setup, customization, and production push, billed per engagement. Commerce is occasionally a factor; Square integration is a recurring requirement for the food/farm cohort, including live inventory sync.</p>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — The existing engine</span>
+    <h2>The MERN app already built for the agency</h2>
+    <p>A working, single-tenant application that runs the operator's digital advertising agency. Its structure is essentially the proposed platform in miniature — which is what made the multi-tenant thesis visible in the first place.</p>
+
+    <h4>Public surface</h4>
+    <ul>
+      <li>Project portfolio &amp; company information</li>
+      <li>Conditional lead-management intake form — onboards everyone from "I don't know what I need" to "here is my exact scope and budget"</li>
+    </ul>
+
+    <h4>Operations backend</h4>
+    <ul>
+      <li>Clients → Projects → Tasks → Time entries → Invoicing</li>
+      <li>Service-discipline definitions and per-customer rate management</li>
+      <li>Block-time scheduling for todo navigation and quick time entry</li>
+      <li>Proposal creation</li>
+      <li>Team management with discipline definitions and rates</li>
+      <li>Domain assignment + Auth0 for admin access</li>
+    </ul>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Thesis</span>
+    <h2>The platform concept</h2>
+
+    <div class="concept-panel">
+      <h4>One-line framing</h4>
+      <p>A business-type-aware, multi-tenant web platform: businesses sign up, declare their type, toggle feature sets, configure simply, point a domain, populate content — and over time, transact with one another inside the network.</p>
+    </div>
+
+    <h3>Configuration model</h3>
+    <p>The platform <em>knows</em> what kind of business each tenant is. A farmer's tenant ships with inventory + CSA + seasonal content patterns. A screen printer's tenant ships with quote intake + proof approval + portfolio gallery. The opinionation per vertical is the product — not a blank canvas with plugins.</p>
+
+    <h3>Long-term B2B layer</h3>
+    <p>Once enough tenants exist across complementary verticals, the network becomes the differentiator: a restaurant can source a farmer, a marketing outfit can assemble vendors and providers for a live event, estimates and transactions can flow inside the platform rather than outside it.</p>
+
+    <h4>Where this is genuinely promising</h4>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Vertical opinionation is the wedge.</strong> Squarespace and WordPress are generic; this is opinionated by business type. That's a real differentiator against entrenched horizontal players.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>The ops backend is the moat.</strong> Website builders give a site; this gives clients/projects/tasks/invoicing wired in. Small businesses currently cobble this from five SaaS tools or spreadsheets.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>The B2B network is a credible long-term story</strong> — useful for narrative and direction, even before it's a built feature.</p>
+    </div>
+
+    <h4>Where to be cautious</h4>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>"Configurable for everyone" is the classic platform trap.</strong> The shared core across verticals is closer to 40% than 80%. Start narrow — likely farmers + food trucks (shared Square integration, natural B2B pair) — before expanding.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Two-sided marketplaces are hard.</strong> Cold-start problems are real. Treat B2B as phase-3, architect for it, don't build it early.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Multi-tenancy in MERN is non-trivial.</strong> Data isolation, custom-domain SSL, per-tenant feature flags, theming — a meaningful re-architecture from the single-tenant agency app.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Auth0 will get expensive at scale.</strong> Fine for now; plan an exit path.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Strategy</span>
+    <h2>The staged go-to-market</h2>
+    <p>Rather than chase a self-serve SaaS launch, the chosen path is a <strong>productized service that accretes into a platform</strong> — using paid client work as the R&amp;D budget. Each engagement generalizes one more piece of the system.</p>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">01</span>Now</div>
+      <div class="phase-body">
+        <h3>Pitch one-off builds personally</h3>
+        <p>Sell to known prospects — bars, food trucks, restaurants, screen printers — using self-built templates. Deliver as standalone properties; the platform thesis is internal, not customer-facing.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">02</span>Build</div>
+      <div class="phase-body">
+        <h3>Build with long-term data models in mind</h3>
+        <p>Every per-client engagement uses the multi-tenant data model under the hood, even though the builds are sold as one-offs. The discipline: every feature request gets tested against "would two or more business types use this?"</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">03</span>Learn</div>
+      <div class="phase-body">
+        <h3>Observe real usage</h3>
+        <p>With a few varied businesses live, watch habits and friction. Improvements flow back into the core platform instead of into one-off forks.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">04</span>Bridge</div>
+      <div class="phase-body">
+        <h3>Migrate the operator's own business</h3>
+        <p>Operator becomes a tenant on the new system — eating own dog food on a multi-tenant version that has already been stress-tested on paying clients.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">05</span>Network</div>
+      <div class="phase-body">
+        <h3>Backdoor the B2B layer</h3>
+        <p>With a family of trusted clients across complementary verticals, introduce connections manually first ("my food truck client needs produce — meet my farmer client"). Build the marketplace UI only after the connection patterns are understood by hand.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Discipline</span>
+    <h2>What this strategy requires of the operator</h2>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>A written rule for core vs. one-off.</strong> Every client request answers: <em>config value or code change?</em> Two-or-more-verticals → core. Single-client desire → tenant config or declined.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Deliberate client mix in phase 1.</strong> Coherent verticals (food/Square cluster + creator/intake cluster). Politely defer wildly different verticals — weddings, B2B consulting — until the model is mature.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Pricing that reflects R&amp;D.</strong> Generalization takes longer than hardcoding. Price engagements above pure deliverable cost, or accept that the platform is a deliberate time investment.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Pre-set graduation criteria for phase 2.</strong> Sketch the trigger now — N tenants, stable feature set, recurring revenue threshold — so one-off mode doesn't become permanent.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Watch the bottleneck moment.</strong> Around client 6–7, build capacity stalls platform progress. That's when to hire, package the build process, or slow intake — not when to push through.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">06 — Architecture</span>
+    <h2>Operative decisions taken so far</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">Engine</div>
+        <div class="val">The existing single-tenant MERN agency app is the prototype, not the production codebase. The next version is multi-tenant from day one.</div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Tenant zero</div>
+        <div class="val">Build multi-tenant scaffolding first, migrate the operator's own business onto it as tenant #1, then onboard external client as tenant #2 — flipped from the originally proposed order, for safer bug discovery and a live demo tenant.</div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Config vs. core</div>
+        <div class="val">Config (per-tenant): branding, content, visible features, intake-form questions, rate cards, theme. Core (shared, evolves for all): data models, workflows, integrations (Square, Stripe, Auth0), admin patterns.</div>
+      </div>
+      <div class="decision-row">
+        <div class="key">B2B marketplace</div>
+        <div class="val">Architected for, not built in phase 1. Data model permits it; transaction flows, escrow, dispute resolution deferred until tenant density exists.</div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Initial verticals</div>
+        <div class="val">Food/Square cluster (farmers, food trucks, restaurants, bars) plus creator/intake cluster (screen printers, small contractors). Diversification deferred.</div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Identity</div>
+        <div class="val">Auth0 short-term. Exit path to Clerk, WorkOS, or self-hosted modeled before scale.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">07 — Status</span>
+    <h2>Where the concept stands today</h2>
+    <p>The plan is grounded: a productized service with a platform backbone, funded by client work, gradually accreting into a multi-tenant system with an eventual B2B layer. Stage 1 — pitching and delivering one-off builds to known prospects using the new multi-tenant scaffolding — is the next concrete activity.</p>
+
+    <h4>Open questions to revisit in subsequent discussions</h4>
+
+    <div class="open-q">
+      <span class="q-label">Q · Timeline</span>
+      <p>How soon does the first external client build happen on the refactored multi-tenant version — weeks, or a longer rebuild period first?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Multi-tenancy strategy</span>
+      <p>Shared DB with tenant_id, schema-per-tenant, or DB-per-tenant? Custom-domain SSL provisioning approach (Caddy or alternative)? Per-tenant feature-flag system?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Config schema</span>
+      <p>What does the per-tenant configuration object look like in v1 — minimum fields to support the food and creator clusters without prematurely generalizing?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Pricing model</span>
+      <p>Setup fee plus monthly? Equity slice? Recurring percentage? How does pricing acknowledge that early builds are also platform R&amp;D?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Graduation criteria</span>
+      <p>Specific markers that trigger the move from "I do every build" to "tenants can self-serve" — number of tenants, MRR, feature stability, or a combination?</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Project Context · Platform Concept</span>
+    <span>Ready for reference in subsequent threads</span>
+  </footer>
+
+</article>
+</body>
+</html>

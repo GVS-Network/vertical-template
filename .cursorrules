@@ -1,181 +1,119 @@
-# Base MERN template — Cursor IDE rules
-
-Repository root contains `client/` and `server/` side by side. For diagrams and request flow, read `docs/architecture/ARCHITECTURE.md`.
-
-You are working on a MERN stack application with the following architecture:
-
-## Tech Stack
-- **Frontend**: Vite + React 18 + TypeScript
-- **Styling**: Tailwind CSS (utility-first)
-- **Backend**: Express.js + TypeScript
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: Auth0 (JWT-based)
-
-## Project Structure
-```
-client/          # React frontend
-  src/
-    components/  # Reusable UI components
-    pages/       # Route-level components
-    hooks/       # Custom React hooks
-    services/    # API calls (axios)
-    context/     # React context providers
-    types/       # TypeScript interfaces
-server/          # Express backend
-  src/
-    controllers/ # Business logic (currently inline in routes)
-    middleware/  # Express middleware (auth, errors)
-    models/      # Mongoose schemas
-    routes/      # API route definitions
-    services/    # External service integrations
-    config/      # Configuration (database, etc.)
-    types/       # TypeScript interfaces
-```
-
-## Code Conventions
-
-### TypeScript
-- Use strict mode
-- Define interfaces for all data structures
-- Prefer `interface` over `type` for object shapes
-- Use explicit return types for functions when not obvious
-
-### React (Frontend)
-- Use functional components with hooks
-- Use `useAuth0` hook for authentication
-- API calls go through `services/api.ts` with token injection
-- Use Tailwind utility classes, avoid custom CSS unless necessary
-- Component files use PascalCase: `MyComponent.tsx`
-
-### Express (Backend)
-- Use async/await with asyncHandler wrapper for error handling
-- Routes are protected with `checkJwt` middleware from Auth0
-- Extract user ID with `extractUserId(req)` from auth payload
-- Use Mongoose models for database operations
-- Return consistent JSON responses
-
-### Patterns to Follow
-
-**Creating a new API route:**
-```typescript
-// server/src/routes/newRoute.ts
-import { Router, Response } from 'express';
-import { checkJwt, AuthRequest, extractUserId } from '../middleware/auth';
-import { asyncHandler, createError } from '../middleware/errorHandler';
-import { Model } from '../models';
-
-const router = Router();
-router.use(checkJwt);
-
-router.get('/', asyncHandler(async (req: AuthRequest, res: Response) => {
-  const userId = extractUserId(req);
-  if (!userId) throw createError('Unauthorized', 401);
-  
-  const items = await Model.find({ user: userId });
-  res.json(items);
-}));
-
-export default router;
-```
-
-**Creating a new React page:**
-```typescript
-// client/src/pages/NewPage.tsx
-import { useState, useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import api from '../services/api';
-
-function NewPage() {
-  const { user } = useAuth0();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await api.get('/endpoint');
-        setData(response.data);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-
-  return (
-    <div className="max-w-4xl mx-auto">
-      {/* Content */}
-    </div>
-  );
-}
-
-export default NewPage;
-```
-
-**Creating a new Mongoose model:**
-```typescript
-// server/src/models/NewModel.ts
-import mongoose, { Document, Schema } from 'mongoose';
-
-export interface INewModel extends Document {
-  name: string;
-  user: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const newModelSchema = new Schema<INewModel>(
-  {
-    name: { type: String, required: true, trim: true },
-    user: { type: String, required: true, index: true },
-  },
-  { timestamps: true }
-);
-
-export const NewModel = mongoose.model<INewModel>('NewModel', newModelSchema);
-```
-
-## Common Tasks
-
-### Add a protected route
-1. Create route file in `server/src/routes/`
-2. Import and use `checkJwt` middleware
-3. Register route in `server/src/index.ts`
-
-### Add a new page
-1. Create component in `client/src/pages/`
-2. Add route in `client/src/App.tsx`
-3. Wrap with `<ProtectedRoute>` if auth required
-
-### Add a database model
-1. Create model in `server/src/models/`
-2. Export from `server/src/models/index.ts`
-3. Create corresponding routes/controllers
-
-## Environment Variables
-
-### Client (.env)
-- `VITE_API_URL` - Backend API URL
-- `VITE_AUTH0_DOMAIN` - Auth0 tenant domain
-- `VITE_AUTH0_CLIENT_ID` - Auth0 application client ID
-- `VITE_AUTH0_AUDIENCE` - Auth0 API identifier
-
-### Server (.env)
-- `PORT` - Server port (default: 3001)
-- `MONGODB_URI` - MongoDB connection string
-- `AUTH0_DOMAIN` - Auth0 tenant domain
-- `AUTH0_AUDIENCE` - Auth0 API identifier
-
-## Shopify Integration Notes
-
-For Shopify embedded apps, you'll need to:
-1. Install `@shopify/app-bridge-react`
-2. Replace Auth0Provider with Shopify's AppBridgeProvider
-3. Use Shopify session tokens instead of Auth0 JWT
-4. Configure Shopify OAuth flow in server
-
-The current auth setup is modular - the `checkJwt` middleware can be swapped for Shopify verification.
+# Vertical-template — .cursorrules
+# Single-file legacy rule set. Read by Cursor at the start of every session.
+# Complements .cursor/rules/*.mdc (scoped/conditional rules).
+#
+# When this file conflicts with a .cursor/rules/*.mdc file, the more specific
+# (glob-scoped) rule wins. When in doubt, read both.
+#
+# ─── PROJECT ────────────────────────────────────────────────────────────
+# This is the vertical-template repo: a multi-tenant-ready MERN starter
+# for very small businesses, opinionated by business type (vertical).
+#
+# The full thesis lives in three project briefs at docs/:
+#   - platform-concept-brief.html        (what & why)
+#   - template-architecture-brief.html   (seams & decisions)
+#   - visual-system-brief.html           (theme registry)
+#
+# The implementation playbook lives at docs/prompts/phase-N-*.html.
+# The README is docs/README.html.
+#
+# When asked to do anything non-trivial, open the relevant brief and the
+# current phase prompt FIRST. Do not infer from filenames; the docs say
+# what the system means.
+#
+# ─── ABSOLUTE RULES ─────────────────────────────────────────────────────
+#
+# 1. SINGLE TENANT CONTEXT SEAM.
+#    Every Express route reads tenant context through getSiteConfig(req).
+#    No process.env.TENANT_ID in route handlers. No direct imports of
+#    the SiteConfig singleton in feature packs. One function, one entry.
+#
+# 2. TENANTID ON EVERY MODEL.
+#    Every Mongoose schema declares tenantId, indexed compound with its
+#    natural key. Single-tenant value is 'default' — never omit the field.
+#
+# 3. DUAL TYPE FILES STAY IN SYNC.
+#    client/src/types/site-config.ts and server/src/types/site-config.ts
+#    must be byte-identical. Same for theme-tokens.ts. The contract:check
+#    script runs in CI. Editing one means editing both.
+#
+# 4. PAYMENTS GO THROUGH THE PROVIDER ABSTRACTION.
+#    No `import Stripe from 'stripe'` and no `import { Client } from
+#    'square'` outside server/src/providers/. Routes call
+#    getPaymentProvider() — they don't know which provider is active.
+#
+# 5. THEME VALUES COME FROM CSS VARIABLES.
+#    Token values are emitted by resolveTokens() into :root as CSS custom
+#    properties. Hardcoded hexes, rems, or spacings outside client/src/theme/
+#    are a build error. Use var(--color-brand-primary), not '#b8451f'.
+#
+# 6. CLIENT BUILDS DO NOT EDIT CORE CODE.
+#    Per-tenant divergence is Type C — site.config.ts, site.theme.ts,
+#    Custom*.tsx files. Editing feature packs, types, the resolver, or
+#    middleware in a client-build branch is forbidden. The fix is either
+#    to generalize the change into core or to reject it.
+#
+# 7. TWO-OR-MORE-VERTICALS TEST.
+#    Before generalizing any feature into core, ask: would a second
+#    vertical use this? If yes, it's core. If no, it's tenant config or
+#    a Custom*.tsx. There is no third option.
+#
+# 8. DOCS UPDATE WITH CODE.
+#    Every PR either (a) is fully covered by existing docs, (b) updates
+#    the relevant context/prompt/brief in the same PR, or (c) opens an
+#    explicit follow-up issue flagged in CHANGELOG. See
+#    docs/rules/documentation-maintenance.html.
+#
+# ─── CONVENTIONS ────────────────────────────────────────────────────────
+#
+# Match the agency-app (askanddeliverwebapp) pattern when there's a choice.
+# Workspace -> tenant. Lead -> IntakeSubmission. Cloudinary upload pattern
+# unchanged. Stripe Payment Links unchanged.
+#
+# TypeScript strict. No `any` without a justification comment. Prefer
+# `unknown` + narrowing. Use zod for runtime validation of anything
+# crossing the network or hydrating from Mongo.
+#
+# Imports rooted at @/ on both sides. Group: external -> @/types ->
+# @/features -> local.
+#
+# Comment WHY, not WHAT. Reference the brief that motivated a non-obvious
+# choice: `// see template-architecture-brief §03 — single seam for phase 2`.
+#
+# ─── WORKFLOW ───────────────────────────────────────────────────────────
+#
+# Big changes (new file at top level, new dependency, new feature pack,
+# schema migration): propose in chat first. Wait for approval. Then code.
+#
+# Small changes (within an existing file or feature pack, no new shape):
+# go ahead, show the diff.
+#
+# When stuck, return to the brief. The briefs explain decisions that
+# previous-Claude already worked through; re-reading them is faster than
+# re-deriving them.
+#
+# ─── VERSIONING ─────────────────────────────────────────────────────────
+#
+# Template repo uses semver in CHANGELOG.md. Bump before each tagged release.
+# Doc set versions independently in docs/README.html (v0.X.Y in header).
+# Brief revisions bump the doc set and add a "thesis" CHANGELOG entry.
+#
+# See docs/rules/documentation-maintenance.html for which doc must update
+# on which kind of change.
+#
+# ─── FORBIDDEN ──────────────────────────────────────────────────────────
+#
+# Tailwind. Next.js. SSR frameworks. GraphQL. Prisma. Monorepo tooling
+# (Nx/Turbo/pnpm workspaces). Adding any of these requires a brief
+# revision, not a chat decision.
+#
+# Reaching into another tenant's data. Even in single-tenant mode, no
+# query may be written that would break under multi-tenancy — all queries
+# filter on tenantId.
+#
+# Inventing new SiteConfig top-level fields without updating the type
+# definition AND the dual-file contract. Same for ThemeTokens.
+#
+# Adding a new color, font, or block style by hardcoding it instead of
+# registering it. The visual brief's "register before second use" rule
+# is absolute.

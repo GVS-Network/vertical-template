@@ -1,0 +1,38 @@
+---
+description: Project context — always loaded. The thesis, the briefs, and where the code is in its phase plan.
+alwaysApply: true
+---
+
+# Project Context
+
+You are working on **vertical-template**: a multi-tenant-ready MERN starter for very small businesses, opinionated by business type (vertical).
+
+## The three project briefs (read before any non-trivial work)
+
+- `docs/platform-concept-brief.html` — the thesis: vertical SaaS, staged go-to-market, the 40% shared core, the eventual B2B network.
+- `docs/template-architecture-brief.html` — the template's seams: SiteConfig, feature packs, the six-change phase-2 jump, change-types A/B/C.
+- `docs/visual-system-brief.html` — the token registry: four-layer resolution, leaf-level overrides, additive category evolution.
+
+## The codebase family
+
+- **baseapp** — frozen MERN starter; both production repos forked from it. Conventions inherited unchanged.
+- **askanddeliverwebapp** — the operator's live agency app. Reference implementation for: workspaceOwnerId (≡ tenantId), Lead model (≡ IntakeSubmission), Stripe Payment Links, `express-oauth2-jwt-bearer`, SiteConfig Mongoose model, Cloudinary uploads. **When in doubt, match this app's pattern.**
+- **vertical-template** — this repo. Where platform work happens.
+
+## Workflow
+
+1. For non-trivial changes, open the relevant brief and the current `docs/prompts/phase-N-*.html` first.
+2. Big changes (new top-level file, new dependency, new feature pack, schema migration) → propose in chat, wait for approval, then code.
+3. Small changes (within an existing feature pack, no new shape) → show the diff.
+4. Every PR updates docs in the same commit (see `docs/rules/documentation-maintenance.html`).
+
+## Phase awareness
+
+- The build-doc phases are 0–7 (see `docs/README.html`).
+- "Phase 2" with no qualifier means **build-doc phase 2** (feature packs).
+- "Phase 2 of the concept brief" or "the template brief's phase-2 transition" — always disambiguate.
+
+## Two voices to listen for
+
+- **The briefs** are the system's memory of *why*. They are not retroactively edited to match code; if implementation drifts, either change the code back or write a brief revision and bump the docs version.
+- **The contexts** (`docs/contexts/`) are the system's memory of *what is true now*. They update freely with the code.

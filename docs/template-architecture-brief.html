@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template Architecture Brief — Vertical SaaS Starter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --bg-panel: #faf7f2;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-muted: #7a756e;
+    --rule: #d9d2c5;
+    --accent: #b8451f;
+    --accent-soft: #e8d8c8;
+    --highlight: #f4e8d8;
+    --green: #3d5a3d;
+    --amber: #a87a1f;
+    --blue: #2a4a6a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 16px;
+    padding: 0;
+  }
+
+  .doc {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 64px 56px 96px;
+    background: var(--bg);
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 28px;
+    margin-bottom: 48px;
+  }
+
+  .doc-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+
+  .doc-meta .tag {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 4px 10px;
+    letter-spacing: 0.1em;
+  }
+
+  h1.doc-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  h1.doc-title em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .doc-subtitle {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-weight: 400;
+    max-width: 640px;
+  }
+
+  /* Section structure */
+  section {
+    margin-bottom: 56px;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: var(--ink-soft);
+  }
+
+  p strong { color: var(--ink); font-weight: 600; }
+
+  ul, ol {
+    margin: 14px 0 14px 4px;
+    padding-left: 22px;
+    color: var(--ink-soft);
+  }
+  li { margin-bottom: 8px; }
+  li::marker { color: var(--accent); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    background: var(--highlight);
+    padding: 1px 6px;
+    color: var(--ink);
+  }
+
+  pre {
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    padding: 18px 20px;
+    margin: 18px 0;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  pre code { background: transparent; padding: 0; font-size: inherit; }
+
+  /* Heritage / lineage panel */
+  .lineage-panel {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--blue);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+
+  .lineage-panel h4 {
+    margin-top: 0;
+    color: var(--blue);
+  }
+
+  .lineage-panel p:last-child { margin-bottom: 0; }
+
+  .lineage-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .lineage-row:last-child { border-bottom: none; }
+  .lineage-row .repo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .lineage-row .repo .badge {
+    display: block;
+    font-size: 10px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+  }
+
+  /* Decisions table */
+  .decisions {
+    margin: 20px 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .decision-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 28px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .decision-row .key {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .decision-row .key .why {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  .decision-row .val {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+  }
+  .decision-row .val p { margin-bottom: 8px; }
+  .decision-row .val p:last-child { margin-bottom: 0; }
+
+  /* Verticals grid */
+  .vertical-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin: 20px 0;
+  }
+
+  .vertical-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    padding: 22px 22px 20px;
+  }
+
+  .vertical-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .vertical-card h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  .vertical-card .spec {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+  .vertical-card .spec .k { color: var(--ink); }
+
+  /* Callout shapes (matches concept brief) */
+  .callout {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 14px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    align-items: start;
+  }
+
+  .callout .icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .callout.opportunity .icon { background: var(--green); }
+  .callout.risk .icon { background: var(--accent); }
+  .callout.discipline .icon { background: var(--amber); }
+  .callout.note .icon { background: var(--blue); }
+
+  .callout p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  .callout strong { color: var(--ink); }
+
+  /* Phase / step blocks */
+  .phase {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 28px;
+    padding: 22px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .phase:last-child { border-bottom: none; }
+
+  .phase-marker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .phase-marker .num {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .phase-body h3 {
+    margin-top: 0;
+    font-size: 18px;
+  }
+
+  .phase-body p {
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  /* Update-flow boxes */
+  .change-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 22px 0;
+  }
+
+  .change-type {
+    border: 1px solid var(--rule);
+    padding: 20px;
+  }
+  .change-type.A { border-top: 3px solid var(--green); }
+  .change-type.B { border-top: 3px solid var(--amber); }
+  .change-type.C { border-top: 3px solid var(--accent); }
+
+  .change-type .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .change-type h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .change-type p { font-size: 13.5px; margin: 0; }
+
+  /* Status / footer */
+  .status-section {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 32px 36px;
+    margin: 32px 0 0;
+  }
+  .status-section h2 {
+    color: var(--bg);
+    border-bottom-color: rgba(245, 241, 234, 0.2);
+    margin-bottom: 24px;
+  }
+  .status-section h3, .status-section h4 { color: var(--bg); }
+  .status-section p { color: rgba(245, 241, 234, 0.85); }
+  .status-section ul { color: rgba(245, 241, 234, 0.85); }
+  .status-section .section-num { color: var(--accent-soft); }
+  .status-section code {
+    background: rgba(245, 241, 234, 0.1);
+    color: var(--bg);
+  }
+
+  .doc-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 720px) {
+    .doc { padding: 40px 24px 64px; }
+    h1.doc-title { font-size: 36px; }
+    .vertical-grid, .change-types { grid-template-columns: 1fr; }
+    .phase, .lineage-row, .decision-row { grid-template-columns: 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Template Architecture</span>
+      <span>Companion to Concept Brief · v0.1</span>
+    </div>
+    <h1 class="doc-title">A <em>vertical-aware</em> MERN starter, multi-tenant-ready underneath.</h1>
+    <p class="doc-subtitle">Decisions, seams, and discipline for the new template that turns the platform thesis into something a build can actually start from on Monday.</p>
+  </header>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">01 — Lineage</span>
+    <h2>Where this template sits in the codebase family</h2>
+    <p>This template is not invented from scratch. It extends one repo and aligns with another — both already in active use, both already proving parts of the thesis.</p>
+
+    <div class="lineage-panel">
+      <div class="lineage-row">
+        <div class="repo">
+          <span class="badge">Forked from</span>
+          baseapp
+        </div>
+        <div>
+          The MERN starter. Establishes conventions for everything downstream — root-level <code>client/</code> + <code>server/</code>, <code>npm run dev</code> with concurrently, Auth0, Mongoose, Vite + React 18 + TS. The new template inherits all of these unchanged.
+        </div>
+      </div>
+      <div class="lineage-row">
+        <div class="repo">
+          <span class="badge">Aligned with</span>
+          askanddeliverwebapp
+        </div>
+        <div>
+          The agency app. Already generated from baseapp; already solved several problems the platform thesis needs — workspaces as tenant boundaries, a Lead model with conversion, Stripe Payment Links, <code>express-oauth2-jwt-bearer</code>, and a <code>SiteConfig</code> Mongo model. Where the new template makes choices, it matches the agency app first.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>Why alignment matters.</strong> The concept brief's phase 4 is "operator migrates onto the new system as tenant #1." Aligning conventions now makes that merge a configuration exercise, not a refactor. The agency app's <code>workspaceOwnerId</code> is functionally the same construct as <code>tenantId</code> here — by phase 2, they become the same field.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">02 — The one object</span>
+    <h2>Every build is shaped by one <code>SiteConfig</code></h2>
+    <p>One TypeScript shape defines what a build looks like. It lives in two files (<code>client/src/types/site-config.ts</code> and <code>server/src/types/site-config.ts</code>) kept byte-identical by a contract-check script in CI.</p>
+
+<pre><code>interface SiteConfig {
+  tenantId: string;
+  vertical: 'bar-restaurant' | 'food-truck' | 'farm-source' | 'screen-printer';
+  branding: { name, tagline, theme, fonts, contact };
+  features: {
+    catalog:  { enabled, mode, categories, squareInventorySync? };
+    content:  { enabled, pages[] };
+    intake:   { enabled, forms[] };           // forms have conditional fields
+    payments: { enabled, provider, publicCheckout };
+    auth:     { enabled, publicAccounts, provider };
+  };
+}</code></pre>
+
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Adding a capability the platform supports for everyone</strong> → core code change. <strong>Adding a choice a tenant can make about that capability</strong> → field on this type. The rule is the same rule from the concept brief, just made concrete.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">03 — Decisions</span>
+    <h2>Architectural choices, with the why</h2>
+
+    <div class="decisions">
+
+      <div class="decision-row">
+        <div class="key">
+          tenantId on every model
+          <span class="why">phase-2 enablement</span>
+        </div>
+        <div class="val">
+          <p>Every Mongoose schema declares <code>tenantId</code> indexed compound with its natural key. In single-tenant mode the value is always <code>'default'</code>. The cost is zero today; the cost of retrofitting across N models on the day multi-tenant ships is high.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          getSiteConfig(req) everywhere
+          <span class="why">single seam for phase 2</span>
+        </div>
+        <div class="val">
+          <p>Every server route reads its tenant context through one function. Today the function returns a singleton; in phase 2 it returns the per-request config. Zero callers change. This is the entire multi-tenant transition for application code.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          Vertical presets, not forks
+          <span class="why">discipline against drift</span>
+        </div>
+        <div class="val">
+          <p>Each of the four verticals ships a <code>preset.ts</code> exporting a <code>SiteConfig</code> minus tenantId and branding. The <code>init:vertical</code> script writes one into env files at build init. Builds override via <code>site.config.ts</code>; they do not edit presets.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          Feature packs are toggle-mounted
+          <span class="why">modular updates</span>
+        </div>
+        <div class="val">
+          <p>Five packs total — <code>catalog</code>, <code>content</code>, <code>intake</code>, <code>payments</code>, plus <code>auth</code> as middleware. Each has a folder on the server and client. The router file mounts them conditionally on <code>SiteConfig.features.&lt;id&gt;.enabled</code>. A disabled pack contributes zero API surface.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          PaymentProvider abstraction
+          <span class="why">stripe + square coexist</span>
+        </div>
+        <div class="val">
+          <p>A <code>PaymentProvider</code> interface with Stripe (via Payment Links, matching the agency app) and Square (with inventory fetch) adapters. The rest of the codebase calls <code>getPaymentProvider()</code> and never imports a vendor SDK. A third provider — Toast, Clover — is one new file.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          Conditional intake = shared validator
+          <span class="why">single source of truth</span>
+        </div>
+        <div class="val">
+          <p>The same <code>isFieldActive</code> predicate runs on client (for UX) and server (for enforcement). Form schemas live in <code>SiteConfig.features.intake.forms[]</code>, not in code. Adding a form for a tenant is config; adding a new field <em>kind</em> is core.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          Intake mirrors agency's Lead
+          <span class="why">phase-4 portability</span>
+        </div>
+        <div class="val">
+          <p>The <code>IntakeSubmission</code> model has notes with <code>createdBy</code>, conversion ids, pipeline status — same shape as the agency app's Lead. A build that grows into the agency app's ops backend moves data with a status-map and a field rename, not a model rewrite.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          Single-tenant first
+          <span class="why">honest phasing</span>
+        </div>
+        <div class="val">
+          <p>No Tenant model, no host-resolution middleware, no client config-fetch path, no tenant admin UI. All six are scoped in <code>MULTI-TENANT-ROADMAP.md</code>; none are built before there are multiple tenants to serve.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">04 — Verticals</span>
+    <h2>The four built-in presets, and what they encode</h2>
+    <p>Each vertical pack is a starting point — opinionated about the parts that vary predictably by business type, silent about the rest.</p>
+
+    <div class="vertical-grid">
+
+      <div class="vertical-card">
+        <span class="label">bar-restaurant</span>
+        <h5>Fixed-location food &amp; drink</h5>
+        <p>Bar, restaurant, café. Presence website + Square POS alignment + private-event intake. Catalog as menu (no checkout). The interesting choice: a structured menu instead of free text — so dishes can be sorted, hidden seasonally, rendered in multiple places.</p>
+        <div class="spec">
+          <div><span class="k">catalog</span> · menu</div>
+          <div><span class="k">payments</span> · square, staff-only</div>
+          <div><span class="k">intake</span> · private event w/ event-type conditional</div>
+          <div><span class="k">publicAccounts</span> · off</div>
+        </div>
+      </div>
+
+      <div class="vertical-card">
+        <span class="label">food-truck</span>
+        <h5>Mobile food operation</h5>
+        <p>Square POS like a restaurant, but a dynamic schedule and catering-forward intake. The conditional sales-guarantee question on festival/corporate bookings encodes domain knowledge a generic builder would never know to ask.</p>
+        <div class="spec">
+          <div><span class="k">catalog</span> · menu</div>
+          <div><span class="k">payments</span> · square, staff-only</div>
+          <div><span class="k">intake</span> · catering w/ guarantee conditional</div>
+          <div><span class="k">publicAccounts</span> · off</div>
+        </div>
+      </div>
+
+      <div class="vertical-card">
+        <span class="label">farm-source</span>
+        <h5>Farm / CSA / farm-to-table</h5>
+        <p>Most commerce-leaning vertical: real inventory, real public checkout, Square inventory sync on (small farms drift stock fast). The wholesale-inquiry form is the seed of the B2B network — its <code>business_type</code> field is shaped to absorb in-platform B2B traffic in phase 3.</p>
+        <div class="spec">
+          <div><span class="k">catalog</span> · inventory, square sync</div>
+          <div><span class="k">payments</span> · square, public checkout on</div>
+          <div><span class="k">intake</span> · wholesale w/ recurrence conditional</div>
+          <div><span class="k">publicAccounts</span> · on (CSA members)</div>
+        </div>
+      </div>
+
+      <div class="vertical-card">
+        <span class="label">screen-printer</span>
+        <h5>Custom-print operation</h5>
+        <p>Quote-driven, no off-the-shelf items. The only vertical defaulting to Stripe — because the workflow is quote→invoice→online payment, which is exactly what Payment Links exist for and exactly what the agency app already does. Long conditional intake; portfolio mode for the catalog.</p>
+        <div class="spec">
+          <div><span class="k">catalog</span> · portfolio</div>
+          <div><span class="k">payments</span> · stripe, staff-only</div>
+          <div><span class="k">intake</span> · project quote w/ garment-type conditional</div>
+          <div><span class="k">publicAccounts</span> · off</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Two verticals share Square, two split.</strong> Bar-restaurant and food-truck cluster on Square because they cluster on a POS. Farm-source also takes Square because the operators already use it. Screen-printer takes Stripe alone because there's no POS counterpart. This is the brief's "food/Square cluster + creator/intake cluster" reflected in code.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">05 — Modular updates</span>
+    <h2>How template improvements reach client builds</h2>
+    <p>The hardest problem in a productized-service model is upgrade flow. The template addresses it by classifying every change into one of three types — and being explicit about which types propagate cleanly.</p>
+
+    <div class="change-types">
+
+      <div class="change-type A">
+        <span class="tag">Type A</span>
+        <h5>Core code</h5>
+        <p>Feature packs, shared types, payment abstraction, auth middleware, shared renderers. <strong>Propagates via <code>git pull</code></strong> as long as client builds don't edit these files.</p>
+      </div>
+
+      <div class="change-type B">
+        <span class="tag">Type B</span>
+        <h5>Vertical presets</h5>
+        <p>Preset files. Consumed at init-time only — existing builds keep their current config. Advisory, not retroactive. Note in release notes; let each build opt in.</p>
+      </div>
+
+      <div class="change-type C">
+        <span class="tag">Type C</span>
+        <h5>Per-build</h5>
+        <p>Branding, content, intake schemas customized per client, hand-written client-specific pages. <strong>Never propagated.</strong> This is the intentional divergence.</p>
+      </div>
+
+    </div>
+
+    <h4>The rule that makes it work</h4>
+    <p>Client builds do not edit core code. If a client needs behavior the core doesn't provide:</p>
+    <ol>
+      <li><strong>Tweak existing config</strong> via <code>site.config.ts</code> overrides — zero merge pain.</li>
+      <li><strong>Add a <code>Custom*.tsx</code> file</strong> alongside shared pages, mount in App.tsx below shared routes — one new file the upstream pull won't touch.</li>
+      <li><strong>Reject the request, or upstream it.</strong> If a one-off looks like a second client's need, generalize now.</li>
+    </ol>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Builds pin to release tags, not branches.</strong> Bumping a client from <code>v0.4.1</code> to <code>v0.4.2</code> is one <code>git pull</code> and a smoke test. Once multi-tenant ships in phase 2, the whole Type-C column collapses — there is no per-build divergence anymore.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">06 — The phase-2 jump</span>
+    <h2>From single-tenant to multi-tenant in six discrete changes</h2>
+    <p>The architecture buys back this transition deliberately. Six files (or so) touched. No feature pack, no model, no vertical preset, no page changes.</p>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">01</span>Model</div>
+      <div class="phase-body">
+        <h3>Add a <code>Tenant</code> Mongoose model</h3>
+        <p>Shape mirrors SiteConfig: <code>{ _id (slug), vertical, branding, features, host }</code>. Why separate from runtime SiteConfig: keeps a typed boundary so migrations can evolve the document while runtime code stays stable. Same separation the agency app uses for its SiteConfig.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">02</span>Middleware</div>
+      <div class="phase-body">
+        <h3>Tenant-resolution middleware</h3>
+        <p>One file: read host header, look up Tenant, attach to <code>req.tenantConfig</code>. Mounted globally before feature routers. Mirrors the agency app's <code>getWorkspaceOwnerId</code> pattern.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">03</span>Swap</div>
+      <div class="phase-body">
+        <h3>Swap <code>getSiteConfig</code>'s body</h3>
+        <p><code>return req.tenantConfig ?? loadSiteConfig()</code>. No callers change. The fallback covers cron jobs and tests.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">04</span>SSL</div>
+      <div class="phase-body">
+        <h3>Custom-domain SSL provisioning</h3>
+        <p>Caddy in front of the app (Let's Encrypt on-demand for registered hosts) or Vercel Domains API. Deployment surface change, not application code.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">05</span>Client</div>
+      <div class="phase-body">
+        <h3>Client config from <code>/api/_meta/config</code></h3>
+        <p>The endpoint already exists. Client swaps build-time env-based loading for a runtime fetch. Largest of the six changes — budget a day.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">06</span>Admin</div>
+      <div class="phase-body">
+        <h3>Tenant admin UI</h3>
+        <p>New <code>/admin/tenants</code> section, operator-only. Until self-service exists, the operator IS the tenant admin — exactly the staged go-to-market from the concept brief.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">07 — Honest scope</span>
+    <h2>What this template deliberately does not include</h2>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>No CMS UI yet.</strong> The content feature pack ships read/upsert endpoints. The admin UI for editing pages grows on each client build, then graduates back into core when patterns crystallize.</p>
+    </div>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>No PortfolioProject model.</strong> When a build needs portfolio (screen-printer especially), bring in the agency app's <code>PortfolioProject</code> model wholesale. Cloudinary uploads and mixed-media galleries are already solved there.</p>
+    </div>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>No ops backend.</strong> Clients, projects, tasks, time entries, invoicing — these live in the agency app and stay there. Phase 4 of the concept brief brings them in by porting modules from <code>askanddeliverwebapp</code>. Doing it now would mean maintaining two copies of evolving code.</p>
+    </div>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>No multi-tenant identity.</strong> The seams are in place. The Tenants collection and per-request resolution land in phase 2 — six discrete changes, scoped above.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section class="status-section">
+    <span class="section-num">08 — Status</span>
+    <h2>What the template ships today</h2>
+    <p>A working scaffold: 4 vertical presets, 4 feature packs (plus auth), a contract-check script, a doctor script, an init-vertical script, complete docs (architecture, feature packs, verticals, multi-tenant roadmap, upgrade flow, per-vertical), and a payment-provider abstraction with Stripe and Square adapters wired up to the agency-app patterns.</p>
+
+    <h4>Immediately ready to do</h4>
+    <ul>
+      <li>Pick a vertical and run <code>npm run init:vertical -- --vertical=&lt;id&gt; --tenant=&lt;slug&gt;</code></li>
+      <li>Edit <code>site.branding.ts</code> on both sides</li>
+      <li>Wire Auth0 (uncomment in <code>middleware/auth.ts</code>) and the payment SDK of choice</li>
+      <li>Start building the public surface and admin UI specific to the client</li>
+    </ul>
+
+    <h4>Open questions deferred to subsequent threads</h4>
+    <ul>
+      <li><strong>Custom-domain SSL strategy</strong> — Caddy vs. Vercel for phase-2 multi-tenancy.</li>
+      <li><strong>File uploads on intake</strong> — when a second vertical needs them, lift Cloudinary-backed upload from the agency app into core.</li>
+      <li><strong>Admin UI patterns</strong> — how much of the agency app's admin shell is portable into vertical builds vs. how much is intentionally simpler per vertical.</li>
+      <li><strong>Phase-2 trigger</strong> — what N tenants and what feature stability constitutes the green light.</li>
+    </ul>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Template Architecture · Vertical SaaS Starter</span>
+    <span>Companion to platform-concept-brief.html</span>
+  </footer>
+
+</article>
+</body>
+</html>

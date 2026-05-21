@@ -1,3 +1,9 @@
+# vertical-template
+
+MERN vertical SaaS template (forked from baseapp). **Build documentation:** open [`docs/README.html`](docs/README.html) in a browser — that is the index for phased Cursor + Claude work.
+
+---
+
 # MERN Stack Starter Template
 
 A modern, production-ready MERN stack boilerplate with TypeScript, Auth0 authentication, and Tailwind CSS.

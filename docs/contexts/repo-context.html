@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repository Context — Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Context</span>
+      <span>Repository Context · v0.1.0</span>
+    </div>
+    <h1 class="doc-title">The <em>codebase family</em>.</h1>
+    <p class="doc-subtitle">Three repositories, one lineage. What lives where, what each is for, and which conventions cross repo boundaries unchanged.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — The three repos</span>
+    <h2>What exists, in one frame</h2>
+
+    <div class="lineage-panel">
+      <div class="lineage-row">
+        <div class="repo">
+          <span class="badge">Repo · ancestor</span>
+          baseapp
+        </div>
+        <div>
+          The MERN starter. Establishes every convention downstream — root-level <code>client/</code> + <code>server/</code>, <code>npm run dev</code> with concurrently, Auth0 admin, Mongoose, Vite + React 18 + TS. <strong>Single-tenant. Generic.</strong> The thing both production repos were forked from.
+        </div>
+      </div>
+      <div class="lineage-row">
+        <div class="repo">
+          <span class="badge">Repo · production</span>
+          askanddeliverwebapp
+        </div>
+        <div>
+          The operator's own agency app. Already running. The <strong>de facto reference implementation</strong> for several thesis-critical patterns: workspace boundaries, the Lead model with conversion, Stripe Payment Links, <code>express-oauth2-jwt-bearer</code>, the <code>SiteConfig</code> Mongo model, Cloudinary-backed uploads. Where the new template makes a choice, the new template matches this app first.
+        </div>
+      </div>
+      <div class="lineage-row">
+        <div class="repo">
+          <span class="badge">Repo · in development</span>
+          vertical-template <span class="dim">(working name)</span>
+        </div>
+        <div>
+          The new platform template. Forked from <strong>baseapp</strong>, aligned with <strong>askanddeliverwebapp</strong>. Vertical-aware, multi-tenant-ready underneath, ships four vertical presets and a token registry. This is what every phase-N prompt is about.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>Why two production repos, not one.</strong> The agency app stays the operator's ops backend through phase 4 of the concept brief — clients, projects, tasks, invoicing. The template ships the public surface and per-tenant ops. Phase 4 ports modules across. Trying to be both repos at once now means two copies of evolving code, which is the failure mode the template brief explicitly rules out.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — Inherited from baseapp</span>
+    <h2>Conventions that cross unchanged</h2>
+    <p>If a question about file layout, tooling, or scripts has a clean answer in baseapp, that is the answer. Do not invent a second convention.</p>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">Top-level layout</div>
+        <div class="val">
+          <p><code>client/</code> and <code>server/</code> at repo root. No monorepo tooling (no pnpm workspaces, no Turborepo). Each side is a self-contained Node project with its own <code>package.json</code>.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Dev loop</div>
+        <div class="val">
+          <p><code>npm run dev</code> at root runs <code>concurrently</code> against both sides. Hot reload on both. Single command, single terminal.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Client stack</div>
+        <div class="val">
+          <p>Vite + React 18 + TypeScript. React Router for routing. No state library mandated — components and contexts unless the agency app shows otherwise for a specific concern.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Server stack</div>
+        <div class="val">
+          <p>Express + TypeScript. Mongoose for Mongo. <code>express-oauth2-jwt-bearer</code> for Auth0 verification on admin routes. <code>dotenv</code>, structured logging, the usual.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Env files</div>
+        <div class="val">
+          <p>Each side has its own <code>.env</code>. <code>.env.example</code> files committed; real <code>.env</code> ignored. Init scripts (phase 4) write into env files at the side that needs the value.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Identity</div>
+        <div class="val">
+          <p>Auth0 short-term, per the concept brief's architecture decisions. Exit path planned to Clerk / WorkOS / self-host before scale. Treat <code>express-oauth2-jwt-bearer</code> as a wrapped dependency — application code never imports it directly outside the auth feature pack.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Aligned with askanddeliverwebapp</span>
+    <h2>Patterns lifted from the agency app</h2>
+    <p>Anywhere the new template's choice could go several ways, it matches the agency app — because phase 4 of the concept brief is "operator becomes a tenant on the new system," which becomes a config exercise instead of a refactor only if the shapes already match.</p>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">
+          Workspace boundary
+          <span class="why">becomes tenantId</span>
+        </div>
+        <div class="val">
+          <p>Agency app uses <code>workspaceOwnerId</code> on every model. Template uses <code>tenantId</code>. They are functionally identical and the migration is a field rename. Don't model anything that contradicts this isomorphism.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Lead model
+          <span class="why">phase-4 portability</span>
+        </div>
+        <div class="val">
+          <p>The template's <code>IntakeSubmission</code> mirrors the agency's <code>Lead</code> — notes with <code>createdBy</code>, conversion ids, pipeline status. When phase 4 ports the ops backend in, intake submissions become leads via a status-map.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Payments
+          <span class="why">reuse, don't reinvent</span>
+        </div>
+        <div class="val">
+          <p>Stripe Payment Links exactly as the agency app uses them. The <code>PaymentProvider</code> interface is new (Square is the second adapter), but the Stripe adapter's body should look familiar to anyone who's read the agency app.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          SiteConfig (Mongo)
+          <span class="why">separation of concerns</span>
+        </div>
+        <div class="val">
+          <p>The agency app has a <code>SiteConfig</code> Mongoose model holding per-workspace branding and operational settings. The template's runtime <code>SiteConfig</code> type is the typed view of the same idea. Phase 7 will add a <code>Tenant</code> Mongoose model in the template that mirrors this shape.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Asset uploads
+          <span class="why">single pipeline</span>
+        </div>
+        <div class="val">
+          <p>Cloudinary, same configuration as the agency app's <code>PortfolioProject</code> uploads. Logo slots in the visual system's <code>AssetRef</code> resolve through this. When phase-2 lifts <code>PortfolioProject</code> into the template, the upload code already matches.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>When in doubt: read the agency app first.</strong> If a pattern there solves the same problem, copy it. Diverging without a reason creates two ways to do one thing — and phase 4 will pay for the divergence in migration cost.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Where the template diverges</span>
+    <h2>What the new repo does that the others don't</h2>
+
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Vertical presets.</strong> The agency app is one shape; the template is four. The whole point of the platform thesis. Verticals live in <code>verticals/&lt;id&gt;/preset.ts</code> and <code>verticals/&lt;id&gt;/theme.preset.ts</code>.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Feature packs.</strong> Catalog, content, intake, payments + auth as middleware. Toggle-mounted. A disabled pack contributes zero API surface. The agency app has fixed features — the template doesn't.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Token registry.</strong> Four-layer theme resolution (foundation → vertical → tenant pick → tenant override). The agency app has theme constants; the template has a registry.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Payment provider abstraction.</strong> Stripe + Square coexist behind one interface. Adding Toast or Clover later is one new file.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Multi-tenant seams (phase 7).</strong> <code>tenantId</code> on every model from day one (single value <code>'default'</code> for now). <code>getSiteConfig(req)</code> as the single seam. The six-change phase-2 jump is architected for.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Reference: file map</span>
+    <h2>What lives where in the template</h2>
+
+<div class="tree"><span class="accent">vertical-template/</span>
+├── client/
+│   ├── src/
+│   │   ├── features/
+│   │   │   ├── catalog/                 <span class="dim">feature pack</span>
+│   │   │   ├── content/
+│   │   │   ├── intake/
+│   │   │   └── payments/
+│   │   ├── theme/
+│   │   │   ├── tokens.foundation.ts     <span class="dim">L1</span>
+│   │   │   ├── resolveTokens.ts         <span class="dim">the resolver</span>
+│   │   │   ├── palettes/
+│   │   │   ├── pairings/
+│   │   │   └── presets/
+│   │   ├── types/
+│   │   │   ├── site-config.ts           <span class="dim">contract-checked w/ server</span>
+│   │   │   └── theme-tokens.ts          <span class="dim">contract-checked w/ server</span>
+│   │   ├── site.config.ts               <span class="dim">per-build, do not pull-overwrite</span>
+│   │   ├── site.theme.ts                <span class="dim">per-build, do not pull-overwrite</span>
+│   │   └── App.tsx
+│   └── package.json
+│
+├── server/
+│   ├── src/
+│   │   ├── features/                    <span class="dim">mirrors client/</span>
+│   │   ├── middleware/
+│   │   │   ├── auth.ts                  <span class="dim">Auth0, agency-app pattern</span>
+│   │   │   └── tenant.ts                <span class="dim">phase-7 only; stub returns 'default'</span>
+│   │   ├── providers/
+│   │   │   ├── PaymentProvider.ts       <span class="dim">interface</span>
+│   │   │   ├── stripe.ts
+│   │   │   └── square.ts
+│   │   ├── models/                      <span class="dim">all carry tenantId</span>
+│   │   ├── types/
+│   │   │   ├── site-config.ts
+│   │   │   └── theme-tokens.ts
+│   │   ├── getSiteConfig.ts             <span class="dim">the single seam</span>
+│   │   └── index.ts
+│   └── package.json
+│
+├── verticals/
+│   ├── bar-restaurant/
+│   │   ├── preset.ts
+│   │   └── theme.preset.ts
+│   ├── food-truck/
+│   ├── farm-source/
+│   └── screen-printer/
+│
+├── scripts/
+│   ├── init-vertical.ts                 <span class="dim">npm run init:vertical</span>
+│   ├── contract-check.ts                <span class="dim">dual-file type parity</span>
+│   └── doctor.ts                        <span class="dim">env/health check</span>
+│
+├── docs/                                <span class="dim">this build-docs folder</span>
+│
+├── .cursorrules                         <span class="dim">legacy, always-on</span>
+├── .cursor/rules/                       <span class="dim">scoped rules</span>
+├── CHANGELOG.md
+├── package.json                         <span class="dim">root scripts: dev, init:vertical, etc.</span>
+└── README.md                            <span class="dim">links to docs/README.html</span></div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">06 — Cross-repo etiquette</span>
+    <h2>What goes into which repo</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">baseapp</div>
+        <div class="val">
+          <p><strong>Frozen unless a convention truly changes.</strong> If a fix needs to apply to every downstream fork, it goes here. Otherwise it goes in the fork. Don't drift baseapp casually — the agency app pulls from it occasionally.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">askanddeliverwebapp</div>
+        <div class="val">
+          <p><strong>Operator's production system.</strong> Changes here happen because the operator's business needs them. Patterns proven here graduate into the template when phase 4 arrives — but the agency app does not get experimental template features pushed back into it.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">vertical-template</div>
+        <div class="val">
+          <p><strong>Where the platform work happens.</strong> Every phase-N prompt operates here. Client builds are forks (or branches, until phase 7) of this repo — see phase 6 for the per-build flow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">07 — Status</span>
+    <h2>What Claude should assume when reading this context</h2>
+    <p>baseapp and askanddeliverwebapp are <strong>live and already in production</strong> — they are reference material, not work surfaces, unless a phase prompt explicitly says otherwise. The vertical-template repo is the active build. When a phase says "match the agency-app pattern," that means: read the relevant files in askanddeliverwebapp, then implement equivalently in the template.</p>
+
+    <h4>Things this context will need to update over time</h4>
+    <div class="open-q">
+      <span class="q-label">Q · Repo URLs and paths</span>
+      <p>The actual git URLs and local clone paths for all three repos get filled in here once the template repo is created. Until then, references are by name only.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Per-client repos</span>
+      <p>Phase 6 introduces the per-client build flow. Decision pending: are client builds branches of the template, forks, or do they pin to template tags? This context updates when the decision lands.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Phase-7 collapse</span>
+      <p>When multi-tenant ships, per-client repos collapse into tenant documents inside the template. The §06 cross-repo etiquette table will need a fourth row for retired patterns.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Context · Repository Family</span>
+    <span>Loaded by every Cursor session</span>
+  </footer>
+
+</article>
+</body>
+</html>

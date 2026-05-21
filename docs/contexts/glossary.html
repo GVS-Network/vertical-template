@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glossary — Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Context</span>
+      <span>Glossary · v0.1.0</span>
+    </div>
+    <h1 class="doc-title">Words that mean <em>specific things</em> here.</h1>
+    <p class="doc-subtitle">Project-internal vocabulary. When Claude (or anyone) uses these terms in a PR or a prompt, they carry the definitions below — not the generic ones.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Core terms</span>
+    <h2>The vocabulary that drives every decision</h2>
+
+    <div class="decisions">
+
+      <div class="decision-row">
+        <div class="key">Tenant</div>
+        <div class="val">
+          <p>A business using the platform. In single-tenant mode (now) there is one tenant with <code>tenantId === 'default'</code>. In multi-tenant mode (phase 7) tenants are documents in the <code>Tenant</code> collection, resolved per-request from the host header. Maps directly to <code>workspaceOwnerId</code> in the agency app.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Vertical</div>
+        <div class="val">
+          <p>A business type the platform is opinionated about. v1 ships four: <code>bar-restaurant</code> · <code>food-truck</code> · <code>farm-source</code> · <code>screen-printer</code>. Each has a <code>preset.ts</code> (SiteConfig defaults) and a <code>theme.preset.ts</code> (token defaults). A tenant declares its vertical; a tenant cannot occupy two verticals.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">SiteConfig</div>
+        <div class="val">
+          <p>The one TypeScript shape that describes what a build looks like. Lives twin in <code>client/src/types/site-config.ts</code> and <code>server/src/types/site-config.ts</code>, kept identical by <code>contract:check</code>. Contains <code>tenantId · vertical · branding · features</code>. Read at runtime through <code>getSiteConfig(req)</code>.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Feature pack</div>
+        <div class="val">
+          <p>A toggle-mounted module that contributes API + UI surface when enabled and zero surface when disabled. The five: <code>catalog · content · intake · payments · auth</code> (auth is technically middleware). Each has a folder on the server and a folder on the client. Routers conditionally mount on <code>SiteConfig.features.&lt;id&gt;.enabled</code>.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Preset</div>
+        <div class="val">
+          <p>A starting set of values for a vertical. Two flavors: <code>preset.ts</code> (SiteConfig minus tenantId + branding) and <code>theme.preset.ts</code> (ThemeTokens minus tenant overrides). Consumed at <code>init:vertical</code> time only. <strong>Existing builds do not retroactively change when a preset changes</strong> — that is the Type-B propagation rule.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Seam</div>
+        <div class="val">
+          <p>A single function or middleware boundary that the rest of the codebase reads through. The platform has two named seams: <code>getSiteConfig(req)</code> (tenant context) and <code>getPaymentProvider()</code> (payments). The point of a seam is that the body can change without callers changing.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Resolver</div>
+        <div class="val">
+          <p>Specifically <code>resolveTokens(tenantId)</code> in the visual system. Walks the four theme layers (foundation → vertical → tenant pick → tenant override), validates contrast and font-weight requirements, emits the final CSS variable set. One function; the layers are data.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Registry</div>
+        <div class="val">
+          <p>The set of named values (palettes, type pairings, block-style presets, etc.) that tenants pick from. The registry is platform-owned and grows deliberately — the visual brief's discipline: "register before second use." Tenants pick from the registry; they do not extend it.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Override</div>
+        <div class="val">
+          <p>A tenant-supplied raw value that wins over a registry pick. Leaf-level only — <code>color.brand.primary: '#7A1F1F'</code> is an override; adding <code>color.brand.tertiary</code> is not, because it changes the shape. Overrides are validated; failed validations fail the build.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — Change taxonomy</span>
+    <h2>Type A · Type B · Type C</h2>
+    <p>From the template brief §05. These three letters carry a lot of weight in this project — use them precisely.</p>
+
+    <div class="change-types">
+      <div class="change-type A">
+        <span class="tag">Type A</span>
+        <h5>Core code</h5>
+        <p>Feature packs, shared types, resolver, providers, middleware. Propagates via <code>git pull</code>. Client builds do not edit Type-A files; if they need different behavior, the change is generalized into core or rejected.</p>
+      </div>
+      <div class="change-type B">
+        <span class="tag">Type B</span>
+        <h5>Presets &amp; registry entries</h5>
+        <p>Vertical presets, palette additions, pairing additions, block-preset additions. Available to opt into; existing builds keep their explicit picks unless they choose to migrate.</p>
+      </div>
+      <div class="change-type C">
+        <span class="tag">Type C</span>
+        <h5>Per-build files</h5>
+        <p><code>site.config.ts</code> · <code>site.theme.ts</code> · <code>Custom*.tsx</code> · branded content. Never propagates. Once multi-tenant ships, Type C collapses into tenant documents.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Phase vocabulary</span>
+    <h2>What "phase" means in this project</h2>
+
+    <p><strong>Concept-brief phases</strong> (1–5) describe go-to-market stages — <em>"pitch one-off builds personally,"</em> <em>"backdoor the B2B layer."</em> These are operator-business phases, not build phases.</p>
+
+    <p><strong>Template-brief phase-2</strong> refers specifically to the multi-tenant transition — the six-change jump documented in §06 of the template brief. This is what the build-docs call <strong>Phase 7</strong>.</p>
+
+    <p><strong>Build-doc phases</strong> (0–7) are the prompts in <code>docs/prompts/</code>. They are the order in which code lands in the template repo. They map loosely to the concept brief's phase 1–2.</p>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Disambiguate by context.</strong> "Phase 2" with no qualifier in a prompt means "build-doc phase 2" (feature packs). In a brief reference, "phase 2 of the concept brief" or "the template brief's phase-2 transition" — always say which.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Implementation terms</span>
+    <h2>Specific shapes and patterns</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">getSiteConfig(req)</div>
+        <div class="val"><p>The single server-side seam for tenant context. Today returns a singleton; in phase 7, returns per-request from <code>req.tenantConfig</code>. Application code calls it; nothing else.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">PaymentProvider</div>
+        <div class="val"><p>Interface in <code>server/src/providers/PaymentProvider.ts</code>. Two adapters: <code>stripe.ts</code>, <code>square.ts</code>. Selected by SiteConfig. <code>getPaymentProvider()</code> returns the active one.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">isFieldActive(field, formState)</div>
+        <div class="val"><p>The shared client/server predicate for conditional intake fields. Runs on the client for UX, runs on the server for enforcement. Form schemas live in <code>SiteConfig.features.intake.forms[]</code> — not in code.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">resolveTokens(tenantId)</div>
+        <div class="val"><p>The visual system's resolver. Walks L1→L2→L3→L4, validates, emits CSS variables. Writes <code>.theme-resolved.json</code> alongside for auditability.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">AssetRef</div>
+        <div class="val"><p>The shape of an uploaded asset (logo, etc.). Cloudinary-backed. Same pattern as the agency app's PortfolioProject uploads.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">IntakeSubmission</div>
+        <div class="val"><p>The template's incoming-lead model. Shaped to match the agency app's <code>Lead</code> so phase 4 migration is a status-map + rename, not a model rewrite.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">contract:check</div>
+        <div class="val"><p>The CI script that asserts client and server type files are byte-identical. Run on every PR. Without it, the dual-file convention drifts and the template brief's premise collapses.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Terms intentionally avoided</span>
+    <h2>What we don't call things</h2>
+
+    <ul>
+      <li><strong>"Theme"</strong> alone — ambiguous. Say "theme tokens," "theme preset," or "resolved theme."</li>
+      <li><strong>"Plugin"</strong> — feature packs are not plugins. Plugins suggest a third-party extension surface; feature packs are platform-owned and toggled, not installed.</li>
+      <li><strong>"Workspace"</strong> in template code — the agency app's term, kept there. Template uses <em>tenant</em>. Mixing them collapses the phase-4 migration.</li>
+      <li><strong>"Module"</strong> as a generic term — too overloaded. Use feature pack, provider, or middleware.</li>
+      <li><strong>"Multi-tenant"</strong> applied to today's code — today is single-tenant. The seams support multi-tenancy; the system does not.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status</span>
+    <h2>How this glossary updates</h2>
+    <p>This is a working document. When a phase prompt introduces a new term that's specific to the project, that term lands here in the same PR. When a term changes meaning (or stops being used), it moves into §05 with a note explaining what replaced it.</p>
+
+    <h4>Anticipated additions</h4>
+    <div class="open-q">
+      <span class="q-label">Q · Phase 7</span>
+      <p>New terms when multi-tenancy ships: <code>Tenant</code> (the model), <code>tenant-resolution middleware</code>, <code>per-tenant config fetch</code>.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · B2B network (concept-brief phase 3)</span>
+      <p>Terms for in-network transactions: <code>provider · consumer · network edge · referral</code>. Not until tenant density exists.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Theme editor</span>
+      <p>When the visual brief's deferred theme-editor UI lands: terms for the editor surface, draft theme, publish flow.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Context · Glossary</span>
+    <span>Project vocabulary, with definitions</span>
+  </footer>
+
+</article>
+</body>
+</html>

@@ -1,0 +1,71 @@
+---
+description: Multi-tenant seams — discipline that applies even though the system is single-tenant today.
+alwaysApply: true
+---
+
+# Multi-Tenant Seams
+
+This system is single-tenant today and multi-tenant by phase 7. The seams that make the transition cheap are in place now. **Code that breaks the seams costs us the cheap transition.**
+
+## The two seams
+
+### 1. `getSiteConfig(req)` — tenant context
+Every server route that needs tenant-aware data reads it through `getSiteConfig(req)`. Today the body returns a singleton; in phase 7 it returns `req.tenantConfig ?? loadSiteConfig()`. Callers do not change.
+
+**Allowed:**
+```ts
+const config = getSiteConfig(req);
+const provider = getPaymentProvider(config);
+```
+
+**Forbidden:**
+```ts
+import { siteConfig } from '@/config';  // bypasses the seam
+const tenantId = process.env.TENANT_ID; // bypasses the seam
+const config = require('./site.config'); // bypasses the seam
+```
+
+### 2. `getPaymentProvider()` — payment vendor
+Routes never branch on `config.features.payments.provider`. They call `getPaymentProvider()`. The factory selects the adapter. The adapter wraps the vendor SDK. Application code does not know whether it is Stripe or Square.
+
+## The tenantId rule
+
+Every Mongoose schema has `tenantId`. Every query filters on `tenantId`. Today's value is `'default'`; that does not make the field optional.
+
+```ts
+// ✅ correct, single-tenant
+await Menu.find({ tenantId: 'default', published: true });
+
+// ✅ correct, picks up tenant from request
+const { tenantId } = getSiteConfig(req);
+await Menu.find({ tenantId, published: true });
+
+// ❌ forbidden — would silently break under multi-tenancy
+await Menu.find({ published: true });
+```
+
+There is no shortcut. The day the seam is flipped to per-request resolution, every query that wasn't tenant-filtered becomes a cross-tenant data leak. We do not write those queries even when there is only one tenant.
+
+## The six-change phase-7 jump
+
+This is what the seams are buying. Per the template brief §06:
+
+1. Add `Tenant` Mongoose model.
+2. Add tenant-resolution middleware (host header → `req.tenantConfig`).
+3. Swap `getSiteConfig`'s body to read `req.tenantConfig ?? loadSiteConfig()`.
+4. Custom-domain SSL (deployment surface, not application code).
+5. Client config from `/api/_meta/config` (runtime fetch instead of build-time env).
+6. Tenant admin UI.
+
+Six files (or so) touched. Zero feature packs change. Zero models change. Zero queries change.
+
+**The "zero queries change" part requires that every query already filters on `tenantId`.** That is why the rule above is absolute.
+
+## When to escalate
+
+- If you find an existing query that doesn't filter on `tenantId`, flag it. Either it's a system query that legitimately spans tenants (and needs a comment explaining why), or it's a bug that needs fixing now.
+- If you're tempted to read tenant context from anywhere other than the seam, stop and re-read the template brief §03 ("Decisions"). The seam exists because phase 7 was foreseen; there is no situation that justifies bypassing it.
+
+## When asked to "just hardcode it for now"
+
+The answer is no. Hardcoding any tenant-context value today is a phase-7 bomb. We don't plant them.

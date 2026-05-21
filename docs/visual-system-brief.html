@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual System Brief — Token Registry & Customization Layer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f1ea;
+    --bg-panel: #faf7f2;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-muted: #7a756e;
+    --rule: #d9d2c5;
+    --accent: #b8451f;
+    --accent-soft: #e8d8c8;
+    --highlight: #f4e8d8;
+    --green: #3d5a3d;
+    --amber: #a87a1f;
+    --blue: #2a4a6a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 16px;
+    padding: 0;
+  }
+
+  .doc {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 64px 56px 96px;
+    background: var(--bg);
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 28px;
+    margin-bottom: 48px;
+  }
+
+  .doc-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    margin-bottom: 24px;
+  }
+
+  .doc-meta .tag {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 4px 10px;
+    letter-spacing: 0.1em;
+  }
+
+  h1.doc-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  h1.doc-title em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .doc-subtitle {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-weight: 400;
+    max-width: 640px;
+  }
+
+  /* Section structure */
+  section { margin-bottom: 56px; }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 12px;
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    margin-top: 24px;
+    margin-bottom: 10px;
+  }
+
+  p { margin-bottom: 14px; color: var(--ink-soft); }
+  p strong { color: var(--ink); font-weight: 600; }
+
+  ul, ol {
+    margin: 14px 0 14px 4px;
+    padding-left: 22px;
+    color: var(--ink-soft);
+  }
+  li { margin-bottom: 8px; }
+  li::marker { color: var(--accent); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    background: var(--highlight);
+    padding: 1px 6px;
+    color: var(--ink);
+  }
+
+  pre {
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    padding: 18px 20px;
+    margin: 18px 0;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  pre code { background: transparent; padding: 0; font-size: inherit; }
+
+  /* Thesis / framing panel */
+  .concept-panel {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .concept-panel h4 { margin-top: 0; color: var(--accent); }
+  .concept-panel p:last-child { margin-bottom: 0; }
+
+  .lineage-panel {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--blue);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .lineage-panel h4 { margin-top: 0; color: var(--blue); }
+  .lineage-panel p:last-child { margin-bottom: 0; }
+
+  /* Token category grid */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin: 20px 0;
+  }
+
+  .category-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    padding: 22px 22px 20px;
+    position: relative;
+  }
+
+  .category-card.future {
+    border-style: dashed;
+    background: transparent;
+  }
+
+  .category-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: block;
+  }
+  .category-card.future .label { color: var(--ink-muted); }
+
+  .category-card h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  .category-card .tokens {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+  .category-card .tokens .k { color: var(--ink); }
+
+  /* Decisions table */
+  .decisions {
+    margin: 20px 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .decision-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 28px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .decision-row .key {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .decision-row .key .why {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  .decision-row .val {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+  }
+  .decision-row .val p { margin-bottom: 8px; }
+  .decision-row .val p:last-child { margin-bottom: 0; }
+
+  /* Layer diagram */
+  .layers {
+    margin: 24px 0;
+    border: 1px solid var(--rule);
+    background: var(--bg-panel);
+  }
+
+  .layer {
+    display: grid;
+    grid-template-columns: 120px 1fr 200px;
+    gap: 24px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--rule);
+    align-items: center;
+  }
+  .layer:last-child { border-bottom: none; }
+
+  .layer .tier {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+  }
+  .layer .tier strong {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+
+  .layer .desc { font-size: 14px; color: var(--ink-soft); }
+
+  .layer .example {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink);
+    background: var(--highlight);
+    padding: 8px 12px;
+    line-height: 1.5;
+  }
+
+  .layer.l1 { border-left: 3px solid var(--blue); }
+  .layer.l2 { border-left: 3px solid var(--green); }
+  .layer.l3 { border-left: 3px solid var(--amber); }
+  .layer.l4 { border-left: 3px solid var(--accent); }
+
+  /* Callouts */
+  .callout {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 14px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    align-items: start;
+  }
+
+  .callout .icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .callout.opportunity .icon { background: var(--green); }
+  .callout.risk .icon { background: var(--accent); }
+  .callout.discipline .icon { background: var(--amber); }
+  .callout.note .icon { background: var(--blue); }
+
+  .callout p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .callout strong { color: var(--ink); }
+
+  /* Type-A/B/C lane reminder */
+  .change-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 22px 0;
+  }
+
+  .change-type {
+    border: 1px solid var(--rule);
+    padding: 20px;
+    background: var(--bg-panel);
+  }
+  .change-type.A { border-top: 3px solid var(--green); }
+  .change-type.B { border-top: 3px solid var(--amber); }
+  .change-type.C { border-top: 3px solid var(--accent); }
+
+  .change-type .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .change-type h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .change-type p { font-size: 13px; margin: 0; line-height: 1.55; }
+
+  /* Phase blocks */
+  .phase {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 28px;
+    padding: 22px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .phase:last-child { border-bottom: none; }
+
+  .phase-marker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .phase-marker .num {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .phase-body h3 { margin-top: 0; font-size: 18px; }
+  .phase-body p { margin-bottom: 8px; font-size: 15px; }
+
+  /* Worked example panel */
+  .worked {
+    background: var(--bg-panel);
+    border: 1px solid var(--rule);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+
+  .worked h4 {
+    margin-top: 0;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .worked-step {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--rule);
+    align-items: start;
+  }
+  .worked-step:last-child { border-bottom: none; }
+
+  .worked-step .n {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .worked-step .body { font-size: 14px; color: var(--ink-soft); }
+  .worked-step .body strong { color: var(--ink); }
+  .worked-step .body code { font-size: 12px; }
+
+  /* Status section */
+  .status-section {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 32px 36px;
+    margin: 32px 0 0;
+  }
+  .status-section h2 {
+    color: var(--bg);
+    border-bottom-color: rgba(245, 241, 234, 0.2);
+    margin-bottom: 24px;
+  }
+  .status-section h3, .status-section h4 { color: var(--bg); }
+  .status-section p { color: rgba(245, 241, 234, 0.85); }
+  .status-section ul { color: rgba(245, 241, 234, 0.85); }
+  .status-section .section-num { color: var(--accent-soft); }
+  .status-section code {
+    background: rgba(245, 241, 234, 0.1);
+    color: var(--bg);
+  }
+
+  .open-q {
+    background: rgba(245, 241, 234, 0.05);
+    border-left: 2px solid var(--accent-soft);
+    padding: 14px 18px;
+    margin: 12px 0;
+  }
+  .open-q .q-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-soft);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .open-q p { margin: 0; font-size: 14.5px; }
+
+  .doc-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 720px) {
+    .doc { padding: 40px 24px 64px; }
+    h1.doc-title { font-size: 36px; }
+    .category-grid, .change-types { grid-template-columns: 1fr; }
+    .phase, .decision-row, .layer { grid-template-columns: 1fr; gap: 8px; }
+    .layer .example { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Visual System</span>
+      <span>Companion to Template Brief · v0.1</span>
+    </div>
+    <h1 class="doc-title">A <em>token registry</em> with guarded override seams.</h1>
+    <p class="doc-subtitle">The customization layer that turns the template brief's <code>branding</code> slice into something that can absorb color, type, logos, blocks, density — and the categories not yet named — without breaking client builds already in production.</p>
+  </header>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">01 — Premise</span>
+    <h2>What this brief is solving for</h2>
+    <p>The template brief established that <strong>branding is per-tenant config, not core code</strong>, and that the <code>SiteConfig.branding</code> slice holds <code>{ name, tagline, theme, fonts, contact }</code>. That's enough to launch a build. It is not enough to evolve.</p>
+    <p>The pressure comes in three forms: (1) clients will ask for things their preset doesn't anticipate — a specific brand red, a custom display font, a denser hero block; (2) the four verticals will diverge visually as they mature, and the differences need somewhere to live; (3) new categories of visual choice — motion later, dark-mode variants, accessibility presets — will arrive and need a home that doesn't disrupt builds already shipped.</p>
+
+    <div class="concept-panel">
+      <h4>One-line framing</h4>
+      <p>The visual system is a <strong>token registry</strong> with three layers of resolution (defaults → vertical preset → tenant overrides) and explicit <strong>override seams</strong> at every layer. New categories enter the registry as additive fields with safe defaults, propagate as <strong>Type B</strong>, and never force a re-render of existing builds until the tenant opts in.</p>
+    </div>
+
+    <div class="lineage-panel">
+      <h4>Position relative to the existing briefs</h4>
+      <p>This is not a new system. The concept brief named branding as tenant-config; the template brief gave it a field on <code>SiteConfig</code>. This brief is the <strong>schema and discipline</strong> for what goes inside that field once there's more than one client to keep coherent — and once the categories you'd want to add later are anticipated by the shape.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">02 — Architecture</span>
+    <h2>The four-layer resolution model</h2>
+    <p>At runtime, every visual value a component reads — a color, a radius, a font stack — resolves through the same four layers in the same order. Each layer is optional except the first. The resolver is one function; the layers are data.</p>
+
+    <div class="layers">
+      <div class="layer l1">
+        <div class="tier">L1 · <strong>Foundation</strong></div>
+        <div class="desc">Platform-wide defaults. Every token in the registry has a value here. Existing builds inherit changes only when they pull and rebuild — but the values are conservative enough that visible drift is rare. Type-A propagation.</div>
+        <div class="example">tokens.foundation.ts</div>
+      </div>
+      <div class="layer l2">
+        <div class="tier">L2 · <strong>Vertical</strong></div>
+        <div class="desc">Per-vertical opinion. Farm-source ships earthy; screen-printer ships graphic; bar-restaurant ships warm. Overrides L1 selectively. Lives next to the existing vertical <code>preset.ts</code> as <code>theme.preset.ts</code>.</div>
+        <div class="example">verticals/farm-source/<br>theme.preset.ts</div>
+      </div>
+      <div class="layer l3">
+        <div class="tier">L3 · <strong>Tenant choice</strong></div>
+        <div class="desc">Tenant selects from the registry — palette ID, type-pairing ID, density preset, block-style preset. The guided-customization rail. No raw values yet; just picks from sets the system already knows.</div>
+        <div class="example">site.theme.ts<br><span style="color:var(--ink-muted)">// palette: 'rust-clay'</span></div>
+      </div>
+      <div class="layer l4">
+        <div class="tier">L4 · <strong>Tenant override</strong></div>
+        <div class="desc">The escape hatch. Specific token values the tenant wins on — exact hex, custom font file, hand-tuned radius. Validated against a guardrails schema (contrast, readable size, etc.) so overrides can't break accessibility or the layout grid.</div>
+        <div class="example">site.theme.ts<br><span style="color:var(--ink-muted)">// overrides: { color.brand: '#7A1F1F' }</span></div>
+      </div>
+    </div>
+
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>The resolver is the seam.</strong> One function, <code>resolveTokens(tenantId)</code>, walks the four layers and emits the final CSS variable set. Components never know which layer a value came from. Adding a fifth layer later (per-page overrides, A/B variants) is a function change, not a component change.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">03 — Registry</span>
+    <h2>The shape of <code>themeTokens</code></h2>
+    <p>One TypeScript type, mirrored client and server (same contract-check pattern as <code>SiteConfig</code>). Every category is namespaced. Every leaf is a value the resolver can produce.</p>
+
+<pre><code>interface ThemeTokens {
+  color: {
+    brand:       { primary, secondary, accent };
+    surface:     { page, panel, raised, sunken };
+    ink:         { default, soft, muted, inverse };
+    semantic:    { success, warning, danger, info };
+    palette:     PaletteId;       // L3 pick
+  };
+  typography: {
+    pairing:     PairingId;       // L3 pick
+    display:     { family, weight, scale };
+    body:        { family, weight, scale };
+    mono:        { family, weight };
+    scale:       'compact' | 'standard' | 'spacious';
+  };
+  logo: {
+    primary:     AssetRef;        // light bg
+    inverse:     AssetRef;        // dark bg
+    mark:        AssetRef;        // square / favicon source
+    favicon:     AssetRef;
+    social:      AssetRef;        // 1200x630 OG
+  };
+  blocks: {
+    card:        StylePresetId;   // 'soft', 'sharp', 'editorial', 'panel'
+    image:       StylePresetId;   // treatment, ratio, mask
+    section:     StylePresetId;   // rhythm + separators
+    button:      StylePresetId;
+  };
+  layout: {
+    density:     'comfortable' | 'standard' | 'compact';
+    radius:      RadiusScale;
+    spacing:     SpacingScale;
+    container:   ContainerScale;
+  };
+  motion?: MotionTokens;          // reserved, not v1
+}</code></pre>
+
+    <p>Two properties are worth stating explicitly. <strong>L3 picks live alongside L4 overrides in the same type</strong> — <code>palette: 'rust-clay'</code> and <code>brand.primary: '#7A1F1F'</code> coexist; the resolver applies the palette first, then the overrides win. <strong>Every category that v1 doesn't yet need is reserved by name</strong> with an optional type — <code>motion?</code> is there so the schema doesn't break when phase-2 motion lands.</p>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>The registry is the rail.</strong> A tenant can pick any <code>PaletteId</code> the registry exports; they cannot invent one. A tenant can override <code>brand.primary</code> to any hex; they cannot add a new color slot. The categories are open to evolution by the platform; the values within them are open to override by the tenant.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">04 — The five categories</span>
+    <h2>What v1 ships and what v1 anticipates</h2>
+    <p>Five categories you named as near-term, each modeled the same way: a registry of named presets, a guardrails schema for raw overrides, and a vertical default per preset.</p>
+
+    <div class="category-grid">
+
+      <div class="category-card">
+        <span class="label">color</span>
+        <h5>Palettes &amp; semantic roles</h5>
+        <p>Palette IDs map to brand/surface/ink/semantic role groups. Tenants pick by ID; overrides hit specific roles. Contrast guardrails enforce WCAG AA on resolved pairs — if a tenant overrides <code>ink.default</code> against <code>surface.page</code> and the ratio falls below 4.5:1, the resolver throws at build, not in production.</p>
+        <div class="tokens">
+          <div><span class="k">L1</span> · neutral, accessible base</div>
+          <div><span class="k">L2</span> · per-vertical palette</div>
+          <div><span class="k">L3</span> · palette ID pick</div>
+          <div><span class="k">L4</span> · role-level hex override</div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <span class="label">logo</span>
+        <h5>Brand marks &amp; variants</h5>
+        <p>Five asset slots covering light bg, dark bg, square mark, favicon source, social OG. <code>AssetRef</code> is Cloudinary-backed (same as the agency app's <code>PortfolioProject</code> uploads). Mark and favicon auto-derive from a single upload if the tenant doesn't provide variants; explicit variants override.</p>
+        <div class="tokens">
+          <div><span class="k">slots</span> · 5 (primary, inverse, mark, favicon, social)</div>
+          <div><span class="k">derivation</span> · auto from <code>mark</code> when absent</div>
+          <div><span class="k">storage</span> · Cloudinary, agency-app pattern</div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <span class="label">typography</span>
+        <h5>Pairings, scale, weight</h5>
+        <p>Type pairings ship as named sets (display family + body family + suggested scale). Custom fonts are an override: tenant supplies WOFF2 files, the system writes <code>@font-face</code> into the resolved CSS. Scale is a token group, not a constant — <code>compact</code> shaves 2pt off the type ramp without touching individual sizes.</p>
+        <div class="tokens">
+          <div><span class="k">L3</span> · pairing ID pick</div>
+          <div><span class="k">L4</span> · custom font upload, weight overrides</div>
+          <div><span class="k">scale</span> · compact / standard / spacious</div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <span class="label">blocks</span>
+        <h5>Content block style presets</h5>
+        <p>The category that does the most quiet work. Cards, image treatments, sections, buttons each have a small set of style presets ('soft' / 'sharp' / 'editorial' / 'panel' for cards, for instance). Shared block components consume the resolved preset; tenants pick a set per block type.</p>
+        <div class="tokens">
+          <div><span class="k">card</span> · soft / sharp / editorial / panel</div>
+          <div><span class="k">image</span> · treatment + ratio + mask</div>
+          <div><span class="k">section</span> · rhythm + separator style</div>
+          <div><span class="k">button</span> · shape + weight + emphasis</div>
+        </div>
+      </div>
+
+      <div class="category-card">
+        <span class="label">layout</span>
+        <h5>Density &amp; spacing scale</h5>
+        <p>One density choice cascades through spacing and container scales — comfortable, standard, compact. Radius scale is its own token group (sharp / soft / pillowy) since it doesn't covary cleanly with density. Most tenants will touch density and nothing else here.</p>
+        <div class="tokens">
+          <div><span class="k">density</span> · comfortable / standard / compact</div>
+          <div><span class="k">radius</span> · sharp / soft / pillowy</div>
+          <div><span class="k">spacing</span> · derived from density</div>
+        </div>
+      </div>
+
+      <div class="category-card future">
+        <span class="label">motion · reserved</span>
+        <h5>Anticipated, not built</h5>
+        <p>The schema reserves <code>motion?: MotionTokens</code> as optional. When motion ships, existing builds with no motion key keep their static look — Type-B propagation. The category lands with safe defaults, opt-in everywhere; no client wakes up to a redesigned site.</p>
+        <div class="tokens">
+          <div><span class="k">status</span> · type reserved, no values</div>
+          <div><span class="k">propagation</span> · Type B when shipped</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">05 — Override discipline</span>
+    <h2>Guided customization, in practice</h2>
+    <p>Guided customization means: tenants get rails, and the rails have known places where you step off them. Three rules govern every override.</p>
+
+    <div class="decisions">
+
+      <div class="decision-row">
+        <div class="key">
+          Overrides are leaf-level only
+          <span class="why">no shape drift</span>
+        </div>
+        <div class="val">
+          <p>A tenant can override <code>color.brand.primary</code>. A tenant cannot add <code>color.brand.tertiary</code>. The category shape is owned by the platform; the leaf values are negotiable. This is what keeps the resolver from becoming a merge engine for arbitrary JSON.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          Every override is validated
+          <span class="why">accessibility &amp; coherence</span>
+        </div>
+        <div class="val">
+          <p>The <code>themeOverrides</code> validator runs at build time. Contrast pairs checked. Custom fonts checked for required weights. Density choices checked against block-preset compatibility. A failing validation is a build error — the tenant's site falls back to L3 with a logged warning.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          Overrides are auditable
+          <span class="why">tenant-visible diffs</span>
+        </div>
+        <div class="val">
+          <p>The resolved token set is written to <code>.theme-resolved.json</code> per build. A tenant (or the operator on their behalf) can see exactly which values came from which layer. When the platform's L1 shifts in a future release, the diff is one file.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">
+          The CMS-shaped path is not v1
+          <span class="why">honest scope</span>
+        </div>
+        <div class="val">
+          <p>Editing <code>site.theme.ts</code> is a code edit, not a UI action. A tenant-facing theme editor is its own product surface and follows the template brief's "no CMS UI yet" discipline. When the patterns crystallize across builds, the editor graduates back into core.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">06 — Propagation</span>
+    <h2>How new visual categories reach existing builds</h2>
+    <p>Type-B for the category, Type-A for the schema. This is the rule that makes "evolve the system without rebuilding the clients" actually true.</p>
+
+    <div class="change-types">
+      <div class="change-type A">
+        <span class="tag">Type A · automatic</span>
+        <h5>The schema, the resolver, the validators</h5>
+        <p>Adding the <code>motion?</code> field, expanding role names inside <code>color</code>, shipping a new block-preset option. Lands via <code>git pull</code>. Safe because the field is optional and the default produces the existing rendering.</p>
+      </div>
+      <div class="change-type B">
+        <span class="tag">Type B · advisory</span>
+        <h5>The defaults, the preset library</h5>
+        <p>A new palette, a new pairing, a new vertical preset value. Available to opt into; existing builds keep their explicit picks. Release notes flag them as available.</p>
+      </div>
+      <div class="change-type C">
+        <span class="tag">Type C · never</span>
+        <h5>The tenant's <code>site.theme.ts</code></h5>
+        <p>Per-build divergence — chosen IDs, raw overrides, custom assets. Upstream pulls do not touch this file. Once multi-tenant ships (phase 2 of the template brief), this collapses into tenant documents.</p>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>The motion example, played out.</strong> Phase-2 ships <code>motion?: MotionTokens</code>: schema change (Type A — every build gets the field), three motion presets in the registry (Type B — available, not applied), and a vertical default of <code>undefined</code> (no change to anyone's rendering). A client says "let's add scroll reveals." Their <code>site.theme.ts</code> sets <code>motion: 'subtle'</code>. One file, one build. No other client moves.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">07 — Worked example</span>
+    <h2>A farm-source client picks rails, then steps off one</h2>
+    <p>How a real configuration lands in the codebase. The client is a small CSA operation; the preset gets them 80% there; the brand red is non-negotiable; everything else stays on rails.</p>
+
+    <div class="worked">
+      <h4>Build flow</h4>
+
+      <div class="worked-step">
+        <div class="n">1</div>
+        <div class="body"><strong>Init.</strong> <code>npm run init:vertical -- --vertical=farm-source --tenant=blackoak</code>. Drops a <code>site.theme.ts</code> seeded with the farm-source theme preset — earthy palette, serif/sans pairing, comfortable density, soft cards.</div>
+      </div>
+
+      <div class="worked-step">
+        <div class="n">2</div>
+        <div class="body"><strong>L3 picks.</strong> Client likes the preset, swaps the palette: <code>palette: 'clay-and-cream'</code> instead of the default <code>'field-and-loam'</code>. Switches block.card to <code>'editorial'</code>. Everything else inherits.</div>
+      </div>
+
+      <div class="worked-step">
+        <div class="n">3</div>
+        <div class="body"><strong>L4 override.</strong> Their brand uses a specific deep red. They add <code>overrides: { 'color.brand.primary': '#7A1F1F' }</code>. Validator checks contrast against resolved <code>surface.page</code> — passes.</div>
+      </div>
+
+      <div class="worked-step">
+        <div class="n">4</div>
+        <div class="body"><strong>Logo.</strong> Tenant uploads a single SVG mark. The system derives favicon and social automatically; primary and inverse variants are opt-in if the brand has them.</div>
+      </div>
+
+      <div class="worked-step">
+        <div class="n">5</div>
+        <div class="body"><strong>Build.</strong> Resolver walks L1→L2→L3→L4, emits <code>:root</code> CSS variables, writes <code>.theme-resolved.json</code>. Total tenant-authored file: 14 lines. Total upstream-pullable code: untouched.</div>
+      </div>
+
+      <div class="worked-step">
+        <div class="n">6</div>
+        <div class="body"><strong>Six months later.</strong> Platform ships <code>motion</code>. Their resolved theme gains <code>motion: undefined</code> automatically. Their site renders identically. They can opt in when ready.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section>
+    <span class="section-num">08 — Discipline</span>
+    <h2>What this layer requires of the operator</h2>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Register every category before tenants ask for it.</strong> The moment a category lives only in one client's overrides, it has skipped the registry — and the next client who asks for "the same thing" can't get it without a code change. When you see a second override of the same shape, lift it into L1.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Preset libraries grow slowly, deliberately.</strong> Three palettes per vertical, not thirty. Two pairings, not fifteen. The Squarespace error is infinite choice; the wedge is opinionated subsets. Add a preset when you've used it twice, not when you've imagined it once.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Treat the validator as a contract.</strong> When a client wants an override the validator rejects (a specific red that fails contrast on a specific surface), the answer is "adjust one side, not the validator." The validator is what keeps the platform's promise that no build is broken by configuration.</p>
+    </div>
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Resist motion in v1.</strong> The schema reserves it; the implementation defers it. Motion done wrong is the fastest way to make several different verticals start looking alike. It earns its place after the static system has stabilized across the first cluster of clients.</p>
+    </div>
+  </section>
+
+  <!-- =========================== -->
+  <section class="status-section">
+    <span class="section-num">09 — Status</span>
+    <h2>Where this brief leaves the system</h2>
+    <p>The visual customization layer is a token registry with four resolution layers, guarded overrides at the leaf level, and additive evolution of categories via Type-B propagation. Five categories land in v1 — color, logo, typography, blocks, layout. Motion is named in the schema and deferred in the implementation. The resolver is one function; the discipline is one rule (register before second use).</p>
+
+    <h4>Immediately ready to do</h4>
+    <ul>
+      <li>Add <code>themeTokens.ts</code> to <code>client/src/types/</code> and <code>server/src/types/</code>; wire to contract-check script.</li>
+      <li>Write <code>resolveTokens(tenantId)</code> with all four layers; hardcode L3/L4 as no-ops while there's one tenant.</li>
+      <li>Author L1 foundation tokens; author one <code>theme.preset.ts</code> per existing vertical preset.</li>
+      <li>Wire the resolver output to <code>:root</code> CSS variables in the existing shared layout.</li>
+      <li>Add the contrast and font-required-weight validators; fail the build on violation.</li>
+    </ul>
+
+    <h4>Open questions deferred to subsequent threads</h4>
+
+    <div class="open-q">
+      <span class="q-label">Q · Asset pipeline</span>
+      <p>Cloudinary direct (matches agency app) or a per-tenant prefix? When a logo gets uploaded via the tenant's eventual admin UI, what's the path from upload to <code>AssetRef</code>?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Custom-font hosting</span>
+      <p>Tenant uploads WOFF2 — stored where, served from where, and how does <code>@font-face</code> get into the resolved CSS at build time vs. runtime?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Validator strictness</span>
+      <p>WCAG AA is the floor; is AAA an opt-in per vertical (farms and food might want stricter outdoor-readable defaults)? What does "fail the build" mean in practice for a tenant who is mid-edit?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Block-preset coupling</span>
+      <p>Card style 'editorial' assumes a certain section rhythm. When tenants mix presets that don't compose, does the validator catch it, or do we ship visual debt and learn?</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Theme editor surface</span>
+      <p>When the editor graduates from code to UI, does it live in the operator's admin (gated, paid) or in each tenant's own admin (self-serve)? The answer probably tracks the concept brief's graduation criteria.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Visual System · Token Registry</span>
+    <span>Companion to template-architecture-brief.html</span>
+  </footer>
+
+</article>
+</body>
+</html>

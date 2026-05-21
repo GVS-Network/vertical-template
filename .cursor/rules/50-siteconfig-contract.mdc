@@ -1,0 +1,47 @@
+---
+description: Rules for editing the dual SiteConfig and ThemeTokens type files.
+globs:
+  - "**/types/site-config.ts"
+  - "**/types/theme-tokens.ts"
+---
+
+# Dual-Type Contract
+
+## The rule
+`client/src/types/site-config.ts` and `server/src/types/site-config.ts` are **byte-identical**. Same for `theme-tokens.ts`.
+
+The `contract:check` script asserts this in CI. A diff between the twin files is a build failure, not a warning.
+
+## Why
+The template brief established this: one TypeScript shape, two files, kept synced by a script. The reason is that both sides need the type and there is no monorepo tooling to share it. The cost of the redundancy is one CI check; the cost of *not* having both sides typed against the same shape is silent contract drift.
+
+## Editing protocol
+
+When editing one of these files:
+
+1. Edit both files identically. If the diff in the PR shows only one of them, the PR is incomplete.
+2. Run `npm run contract:check` locally before committing.
+3. Bump `CHANGELOG.md` with an entry under the current version describing the schema change.
+4. If the change adds a new top-level field, update `docs/contexts/glossary.html` if the field name has semantic weight.
+5. If the change adds a new vertical, a new feature, or a new payment provider, update the relevant brief's `§04` section.
+
+## What can go in here
+
+### SiteConfig
+- `tenantId`, `vertical`, `branding`, `features.*`. The shape is closed at the top level.
+- New feature pack toggles go under `features.<id>` with the pack's namespace.
+- New verticals join the `vertical` union literal.
+
+### ThemeTokens
+- The five category groups (`color`, `typography`, `logo`, `blocks`, `layout`), each with their leaf token paths.
+- New leaf tokens go inside an existing group when possible. New top-level groups (motion, etc.) land *optional* (`motion?: MotionTokens`) so existing builds don't break.
+
+## What cannot go in here
+- Implementation details. These are types, not constants. Default values live in `tokens.foundation.ts`, `verticals/<id>/preset.ts`, `verticals/<id>/theme.preset.ts`.
+- Runtime helpers. The resolver, validators, predicates live elsewhere.
+- Tenant-specific values. These files describe the *shape*, not any particular tenant's choices.
+
+## When the script fails
+The most common reason `contract:check` fails: someone edited one file in their IDE and didn't notice. Run the script locally before pushing. If the diff is legitimate (whitespace, ordering), normalize and re-run.
+
+If the script keeps failing because the two files genuinely need to differ, that is a thesis-level question — open the template brief and decide whether the single-shape rule needs revision. Don't paper over a divergence with comments saying "client only" / "server only" inside the type.

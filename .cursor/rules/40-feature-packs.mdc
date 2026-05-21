@@ -1,0 +1,87 @@
+---
+description: Conventions for feature packs (catalog, content, intake, payments, auth).
+globs:
+  - "**/features/**/*"
+  - "**/providers/**/*"
+---
+
+# Feature Pack Conventions
+
+## What a feature pack is
+A toggle-mounted module that contributes API + UI surface when enabled and zero surface when disabled. The five canonical packs:
+
+- `catalog` — menu / inventory / portfolio depending on mode
+- `content` — page records, read/upsert endpoints
+- `intake` — conditional forms, IntakeSubmission model
+- `payments` — provider-abstracted commerce
+- `auth` — middleware, not a router (technically not a "pack" in the strict sense)
+
+## Anatomy of a pack
+
+### Server side: `server/src/features/<id>/`
+
+```
+features/catalog/
+  index.ts           — exports { router }
+  routes/            — Express handlers
+  models/            — Mongoose models (each with tenantId)
+  services/          — business logic
+  schemas/           — zod validators
+  index.test.ts      — pack-level integration tests
+```
+
+### Client side: `client/src/features/<id>/`
+
+```
+features/catalog/
+  index.ts           — exports route components
+  pages/             — top-level route components
+  components/        — feature-scoped UI
+  hooks/             — feature-scoped hooks
+```
+
+## The toggle
+The main server bootstrap conditionally mounts:
+
+```ts
+const config = loadSiteConfig();
+if (config.features.catalog.enabled) {
+  const { router } = await import('@/features/catalog');
+  app.use('/api/catalog', router);
+}
+```
+
+The main client App.tsx conditionally renders:
+
+```tsx
+{config.features.catalog.enabled && (
+  <Route path="/menu" element={<MenuPage />} />
+)}
+```
+
+**A disabled pack must not contribute any code path.** Not a 404, not an empty router, not a stub. The condition is evaluated once at boot. If the answer is `false`, the import doesn't happen, the route doesn't mount, and the bundle should tree-shake the client code.
+
+## Cross-pack rules
+
+- **No deep imports across packs.** If catalog needs something from intake's internals, the answer is to lift the shared thing into `server/src/shared/` or `client/src/shared/`.
+- **No pack reads another pack's config slice directly.** Read your own slice from `getSiteConfig(req).features.<id>`; don't read `features.intake` from catalog.
+- **No pack writes to another pack's models.** Cross-pack effects go through services, not direct model access.
+
+## Payment provider as a special case
+`server/src/providers/` is not a feature pack but follows the same isolation rules:
+- Vendor SDKs (`stripe`, `square`) are imported only here.
+- The interface lives in `PaymentProvider.ts`. Adding a third provider (Toast, Clover) means adding one new file that implements the interface.
+- Routes call `getPaymentProvider()` and never branch on `config.features.payments.provider`. The selection logic lives in the factory.
+
+## When in doubt: two-or-more-verticals test
+Before adding anything to a pack, ask: would a second vertical use this exact behavior?
+
+- **Yes** → it goes in the pack.
+- **No, but a configuration switch would generalize it** → it goes in the pack with a `SiteConfig.features.<id>.<option>` toggle.
+- **No, only this one client wants it** → it's not a pack change. It's a `Custom*.tsx` or a `site.config.ts` override or a polite no.
+
+## When to ask before coding
+- Creating a new feature pack (this is rare and should be brief-motivated).
+- Splitting an existing pack.
+- Adding a new toggle to `SiteConfig.features.<id>`.
+- Anything that crosses the pack boundary in a way the rules above don't sanction.

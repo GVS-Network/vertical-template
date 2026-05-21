@@ -1,0 +1,69 @@
+---
+description: Rules for theme tokens, the resolver, palettes, pairings, and any CSS.
+globs:
+  - "**/theme/**/*"
+  - "**/verticals/**/theme.preset.ts"
+  - "**/site.theme.ts"
+  - "**/*.css"
+  - "**/*.module.css"
+---
+
+# Visual System Rules
+
+The full thesis lives in `docs/visual-system-brief.html`. Read it before touching this part of the codebase.
+
+## The four layers
+
+Every visual value resolves through `resolveTokens(tenantId)`:
+
+- **L1 · Foundation** — `client/src/theme/tokens.foundation.ts`. Platform-wide defaults. Type-A propagation (lands via `git pull`).
+- **L2 · Vertical** — `verticals/<id>/theme.preset.ts`. Per-vertical opinion. Type-B (advisory; existing builds keep their picks).
+- **L3 · Tenant pick** — `client/src/site.theme.ts`. Tenant selects from registered options (palette ID, pairing ID, density).
+- **L4 · Tenant override** — `client/src/site.theme.ts`'s `overrides` field. Leaf-level raw values.
+
+L1 and L2 are core code. L3 and L4 are per-build (Type C).
+
+## Hard rules
+
+### 1. The resolver is the only thing that emits CSS variables
+No component, no page, no feature pack writes `:root { --foo: bar }`. The resolver's output is the only source. Component CSS *consumes* `var(--foo)`.
+
+### 2. No hardcoded design values outside theme/
+Hardcoded hexes (`#b8451f`), rems (`1.5rem`), or magic spacing in component CSS modules is a build error. The exceptions:
+
+- `:root` declarations in the resolver's emitted CSS.
+- Values inside `client/src/theme/`, which by definition own the tokens.
+- One-off documentation pages whose styling is itself the artifact (the project briefs, this build-docs folder).
+
+### 3. Leaf-level overrides only
+Tenants override `color.brand.primary`. Tenants cannot add `color.brand.tertiary`. The category shape is owned by the platform; the leaf values are negotiable.
+
+If a client genuinely needs a new leaf, that is a Type-A change (registry expansion) and a brief update — not a `site.theme.ts` workaround.
+
+### 4. Every override is validated
+The `themeOverrides` validator runs at build time. Contrast pairs (WCAG AA), font-weight presence, density-vs-block-preset compatibility. **A failing validation is a build error**, not a warning. The build falls back to L3 with a logged warning if and only if the failure is in L4 *only*.
+
+### 5. Registry expansion follows "second use"
+Before adding a palette, pairing, or block preset to the registry: has a second build asked for it? If yes, lift. If no, leave it as an override on the one client that needs it. The Squarespace failure mode is infinite choice; the wedge is opinionated subsets.
+
+### 6. Reserved categories are optional
+`motion?: MotionTokens` is optional in the type. When motion ships, existing builds with no motion key keep their static look. **Never make a reserved category required without a phased migration plan.**
+
+## File ownership
+
+| File | Type | Edit when |
+|---|---|---|
+| `theme/tokens.foundation.ts` | A | Adjusting platform defaults; brief-touching change |
+| `theme/resolveTokens.ts` | A | Adding a layer, changing emission, fixing a bug |
+| `theme/palettes/*.ts` | A (lib) | Adding a registered palette (after second-use trigger) |
+| `theme/pairings/*.ts` | A (lib) | Adding a registered type pairing |
+| `theme/presets/*.ts` | A (lib) | Adding a block-style preset |
+| `verticals/<id>/theme.preset.ts` | B | Updating a vertical's defaults; existing builds opt in |
+| `site.theme.ts` | C | Per-build picks and overrides; never propagated |
+
+## When to ask before coding
+
+- Adding a new top-level token category (the `motion?` example was anticipated; the next one isn't).
+- Changing the resolver's layer order or the layer count.
+- Tightening a validator in a way that may break existing builds.
+- Adding a Tailwind-shaped utility layer (don't — it bypasses the registry).

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>README — Vertical SaaS Build Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">README</span>
+      <span>Build Documentation · v0.1.0</span>
+    </div>
+    <h1 class="doc-title">The <em>build documentation</em> family.</h1>
+    <p class="doc-subtitle">An index of every doc that drives the Cursor + Claude build loop, the order they're read in, and the rules that keep them honest as the system evolves.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Purpose</span>
+    <h2>What this folder is for</h2>
+    <p>The three project briefs <em>(concept · template · visual system)</em> describe what is being built and why. This folder describes <strong>how the build actually happens</strong>: which AI agent reads what, in which order, with which rules in force, and how the docs themselves stay current as the codebase changes underneath them.</p>
+
+    <div class="concept-panel">
+      <h4>One-line framing</h4>
+      <p>The briefs are the <em>thesis</em>. The build docs are the <em>operating system</em>. Cursor + Claude is the runtime. Every line of code in the template should be traceable through these docs back to a decision in a brief.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — The document family</span>
+    <h2>What lives here and what it's for</h2>
+
+    <h4>Reference (read-only inputs)</h4>
+    <div class="doc-family">
+      <a class="doc-card" href="platform-concept-brief.html">
+        <span class="file">platform-concept-brief.html</span>
+        <h5>Concept Brief</h5>
+        <p>The thesis. Vertical SaaS for small businesses, staged go-to-market, the 40% shared core.</p>
+      </a>
+      <a class="doc-card" href="template-architecture-brief.html">
+        <span class="file">template-architecture-brief.html</span>
+        <h5>Template Architecture Brief</h5>
+        <p>The MERN template's seams: SiteConfig, feature packs, the six-change phase-2 jump.</p>
+      </a>
+      <a class="doc-card" href="visual-system-brief.html">
+        <span class="file">visual-system-brief.html</span>
+        <h5>Visual System Brief</h5>
+        <p>The token registry: four-layer resolution, guarded overrides, Type-B propagation.</p>
+      </a>
+    </div>
+
+    <h4>Context (loaded into every Cursor session)</h4>
+    <div class="doc-family">
+      <a class="doc-card" href="contexts/repo-context.html">
+        <span class="file">contexts/repo-context.html</span>
+        <h5>Repository Context</h5>
+        <p>The codebase family — baseapp, askanddeliverwebapp, the new template. Conventions inherited, conventions diverging.</p>
+      </a>
+      <a class="doc-card" href="contexts/stack-context.html">
+        <span class="file">contexts/stack-context.html</span>
+        <h5>Stack Context</h5>
+        <p>MERN specifics, library choices, environment expectations. The "before you write code" baseline.</p>
+      </a>
+      <a class="doc-card" href="contexts/glossary.html">
+        <span class="file">contexts/glossary.html</span>
+        <h5>Glossary</h5>
+        <p>Terms that mean specific things in this project — tenant, vertical, feature pack, Type A/B/C, seam.</p>
+      </a>
+      <a class="doc-card" href="contexts/session-starter.html">
+        <span class="file">contexts/session-starter.html</span>
+        <h5>Session Starter Prompt</h5>
+        <p>The opening prompt template to paste into Cursor at the start of any build session.</p>
+      </a>
+    </div>
+
+    <h4>Rules (enforce themselves on every edit)</h4>
+    <div class="doc-family">
+      <a class="doc-card" href="rules/cursorrules-overview.html">
+        <span class="file">rules/cursorrules-overview.html</span>
+        <h5>Cursor Rules Overview</h5>
+        <p>What's in <code>.cursorrules</code> and <code>.cursor/rules/*.mdc</code>, how to edit them, when they trigger.</p>
+      </a>
+      <a class="doc-card" href="rules/documentation-maintenance.html">
+        <span class="file">rules/documentation-maintenance.html</span>
+        <h5>Documentation Maintenance</h5>
+        <p>Versioning, change-types for docs, the triggers that force a doc update before a PR can merge.</p>
+      </a>
+    </div>
+
+    <h4>Phased build prompt guides (the actual build sequence)</h4>
+    <div class="doc-family">
+      <a class="doc-card" href="prompts/phase-0-bootstrap.html">
+        <span class="file">prompts/phase-0-bootstrap.html</span>
+        <h5>Phase 0 · Bootstrap</h5>
+        <p>Fork baseapp, install rules, wire docs, verify dev loop. The "are we live?" gate.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-1-siteconfig.html">
+        <span class="file">prompts/phase-1-siteconfig.html</span>
+        <h5>Phase 1 · SiteConfig &amp; Seams</h5>
+        <p>The one TypeScript shape, dual-file contract check, <code>getSiteConfig()</code> seam, <code>tenantId</code> everywhere.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-2-feature-packs.html">
+        <span class="file">prompts/phase-2-feature-packs.html</span>
+        <h5>Phase 2 · Feature Packs</h5>
+        <p>Five packs (catalog, content, intake, payments, auth). Toggle-mounted. Disabled = zero surface.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-3-payments.html">
+        <span class="file">prompts/phase-3-payments.html</span>
+        <h5>Phase 3 · Payment Provider Abstraction</h5>
+        <p>Stripe (Payment Links) and Square (with inventory) behind one interface.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-4-verticals.html">
+        <span class="file">prompts/phase-4-verticals.html</span>
+        <h5>Phase 4 · Vertical Presets</h5>
+        <p>Four presets — bar-restaurant, food-truck, farm-source, screen-printer. The <code>init:vertical</code> script.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-5-visual-system.html">
+        <span class="file">prompts/phase-5-visual-system.html</span>
+        <h5>Phase 5 · Token Registry &amp; Resolver</h5>
+        <p>Four-layer <code>resolveTokens()</code>, contrast validator, CSS-variable emission.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-6-first-client.html">
+        <span class="file">prompts/phase-6-first-client.html</span>
+        <h5>Phase 6 · First Client Build</h5>
+        <p>Drive a real client engagement through the template. The brief's "stage 1" begins here.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-7-multi-tenant.html">
+        <span class="file">prompts/phase-7-multi-tenant.html</span>
+        <h5>Phase 7 · Multi-Tenant Jump</h5>
+        <p>The six discrete changes. Tenant model, host middleware, getSiteConfig swap, SSL, client config, admin.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — File tree</span>
+    <h2>Where these files live in the repo</h2>
+
+<div class="tree"><span class="accent">repo-root/</span>
+├── <span class="accent">docs/</span>
+│   ├── README.html                            <span class="dim">← you are here</span>
+│   ├── platform-concept-brief.html            <span class="dim">← thesis</span>
+│   ├── template-architecture-brief.html       <span class="dim">← template seams</span>
+│   ├── visual-system-brief.html               <span class="dim">← token registry</span>
+│   ├── assets/
+│   │   └── doc-system.css                     <span class="dim">← shared style</span>
+│   ├── contexts/
+│   │   ├── repo-context.html
+│   │   ├── stack-context.html
+│   │   ├── glossary.html
+│   │   └── session-starter.html
+│   ├── rules/
+│   │   ├── cursorrules-overview.html
+│   │   └── documentation-maintenance.html
+│   └── prompts/
+│       ├── phase-0-bootstrap.html
+│       ├── phase-1-siteconfig.html
+│       ├── phase-2-feature-packs.html
+│       ├── phase-3-payments.html
+│       ├── phase-4-verticals.html
+│       ├── phase-5-visual-system.html
+│       ├── phase-6-first-client.html
+│       └── phase-7-multi-tenant.html
+│
+├── <span class="accent">.cursorrules</span>                              <span class="dim">← legacy single-file, always-on</span>
+├── <span class="accent">.cursor/</span>
+│   └── rules/
+│       ├── 00-project-context.mdc             <span class="dim">alwaysApply: true</span>
+│       ├── 10-typescript-conventions.mdc      <span class="dim">globs: **/*.ts, **/*.tsx</span>
+│       ├── 20-server-conventions.mdc          <span class="dim">globs: server/**/*</span>
+│       ├── 30-client-conventions.mdc          <span class="dim">globs: client/**/*</span>
+│       ├── 40-feature-packs.mdc               <span class="dim">globs: **/features/**/*</span>
+│       ├── 50-siteconfig-contract.mdc         <span class="dim">globs: **/types/site-config.ts</span>
+│       ├── 60-visual-system.mdc               <span class="dim">globs: **/theme/**/*, **/styles/**/*</span>
+│       ├── 70-multi-tenant-seams.mdc          <span class="dim">alwaysApply: true</span>
+│       ├── 80-versioning-and-docs.mdc         <span class="dim">alwaysApply: true</span>
+│       └── 99-claude-collaboration.mdc        <span class="dim">alwaysApply: true</span>
+│
+└── CHANGELOG.md                               <span class="dim">← template versioning, see rules/80</span></div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — How to actually use this</span>
+    <h2>The build loop</h2>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">01</span>Open</div>
+      <div class="phase-body">
+        <h3>Open Cursor on the repo</h3>
+        <p>Cursor auto-loads <code>.cursorrules</code> and every <code>.cursor/rules/*.mdc</code> file that matches the files you have open. You don't activate them — they activate themselves. Verify the indicator in the chat sidebar shows the rule count.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">02</span>Prime</div>
+      <div class="phase-body">
+        <h3>Paste the session starter</h3>
+        <p>Open <a href="contexts/session-starter.html"><code>contexts/session-starter.html</code></a>, copy the prompt block at the bottom, paste into Cursor's chat. It tells Claude which phase you're in, which briefs are active, what's already built, what is forbidden.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">03</span>Phase</div>
+      <div class="phase-body">
+        <h3>Pick the phase prompt</h3>
+        <p>Open the <code>prompts/phase-N-*.html</code> for the current phase. Each contains: prerequisites, deliverables, prompts to feed Cursor in order, and acceptance criteria.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">04</span>Loop</div>
+      <div class="phase-body">
+        <h3>Prompt → review → commit → next prompt</h3>
+        <p>Each phase doc breaks the work into prompts small enough that Claude can complete one and you can review the diff before the next. Don't batch them.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">05</span>Close</div>
+      <div class="phase-body">
+        <h3>Update docs before merging</h3>
+        <p>The <a href="rules/documentation-maintenance.html">doc-maintenance rule</a> determines what must change. CHANGELOG and any affected brief/context update in the same PR as the code.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Versioning</span>
+    <h2>How these docs version, and why it matters</h2>
+
+    <p>This documentation set carries <strong>two versions</strong>: a doc-set version (this file's <code>v0.1.0</code> in the header) and a template version (CHANGELOG.md at repo root). They are not the same.</p>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">
+          Template version
+          <span class="why">what client builds pin to</span>
+        </div>
+        <div class="val">
+          <p>Semver. <code>v0.4.1 → v0.4.2</code>. Tagged on the template repo. Client builds pin to a tag and bump deliberately. This is the version the template brief refers to in its upgrade-flow rule.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Docs version
+          <span class="why">documentation lineage</span>
+        </div>
+        <div class="val">
+          <p>Independent semver in this README's header. Bumps when the doc family adds, retires, or restructures a doc. Track in CHANGELOG under a <code>docs</code> heading. A docs-only change doesn't bump template version; a template change that needs new docs bumps both.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Brief revisions
+          <span class="why">thesis edits are explicit</span>
+        </div>
+        <div class="val">
+          <p>The three briefs carry their own <code>v1</code>, <code>v0.1</code>, <code>v0.1</code> in their headers. Editing a brief is a deliberate act — it means the strategy changed. Brief edits always bump docs version and demand a CHANGELOG entry under <code>thesis</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Briefs are not retroactively edited to match code.</strong> If the implementation diverges from a brief, either change the code back, or write a new brief revision and explain the decision. The briefs are the system's memory of <em>why</em> — protect that.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — Status</span>
+    <h2>Where the build documentation stands</h2>
+    <p>v0.1.0 of the doc set — the initial scaffolding. Three briefs in, eight phase prompts out, two rule directories and four contexts wired. The template repo and Cursor rules are the next concrete deliverable; this folder is what gets cloned next to them.</p>
+
+    <h4>Things this README will need to add over time</h4>
+    <div class="open-q">
+      <span class="q-label">Q · Phase-2 brief</span>
+      <p>When the template hits the multi-tenant transition, a fourth project brief joins the family — runtime tenant resolution, custom-domain SSL, the operator-as-tenant-zero migration. Add it to the Reference cards in §02.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Skill capture</span>
+      <p>Recurring prompt patterns that prove useful across phases probably graduate into a <code>skills/</code> subdirectory — Claude-facing skill docs that get attached to specific file globs. Track candidates in CHANGELOG.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Per-client doc fork</span>
+      <p>Each client build inherits this docs/ folder. When client builds start having their own decisions worth recording, the doc family may split into <code>docs/platform/</code> (this) and <code>docs/build/</code> (per-tenant) — covered in phase-6.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Build Documentation · README</span>
+    <span>Index for the Cursor + Claude build loop</span>
+  </footer>
+
+</article>
+</body>
+</html>

@@ -1,0 +1,44 @@
+---
+description: TypeScript conventions for any .ts/.tsx file in this repo.
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+---
+
+# TypeScript Conventions
+
+## Strictness
+- `strict: true` is non-negotiable.
+- No `any` without an inline `// any: <reason>` comment.
+- Prefer `unknown` + narrowing over `any`.
+- Use `zod` for runtime validation of anything crossing the network or hydrating from Mongo. Every Mongoose schema has a matching `z.object()` for inbound validation.
+
+## Shapes
+- `interface` for object shapes that callers extend.
+- `type` for unions and aliases.
+- Avoid `enum`; use union literal types (`type Vertical = 'bar-restaurant' | 'food-truck' | ...`).
+
+## Imports
+- Absolute paths rooted at `@/` (configured in tsconfig `paths`) on both sides.
+- Group order: external packages → `@/types` → `@/features` → local relative.
+- No deep imports across feature-pack boundaries. If feature A needs something from feature B's internals, the answer is to expose it through B's barrel or move it to shared.
+
+## Files
+- Files in kebab-case: `site-config.ts`.
+- Component files in PascalCase: `IntakeForm.tsx`.
+- One default export per component file.
+- Hooks live next to the component that owns them, not in a global `hooks/` folder.
+
+## Comments
+Comment *why*, not *what*. A reference to a brief is more useful than three lines explaining the code:
+
+```ts
+// see template-architecture-brief §03 — single seam for phase 2
+export function getSiteConfig(req: Request): SiteConfig { ... }
+```
+
+## Forbidden in this codebase
+- `process.env.TENANT_ID` in route handlers. Read tenant context through `getSiteConfig(req)`.
+- Direct Stripe / Square SDK imports outside `server/src/providers/`.
+- Hardcoded color / font / radius values outside `client/src/theme/`. Use the CSS variables emitted by `resolveTokens()`.
+- New top-level fields on `SiteConfig` or `ThemeTokens` without updating both client and server type files. The `contract:check` script will fail CI.

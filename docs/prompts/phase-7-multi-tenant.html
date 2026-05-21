@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 7 — Multi-Tenant · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 7</span>
+      <span>Multi-Tenant · v0.7.0 → v1.0.0</span>
+    </div>
+    <h1 class="doc-title">Phase 7 — <em>Multi-tenant</em>.</h1>
+    <p class="doc-subtitle">The six discrete changes that turn a single-tenant template into a multi-tenant platform. The template-architecture brief promised this would be six changes, not sixty — Phase 1's <code>tenantId</code> investment and Phase 5's tenant-keyed token resolution are what cash that promise. After this phase, one deploy serves many sites.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 6 closed, tagged <code>v0.7.0</code>. A real client is live single-tenant.</li>
+      <li>The tenant-leakage test from Phase 4 still passes (different <code>BOUND_TENANT_ID</code>s show no cross-talk).</li>
+      <li>You have read the template-architecture brief's "phase-2 jump" section (which is this phase under the build doc's numbering) and counted the six changes for yourself.</li>
+      <li>You have a credentials story for SSL at scale — either a wildcard, a per-domain auto-issuer (e.g. Caddy/Let's Encrypt), or a managed front (e.g. Cloudflare). Decide before prompt 7.4.</li>
+    </ul>
+
+    <div class="callout risk">
+      <span class="icon"></span>
+      <p><strong>The phase-6 client must not break.</strong> Their single-tenant deploy is in production. Phase 7's success criterion is "we collapsed N deploys into 1 and no customer noticed". Do not skip the migration verification at the end.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — The six changes</span>
+    <h2>What this phase produces — exactly</h2>
+
+    <p>From the template-architecture brief: this jump is <strong>exactly six discrete changes</strong>. If you find yourself making a seventh, stop and ask whether it's actually part of one of these six, or whether it's scope creep that should be its own later phase.</p>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>Change 1 — Tenant model</strong><span class="why">first-class entity</span></div>
+        <div class="val"><p>Introduce a proper <code>Tenant</code> Mongoose model (replacing the placeholder <code>_tenants</code> collection from Phase 4). Fields: <code>_id</code> (tenantId string), <code>preset</code>, <code>siteConfigOverrides</code>, <code>hosts</code> (array of hostnames), <code>status</code>, <code>createdAt</code>, <code>updatedAt</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Change 2 — Host middleware</strong><span class="why">request → tenant</span></div>
+        <div class="val"><p>Express middleware that reads <code>req.hostname</code>, looks up the matching <code>Tenant</code>, attaches it to <code>req.tenant</code>. Runs before <code>req.siteConfig</code> is set.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Change 3 — getSiteConfig swap</strong><span class="why">the seam pays off</span></div>
+        <div class="val"><p><code>getSiteConfig(req)</code> body changes from <code>return defaultSiteConfig</code> to <code>return mergeDefaults(req.tenant.siteConfigOverrides)</code>. <strong>Zero callers change.</strong> The signature has been right since Phase 1.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Change 4 — SSL strategy</strong><span class="why">infra, not code</span></div>
+        <div class="val"><p>Implement whatever was decided in prereqs: wildcard cert, auto-issuance per host, or a managed front. Code-side this is small (maybe a host-allowlist check); infra-side it's the bulk of the work.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Change 5 — Tenant config admin</strong><span class="why">how operator manages tenants</span></div>
+        <div class="val"><p>A protected admin UI at <code>/__admin/tenants</code>: create a tenant, list tenants, edit a tenant's <code>siteConfigOverrides</code> and <code>hosts</code>, suspend a tenant. Auth0 with an operator role.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Change 6 — Ops dashboard</strong><span class="why">visibility</span></div>
+        <div class="val"><p>A read-only dashboard at <code>/__admin/ops</code>: per-tenant request counts, recent errors, payment-provider health, last successful inventory sync. The thing the operator looks at at 9am Monday.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Change taxonomy</span>
+    <h2>What kind of changes are we making?</h2>
+
+    <div class="change-types">
+      <div class="change-type A">
+        <span class="tag">Type A</span>
+        <h5>Tenant model fields</h5>
+        <p>Adding the Tenant model is additive — nothing references it until host middleware activates. Pure Type-A creation.</p>
+      </div>
+      <div class="change-type B">
+        <span class="tag">Type B</span>
+        <h5>(none in this phase)</h5>
+        <p>No visual-token work happens here. Tokens already resolve by tenantId; multi-tenant just changes how tenantId arrives.</p>
+      </div>
+      <div class="change-type C">
+        <span class="tag">Type C</span>
+        <h5>getSiteConfig body swap</h5>
+        <p>Even though the signature doesn't change, the body change is Type C because it touches the contract every caller relies on. Test thoroughly. Stage carefully.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-7 prompt sequence</h2>
+
+    <h3>Prompt 7.1 — Carry forward + audit Phase 6 surprises</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.1</span>
+Resolve OPEN_QUESTIONS from Phase 6. Pay special attention to the closing question: did the phase-6 client need anything that tenantId-on-every-model didn't buy?
+
+If YES — there is a missing tenantId scope somewhere — fix it FIRST, before any Phase 7 work. Phase 7 assumes every cross-tenant boundary is clean.
+
+Audit:
+  1. Re-run the tenant-leakage test from Phase 4 with three tenants now (default, demo, phase-6 client codename).
+  2. Check every webhook handler: does it correctly route to the right tenantId based on something other than req.hostname? (Webhooks don't carry our hostname.)
+  3. Check every cron/background job (if any): is it iterating by tenantId, not assuming a single tenant?
+
+Report the audit. Do not start prompt 7.2 until clean.</div>
+
+    <h3>Prompt 7.2 — Change 1: Tenant model</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.2</span>
+Create the Tenant Mongoose model at server/models/tenant.ts.
+
+Schema:
+  _id: String (this IS the tenantId — no separate id field)
+  preset: 'bar-restaurant' | 'food-truck' | 'farm-source' | 'screen-printer'
+  siteConfigOverrides: Mixed (partial SiteConfig, merged onto defaults at request time)
+  hosts: [String] (array of hostnames this tenant answers to; e.g. ['client.com', 'www.client.com'])
+  status: 'active' | 'suspended' | 'archived'
+  paymentProviderRef: String (provider's account id, for routing webhooks)
+  createdAt, updatedAt
+
+Indexes:
+  - unique on _id (Mongoose default for _id).
+  - sparse unique on each element of hosts (a host can serve at most one tenant).
+
+Migrate existing _tenants placeholder docs from Phase 4 into the real Tenant collection. Write a migration script at scripts/migrate/0001-tenants.ts. Idempotent.
+
+Commit: <span class="hl">"phase-7: change 1 — Tenant model + migration"</span>.</div>
+
+    <h3>Prompt 7.3 — Change 2: Host middleware</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.3</span>
+Create server/middleware/resolve-tenant.ts:
+
+  - Read req.hostname.
+  - Look up Tenant.findOne({ hosts: hostname, status: 'active' }).
+  - If found: req.tenant = tenant.
+  - If not found:
+      - In development with BOUND_TENANT_ID set: load that tenant by id.
+      - Otherwise: respond 404 with a "no tenant for this host" page (NOT a server error — these are valid lookups that miss).
+
+Mount this middleware AS EARLY AS POSSIBLE in the chain, before any router or auth, but AFTER cookie/body parsing.
+
+Add types/express.d.ts augmentation for req.tenant.
+
+Test:
+  - Hit the app with a recognized host: req.tenant populated.
+  - Hit with an unknown host: clean 404.
+  - Hit a suspended tenant: clean 404 (or 503 with a "suspended" page — decide and document).
+
+Commit: <span class="hl">"phase-7: change 2 — host middleware (resolve-tenant)"</span>.</div>
+
+    <h3>Prompt 7.4 — Change 3: getSiteConfig swap (THE big one)</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.4</span>
+This is the change that pays off the Phase 1 seam investment.
+
+Open server/seams/get-site-config.ts. Change the body:
+
+  export function getSiteConfig(req: Request): SiteConfig {
+    if (!req.tenant) throw new Error('getSiteConfig called before resolve-tenant middleware');
+    return mergeDeep(defaultSiteConfig, req.tenant.siteConfigOverrides);
+  }
+
+The signature is unchanged. Therefore <span class="hl">no other code in the repo needs to change</span>. If you find yourself wanting to change a caller, STOP — that's a sign the seam was wrong or this change is.
+
+After the swap:
+  1. Run all tests.
+  2. Boot with two seeded tenants on different hosts (use /etc/hosts locally to fake it).
+  3. Confirm each host renders its own tenant's config — branding, features, payment provider.
+  4. Confirm req.siteConfig.tenantId === req.tenant._id everywhere.
+
+Commit: <span class="hl">"phase-7: change 3 — getSiteConfig reads req.tenant"</span>.</div>
+
+    <h3>Prompt 7.5 — Change 4: SSL strategy</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.5</span>
+Per the SSL decision made in prereqs, implement and document.
+
+If wildcard cert (subdomain-only model):
+  - Update DNS docs in build-docs/clients/&lt;client&gt;.md to reflect "your-name.&lt;our-domain&gt;.com is how you get on platform".
+  - No code changes beyond a host-allowlist check.
+
+If auto-issuance per host (Caddy / autocert / cert-manager):
+  - Stand up the auto-issuer in front of the app.
+  - Add a host-allowlist in code: only attempt issuance for hosts that map to an active Tenant.
+
+If managed front (Cloudflare, Fastly, etc):
+  - Configure the front with the platform's origin.
+  - Document the manual step of adding each new host to the front.
+
+Update scripts/doctor.ts: in production, fetch https://&lt;tenant.hosts[0]&gt; from the running app's perspective and verify a 200 with valid cert. Fail loud if not.
+
+Commit: <span class="hl">"phase-7: change 4 — SSL strategy (&lt;strategy-name&gt;)"</span>.</div>
+
+    <h3>Prompt 7.6 — Change 5: Tenant admin UI</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.6</span>
+Build an admin UI at /__admin/tenants. It is gated by Auth0 with a role check (only users with the "operator" role can access).
+
+Routes:
+  GET /__admin/tenants            — list all tenants
+  GET /__admin/tenants/:id         — show one tenant + its config overrides + hosts
+  POST /__admin/tenants            — create new tenant (preset + initial host)
+  PUT /__admin/tenants/:id         — edit overrides, hosts, status
+  POST /__admin/tenants/:id/suspend
+  POST /__admin/tenants/:id/activate
+
+UI is intentionally minimal — this is for the operator, not customers. Plain table, form, save button. Use the same CSS variables so admin doesn't fork the theme.
+
+Critically: the admin UI itself should NOT be tenant-scoped — it lives outside the multi-tenant world (on a dedicated host like admin.&lt;our-domain&gt;.com) and reads tenants directly via Mongoose.
+
+Commit: <span class="hl">"phase-7: change 5 — tenant admin UI"</span>.</div>
+
+    <h3>Prompt 7.7 — Change 6: Ops dashboard</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.7</span>
+Build a read-only dashboard at /__admin/ops. Same role gate as 7.6.
+
+What it shows (per tenant, last 24h + last 7d):
+  - Request count, error count.
+  - Top 5 error paths.
+  - Last successful payment, count of payments.
+  - Last successful webhook event per provider.
+  - For Square tenants: last successful inventory sync.
+  - For tenants where webhooks have been quiet for &gt; expected interval: red flag.
+
+Data source: a lightweight events log we add to in the existing middleware (don't introduce a new DB; reuse Mongo). Aggregate at request time — caching is a later optimization.
+
+The point of this dashboard is the 9am-Monday check. Optimize for "operator opens it, in 30 seconds knows whether anything needs attention".
+
+Commit: <span class="hl">"phase-7: change 6 — ops dashboard"</span>.</div>
+
+    <h3>Prompt 7.8 — Migrate the Phase-6 client</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.8</span>
+THE critical migration. The phase-6 client is currently on its own deploy. We need to move them to the multi-tenant deploy without breaking them.
+
+Plan:
+  1. On the multi-tenant deploy, create the client as a Tenant document (using the admin UI from 7.6 or a script). Copy the siteConfigOverrides, hosts (including www. variant), preset.
+  2. Migrate the client's Mongo data: export from the single-tenant DB, import into the multi-tenant DB with the right tenantId. Use a migration script. Idempotent. Dry-run mode.
+  3. Stage: point a staging hostname at the multi-tenant deploy with the client's tenant. Compare side-by-side with the single-tenant deploy for parity.
+  4. Cutover: change DNS for the client's real host to the multi-tenant deploy. Watch the ops dashboard. Watch error rates.
+  5. After 24h of clean ops: decommission the single-tenant deploy (or keep it warm as rollback for another week — operator's call).
+
+Run a small real-world transaction post-cutover to confirm payments still flow.
+
+Commit migration scripts: <span class="hl">"phase-7: migrate &lt;client&gt; to multi-tenant deploy"</span>.</div>
+
+    <h3>Prompt 7.9 — Stress test the platform</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.9</span>
+Stand up three more synthetic tenants (one per remaining vertical) on the multi-tenant deploy, each with a fake hostname (use /etc/hosts or a subdomain).
+
+Verify:
+  - Each renders its own theme, content, payment provider.
+  - A webhook for tenant A does not affect tenant B (forge events, observe).
+  - The contrast validator runs across all four resolved theme bundles.
+  - The ops dashboard shows all four in its tenant list with sane numbers.
+  - A "suspend" on tenant A immediately makes A's hosts return the suspended page, while B/C/D keep serving.
+
+Report any anomaly. Anomalies = fixes BEFORE closing the phase.
+
+Commit fixes individually as <span class="hl">"phase-7: stress test fix — &lt;what&gt;"</span>.</div>
+
+    <h3>Prompt 7.10 — Close the phase + tag v1.0.0</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 7.10</span>
+Final doc update pass. This is the v1.0.0 cut — the moment the template stops being "in development" and becomes "the platform".
+
+  - CHANGELOG: a big Phase 7 / v1.0.0 entry. List all six changes, the migration of the phase-6 client, the stress-test outcomes.
+  - package.json: bump to 1.0.0.
+  - README.html (build-docs/): update doc-meta to v1.0.0. Add a short paragraph at the top noting "the template now serves multiple tenants from one deploy".
+  - repo-context.html §05: add server/models/tenant.ts, server/middleware/resolve-tenant.ts, scripts/migrate/, admin/, ops/.
+  - glossary.html: every term should now have a Phase-7-aware definition (tenant is now a real entity, not a defaulted string).
+  - rules: review every cursor rule. Anything that said "tenantId defaults to 'default'" is now <em>wrong by default</em> — update.
+  - briefs: any brief revision proposed in Phase 6 discoveries that survived review gets applied NOW, with a CHANGELOG note about which brief was edited and why.
+
+Tag <span class="hl">v1.0.0</span>. Fresh-clone test. <strong>Champagne.</strong></div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 7 is done when…</h2>
+    <ul>
+      <li>All six changes are implemented and committed individually.</li>
+      <li>The Phase-6 client is migrated and serving from the multi-tenant deploy with no customer-visible disruption.</li>
+      <li>Three synthetic tenants on the multi-tenant deploy demonstrate full isolation (data, theme, payments, webhooks).</li>
+      <li>The admin UI can create, edit, suspend tenants.</li>
+      <li>The ops dashboard shows per-tenant health.</li>
+      <li>Every cursor rule has been reviewed and updated for the multi-tenant world.</li>
+      <li>The briefs are consistent with the implemented system (revisions applied or proposals dismissed).</li>
+      <li>Tagged <code>v1.0.0</code>.</li>
+    </ul>
+
+    <div class="callout opportunity">
+      <span class="icon"></span>
+      <p><strong>You now own a vertical-SaaS platform.</strong> Six discrete changes — not sixty — because Phase 1 invested in seams and Phase 5 invested in tenant-keyed resolution. The cost of the next client onboarding is now hours, not weeks. That is the thesis of the concept brief, paid out in code.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">06 — What comes after v1.0.0</span>
+    <h2>The build docs aren't done — they evolve</h2>
+    <p>v1.0.0 means the template is feature-complete against the original three briefs. It does not mean the build docs are frozen. Per <a href="../rules/documentation-maintenance.html" style="color: var(--accent-soft);">documentation-maintenance</a>, the docs evolve as the platform evolves. Every new vertical, every new pack, every new shared concern gets its own phase doc.</p>
+
+    <h4>What lives beyond v1.0.0</h4>
+    <ul>
+      <li><strong>Phase 8+:</strong> Operational concerns that weren't on the v1.0 critical path — backups, observability deeper than the ops dashboard, rate limiting, abuse detection.</li>
+      <li><strong>New verticals:</strong> A fifth vertical (when the operator has client momentum to justify it) gets its own preset folder, its own brand brief, its own onboarding phase prompt.</li>
+      <li><strong>New feature packs:</strong> Packs are independently version-able. A "loyalty" pack or a "scheduling" pack ships as a Type-A addition with its own phase doc.</li>
+      <li><strong>Brief revisions:</strong> The concept/template/visual-system briefs are living documents. Real client experience reshapes them on a roughly quarterly cadence.</li>
+    </ul>
+
+    <div class="open-q">
+      <span class="q-label">The standing question</span>
+      <p>What's the next vertical, and which existing client conversation tells us it's ready? Every build phase from here forward starts by answering that.</p>
+    </div>
+  </section>
+
+</article>
+</body>
+</html>

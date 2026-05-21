@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursor Rules Overview — Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Rules</span>
+      <span>Cursor Rules Overview · v0.1.0</span>
+    </div>
+    <h1 class="doc-title">The <em>rules layer</em>.</h1>
+    <p class="doc-subtitle">What's in <code>.cursorrules</code>, what's in <code>.cursor/rules/*.mdc</code>, when each one fires, and how to edit them without accidentally weakening the system.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — Two rule systems</span>
+    <h2>Why both <code>.cursorrules</code> and <code>.cursor/rules/</code></h2>
+    <p>Cursor supports two rule mechanisms simultaneously. The repo uses both because they cover different cases:</p>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">
+          .cursorrules
+          <span class="why">legacy · single file · always-on</span>
+        </div>
+        <div class="val">
+          <p>A single plaintext file at repo root. Loaded into every chat session, every file. Best for short, absolute principles that must always be visible. Our copy is ~100 lines and stays that way.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          .cursor/rules/*.mdc
+          <span class="why">scoped · multi-file · conditional</span>
+        </div>
+        <div class="val">
+          <p>Folder of <code>.mdc</code> files (Markdown with frontmatter). Each file has a <code>description</code>, optional <code>globs</code>, optional <code>alwaysApply</code>. Cursor loads each file when the right context is in scope — typically when an editor file matches one of its globs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="icon">i</span>
+      <p><strong>When they conflict.</strong> The more specific (glob-scoped) rule wins. <code>.cursorrules</code> is the floor; the <code>.mdc</code> files refine for context. If you find yourself writing the same rule in both, delete the <code>.cursorrules</code> copy.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — The rule files</span>
+    <h2>What's installed and what each one does</h2>
+
+    <h4>Always-applied (load on every chat)</h4>
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">00-project-context.mdc</div>
+        <div class="val"><p>The thesis in one screen. Names the three briefs, the codebase family, the workflow. The "primer" — what Claude needs in working memory regardless of which file is open.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">70-multi-tenant-seams.mdc</div>
+        <div class="val"><p>The two seams (<code>getSiteConfig</code>, <code>getPaymentProvider</code>) and the <code>tenantId</code> rule. Always on because the discipline applies everywhere — not just inside <code>server/</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">80-versioning-and-docs.mdc</div>
+        <div class="val"><p>Two versions (template + docs). Doc-update triggers per change-type. CHANGELOG protocol. Brief-revision procedure.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">99-claude-collaboration.mdc</div>
+        <div class="val"><p>How Claude should pace, what to flag, what to ask before doing. The "voice" rule — keeps sessions from going sideways.</p></div>
+      </div>
+    </div>
+
+    <h4>Glob-scoped (load when matching files are open)</h4>
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">
+          10-typescript-conventions.mdc
+          <span class="why">**/*.ts · **/*.tsx</span>
+        </div>
+        <div class="val"><p>Strict mode, no <code>any</code>, zod for runtime validation, import grouping, file naming. The "before you write TS" rule.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          20-server-conventions.mdc
+          <span class="why">server/**/*</span>
+        </div>
+        <div class="val"><p>Express patterns, Mongoose patterns, the seam rules in their server-specific form, feature-pack toggle protocol.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          30-client-conventions.mdc
+          <span class="why">client/**/*</span>
+        </div>
+        <div class="val"><p>React + Vite patterns, routing, CSS variable consumption rules, <code>site.config.ts</code> / <code>site.theme.ts</code> as the only legitimate per-build files, <code>Custom*.tsx</code> protocol.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          40-feature-packs.mdc
+          <span class="why">**/features/**, **/providers/**</span>
+        </div>
+        <div class="val"><p>Anatomy of a pack, the toggle protocol, cross-pack isolation, the two-or-more-verticals test.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          50-siteconfig-contract.mdc
+          <span class="why">**/types/site-config.ts · **/types/theme-tokens.ts</span>
+        </div>
+        <div class="val"><p>Twin-file contract. Editing protocol. What can and cannot go in the type files.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          60-visual-system.mdc
+          <span class="why">**/theme/**, **/site.theme.ts, **/*.css, **/*.module.css</span>
+        </div>
+        <div class="val"><p>Four-layer resolver. Leaf-only overrides. Registry expansion via "second use." No hardcoded design values outside <code>theme/</code>.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — Anatomy of a rule</span>
+    <h2>How an <code>.mdc</code> file is structured</h2>
+
+<pre><code>---
+description: One-line summary shown in the rule picker.
+globs:
+  - "server/**/*"
+  - "shared/server/**/*"
+alwaysApply: false           # default; can be omitted
+---
+
+# Rule Title
+
+Markdown content. Cursor passes this to the model when the rule is active.
+
+Keep it under ~200 lines. Long rules get ignored or compressed.
+
+Reference other docs with relative paths so Claude can open them:
+- Full reference: `docs/rules/documentation-maintenance.html`.
+</code></pre>
+
+    <h4>Conventions for our rules</h4>
+    <ul>
+      <li><strong>Numbered prefixes.</strong> <code>00-</code> through <code>99-</code>. Lower numbers are "earlier in the mental stack" — project context, then conventions, then meta-rules. Cursor doesn't actually order them, but humans editing the folder benefit.</li>
+      <li><strong>Description is a sentence, not a phrase.</strong> "TypeScript conventions for any .ts/.tsx file in this repo" — not "TS rules."</li>
+      <li><strong>Globs are specific.</strong> Prefer <code>server/**/*</code> over <code>**/*.ts</code> when the rule is server-specific. Overlap is fine; vagueness isn't.</li>
+      <li><strong>One rule, one file.</strong> If a rule grows past ~200 lines, split it. Long rules are skipped silently by the model.</li>
+      <li><strong>Cross-link rather than duplicate.</strong> If rule 60 wants to remind about the contract-check script, link to rule 50 — don't restate the rule.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — Editing rules</span>
+    <h2>When to edit, and how</h2>
+
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Edit a rule when the same correction has been given more than twice.</strong> If you've told Claude the same thing three times across three sessions, the rule isn't catching it. Either tighten the wording, add a clearer example, or add a new rule with a tighter glob.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Edit when a phase prompt completes.</strong> A completed phase often reveals a rule that should have existed from the start. Phase docs include a "rules-to-write" check at the end.</p>
+    </div>
+    <div class="callout opportunity">
+      <span class="icon">✓</span>
+      <p><strong>Edit when a brief revises.</strong> Brief revisions usually map to rule revisions. The doc-maintenance flow flags this.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Don't weaken a rule because a single session pushed back.</strong> Rules exist because of patterns, not single instances. If a rule feels wrong in one session, write the friction down and revisit the rule between sessions, not during one.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Don't add a rule for a single client's edge case.</strong> Client-build behavior lives in <code>site.config.ts</code> and <code>site.theme.ts</code>. The rules govern the platform; they should generalize across builds.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — Versioning rules</span>
+    <h2>How rule changes are tracked</h2>
+
+    <p>Rule files live in the repo and version with the code. A rule change is a normal commit; major rule restructures bump the docs version in <code>docs/README.html</code>.</p>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">
+          Patch
+          <span class="why">no docs bump</span>
+        </div>
+        <div class="val"><p>Wording fixes, typo, example added, glob narrowed without behavior change. CHANGELOG entry under <strong>Docs</strong>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Minor
+          <span class="why">docs minor bump</span>
+        </div>
+        <div class="val"><p>New rule added. Existing rule expanded. New glob added. Behavior of an existing rule tightened. CHANGELOG entry under <strong>Docs</strong>; this README's version increments.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Major
+          <span class="why">docs major bump</span>
+        </div>
+        <div class="val"><p>Rule retired. Rule restructured (split into two, merged from two). Rule's behavior weakened in a way clients should know about. CHANGELOG entry under <strong>Docs</strong> with prominent note; usually corresponds to a brief revision.</p></div>
+      </div>
+    </div>
+
+    <h4>Retiring a rule</h4>
+    <p>Don't delete the file. Move it to <code>.cursor/rules/retired/</code> with a header note explaining what replaced it and on what date. Keeps the rule history searchable; explains future "why was this not enforced?" questions.</p>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">06 — Sanity-check the rules</span>
+    <h2>The five-minute audit</h2>
+
+    <p>Run this informally every few weeks, formally at each minor template release:</p>
+
+    <ol>
+      <li><strong>Open Cursor on a representative file (e.g. <code>server/src/features/intake/routes/submit.ts</code>).</strong> Check the rules indicator in the chat sidebar — it should show the always-applied set plus the matching scoped rules. Wrong glob → fix the glob.</li>
+      <li><strong>Read each <code>.mdc</code> file end-to-end.</strong> Anything stale (references to a feature that no longer exists, a vertical that was renamed, a phase that completed)? Patch it.</li>
+      <li><strong>Compare <code>.cursorrules</code> to the <code>.mdc</code> set.</strong> Duplicates? Delete from <code>.cursorrules</code>. Contradictions? Resolve.</li>
+      <li><strong>Look at the last ten PRs.</strong> Any of them required a Claude correction more than once? That's a rule gap.</li>
+      <li><strong>Look at the open questions in the briefs and contexts.</strong> Any of them resolved silently in code without an answering rule? That's a missing rule.</li>
+    </ol>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">07 — Status</span>
+    <h2>The rule set as of v0.1.0</h2>
+    <p>One <code>.cursorrules</code> + ten <code>.mdc</code> files: four always-applied, six glob-scoped. The set is intentionally minimal — every rule corresponds to a specific failure mode the briefs anticipated. Adding rules is easy; removing or changing them later is harder, so additions are deliberate.</p>
+
+    <h4>Anticipated rule changes</h4>
+    <div class="open-q">
+      <span class="q-label">Q · Phase-7 rules</span>
+      <p>When multi-tenancy ships, rule 70 ("seams") and rule 20 ("server") get substantial revisions — the single-tenant assumption that's currently load-bearing relaxes. Plan a doc-major bump.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Per-client rule overlay</span>
+      <p>Per-client builds may want a small additional rule set forbidding edits to core files. Candidate: a <code>client-build/.cursor/rules/00-type-c-only.mdc</code> shipped with each build at phase 6.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Skill-attached patterns</span>
+      <p>Recurring prompt patterns may graduate into Cursor "skills" or scoped rules with file attachments. Track candidates in CHANGELOG.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Rules · Cursor Overview</span>
+    <span>Sibling: documentation-maintenance.html</span>
+  </footer>
+
+</article>
+</body>
+</html>

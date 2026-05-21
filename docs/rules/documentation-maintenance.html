@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentation Maintenance — Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">Rules</span>
+      <span>Documentation Maintenance · v0.1.0</span>
+    </div>
+    <h1 class="doc-title">Docs that <em>keep up</em> with code.</h1>
+    <p class="doc-subtitle">The versioning model, the change-types for docs, and the triggers that force a documentation update before a PR can merge.</p>
+  </header>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">01 — The premise</span>
+    <h2>Why this rule exists at all</h2>
+    <p>The three project briefs and the contexts under <code>docs/</code> are not "nice to have." They are how Claude (and future-you) recovers context after time away. A code change that lands without its corresponding doc edit creates an invisible debt — the system's memory of <em>why</em> drifts out of sync with what the code now does.</p>
+
+    <div class="concept-panel">
+      <h4>One-line framing</h4>
+      <p>Code without docs is a guess that the next person will infer the same thing twice. The rule is simple: <strong>every code change either is covered by existing docs, or updates docs in the same PR, or surfaces a brief revision.</strong> There is no fourth option.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">02 — Two versions</span>
+    <h2>Template version vs. docs version</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key">
+          Template version
+          <span class="why">CHANGELOG.md · semver</span>
+        </div>
+        <div class="val">
+          <p>The version client builds pin to. Lives in <code>CHANGELOG.md</code> at repo root. Bumps on tagged releases of the template.</p>
+          <p><strong>MAJOR</strong> — breaking change to public surface (SiteConfig shape, ThemeTokens shape, feature pack API). Migration steps required.</p>
+          <p><strong>MINOR</strong> — new feature pack, new vertical preset, new payment adapter, new registry entry. Backward compatible.</p>
+          <p><strong>PATCH</strong> — fixes, internal refactors, additive Type-B changes that existing builds opt into.</p>
+        </div>
+      </div>
+      <div class="decision-row">
+        <div class="key">
+          Docs version
+          <span class="why">README.html header · semver</span>
+        </div>
+        <div class="val">
+          <p>The version of the documentation family. Lives in <code>docs/README.html</code>'s header (<code>Build Documentation · v0.X.Y</code>).</p>
+          <p><strong>MAJOR</strong> — doc retired, doc restructured, a brief revised in a way that changes thesis-level claims.</p>
+          <p><strong>MINOR</strong> — new doc added, new rule added, new section in an existing doc that captures a new pattern.</p>
+          <p><strong>PATCH</strong> — typos, clarifications, examples, wording polish.</p>
+        </div>
+      </div>
+    </div>
+
+    <p>The two version numbers are independent. A docs-only PR doesn't bump the template version. A template bug fix doesn't bump the docs version (unless the fix corrects something the docs said).</p>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">03 — CHANGELOG protocol</span>
+    <h2>The shape of <code>CHANGELOG.md</code></h2>
+
+    <p>Keep-a-Changelog style. Headings in this order under each release:</p>
+
+<pre><code>## [Unreleased]
+
+### Added
+- Feature packs scaffolding for catalog and content.
+
+### Changed
+- Auth0 middleware moved into auth feature pack (`server/src/features/auth/`).
+
+### Fixed
+- IntakeSubmission missing tenantId index (compound w/ submittedAt).
+
+### Thesis
+- (rare) Brief revision · template-architecture-brief §03 decision row 4
+  updated to reflect that auth lives in features/, not middleware/.
+
+### Docs
+- Added rules/cursorrules-overview.html.
+- Updated stack-context §03 to add `zod-form-data` to allowed deps.
+
+## [v0.4.2] — 2026-XX-XX
+
+(consolidated from [Unreleased] at release tagging)
+</code></pre>
+
+    <h4>Conventions</h4>
+    <ul>
+      <li><strong>Every PR appends to <code>[Unreleased]</code>.</strong> Release tagging is the only event that converts <code>[Unreleased]</code> into a versioned heading.</li>
+      <li><strong>Sections are added on demand.</strong> A PR with no <em>Thesis</em> change doesn't include the heading.</li>
+      <li><strong>Entries are user-facing.</strong> "Refactored intake handler" is too internal; "Reduced intake submission latency from 800ms to 200ms" is real news.</li>
+      <li><strong>Link to the PR.</strong> Each bullet ends with a parenthesized PR number once the PR is opened.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">04 — The update matrix</span>
+    <h2>Which doc must update for which change</h2>
+
+    <div class="decisions">
+
+      <div class="decision-row">
+        <div class="key">New top-level folder</div>
+        <div class="val"><p><code>contexts/repo-context.html</code> §05 file map. <code>CHANGELOG</code>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New dependency</div>
+        <div class="val"><p><code>contexts/stack-context.html</code> §03 allowed list. <code>CHANGELOG</code>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New env var</div>
+        <div class="val"><p><code>contexts/stack-context.html</code> §04. <code>.env.example</code> on the relevant side. <code>CHANGELOG</code>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New SiteConfig field</div>
+        <div class="val"><p>Both type files (<code>contract:check</code> enforced). <code>template-architecture-brief.html</code> §02 if the new field is structurally significant. <code>contexts/glossary.html</code> if the field has a semantically loaded name. <code>CHANGELOG</code>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New feature pack</div>
+        <div class="val"><p><code>template-architecture-brief.html</code> §03 decision row and §04 verticals if it changes the pack count. <code>contexts/glossary.html</code> §04 (canonical packs). New rule under <code>.cursor/rules/</code> if the pack has unusual conventions. <code>CHANGELOG</code>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New vertical</div>
+        <div class="val"><p><code>platform-concept-brief.html</code> §01 client-landscape table. <code>template-architecture-brief.html</code> §04. Vertical SiteConfig literal in the type. Preset files. Theme preset file. Phase-4 prompt update. <code>CHANGELOG</code>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New payment provider</div>
+        <div class="val"><p><code>template-architecture-brief.html</code> §03 PaymentProvider row. <code>contexts/stack-context.html</code> §01. The provider's adapter file under <code>server/src/providers/</code>. <code>CHANGELOG</code>. <em>(The first third provider is a Thesis-level event.)</em></p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New token category</div>
+        <div class="val"><p><code>visual-system-brief.html</code> §03 registry shape, §04 cards. Type file (both sides, contract-checked). Resolver. Validators. <code>CHANGELOG</code> under <em>Thesis</em> if the category is foundational, <em>Added</em> if additive-optional.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">New registry entry (palette, pairing, preset)</div>
+        <div class="val"><p>The registry file. <code>visual-system-brief.html</code> only if the addition signals a pattern (third palette in a vertical that previously had one). <code>CHANGELOG</code> under <em>Added</em>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Phase prompt completion</div>
+        <div class="val"><p>The phase doc's acceptance criteria checked off. Any acceptance criterion that turned out wrong gets revised in the same PR. Next phase's "Prerequisites" sanity-checked. <code>CHANGELOG</code>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Rule change (any .cursor/rules/*.mdc edit)</div>
+        <div class="val"><p><code>rules/cursorrules-overview.html</code> §02 if the rule was added, retired, or substantially restructured. <code>CHANGELOG</code> under <em>Docs</em>.</p></div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Brief revision</div>
+        <div class="val"><p>The brief's version in its header bumps. <code>docs/README.html</code> docs-version bumps. Cross-brief and context refs flagged in the same PR. <code>CHANGELOG</code> under <em>Thesis</em>.</p></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">05 — CI enforcement</span>
+    <h2>What the build checks automatically</h2>
+
+    <p>Two scripts run in CI to keep docs honest. They catch the obvious cases; reviewers catch the subtle ones.</p>
+
+    <h4>doc-changelog-check</h4>
+    <p>Asserts that any PR with a code change has at least one new line under <code>[Unreleased]</code> in <code>CHANGELOG.md</code>. Pure-comment-only and pure-typo PRs can override with a <code>[skip changelog]</code> label.</p>
+
+    <h4>doc-coupled-files-check</h4>
+    <p>A static map of file-coupling. If a PR changes files matching pattern A without changing files matching pattern B, it fails. The map (starts here, expand as needed):</p>
+
+<pre><code># Each entry: changed-path-glob -> required-also-changed-glob
+package.json                        => docs/contexts/stack-context.html
+.env.example                        => docs/contexts/stack-context.html
+**/types/site-config.ts             => docs/contexts/glossary.html | docs/template-architecture-brief.html
+**/types/theme-tokens.ts            => docs/visual-system-brief.html
+verticals/<new>/preset.ts           => docs/template-architecture-brief.html
+verticals/<new>/theme.preset.ts     => docs/visual-system-brief.html
+server/src/providers/<new>.ts       => docs/template-architecture-brief.html
+.cursor/rules/**                    => docs/rules/cursorrules-overview.html
+docs/*-brief.html                   => docs/README.html  # docs version bump</code></pre>
+
+    <p>The pipe means <em>"one of these"</em>. The check is a heuristic, not a proof — overrides exist via the PR label <code>[docs-checked]</code> when the reviewer has explicitly verified the docs are correct without the coupled file changing.</p>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">06 — Brief-revision protocol</span>
+    <h2>The deliberate path for thesis edits</h2>
+
+    <p>Briefs are not casually edited. The friction is on purpose — every brief edit is a strategic claim about what the platform is and why.</p>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">01</span>Surface</div>
+      <div class="phase-body">
+        <h3>Open the question explicitly</h3>
+        <p>Write down what's changing, what current claim it contradicts, and what triggered the revision. This is the PR description's first paragraph. Phrase it as a decision, not a fix.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">02</span>Scope</div>
+      <div class="phase-body">
+        <h3>Identify dependents</h3>
+        <p>Which other briefs reference the changed section? Which contexts? Which rules? Which phase prompts? Often the changed section is internally cross-linked elsewhere — find those refs and either fix them in the same PR or open follow-ups.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">03</span>Edit</div>
+      <div class="phase-body">
+        <h3>Make the change with version bumps</h3>
+        <p>Edit the brief. Bump its header version (<code>v1 → v2</code>). Bump <code>docs/README.html</code>'s docs version (usually minor; major if the revision changes a foundational claim).</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">04</span>Log</div>
+      <div class="phase-body">
+        <h3>CHANGELOG entry under Thesis</h3>
+        <p>One paragraph: what the old claim was, what the new claim is, why the change. Reference the PR. Future-you reading the CHANGELOG should be able to reconstruct the decision without re-reading the brief.</p>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><span class="num">05</span>Settle</div>
+      <div class="phase-body">
+        <h3>Update the rules</h3>
+        <p>If the brief revision contradicts a rule, the rule needs updating in the same PR. If the brief revision creates a new rule (e.g. "we no longer support X"), the new rule lands in the same PR.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section>
+    <span class="section-num">07 — Anti-patterns</span>
+    <h2>What this rule explicitly forbids</h2>
+
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Silent brief edits.</strong> Editing a brief without bumping its version, without a CHANGELOG entry, or without checking dependents. The briefs are the system's memory; quiet edits to them are how the memory gets corrupted.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>"Update docs later" deferrals.</strong> Doc debt compounds. The PR that adds the code without the doc is the one with the context; any later attempt to write the docs will miss something. Always same-PR.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>Speculative docs.</strong> Don't document features that don't exist yet. Phase prompts describe what's coming; briefs describe what's decided. New context entries are for things that are real now.</p>
+    </div>
+    <div class="callout risk">
+      <span class="icon">!</span>
+      <p><strong>CHANGELOG as a dumping ground.</strong> If the entry would be more useful in the relevant context or brief, put it there. CHANGELOG is for chronology — what changed, when. The context is for state — what is true.</p>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <section class="status-section">
+    <span class="section-num">08 — Status</span>
+    <h2>What this rule enforces today</h2>
+    <p>v0.1.0 — the matrix, the CI checks (specified, not yet implemented in the template's <code>scripts/</code>), the brief-revision protocol. The matrix is the load-bearing part; the CI is its enforcement. Without the CI, the matrix becomes informal review pressure, which works for a small team and degrades as the team grows.</p>
+
+    <h4>Open questions</h4>
+    <div class="open-q">
+      <span class="q-label">Q · Implementing the CI scripts</span>
+      <p>Phase 0 lands the doc-changelog-check; doc-coupled-files-check follows once the docs/ folder exists in the template repo. Until then, the matrix is reviewer-enforced.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Per-client doc divergence</span>
+      <p>Phase 6 introduces client builds. Do client builds maintain their own <code>build-notes.html</code>? If yes, this rule needs a section on per-build vs. platform docs.</p>
+    </div>
+    <div class="open-q">
+      <span class="q-label">Q · Skill-attached docs</span>
+      <p>If recurring patterns graduate into Cursor "skills," the matrix needs a row for skill-file changes.</p>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>Rules · Documentation Maintenance</span>
+    <span>Sibling: cursorrules-overview.html</span>
+  </footer>
+
+</article>
+</body>
+</html>

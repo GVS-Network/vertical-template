@@ -1,0 +1,99 @@
+---
+description: Versioning, CHANGELOG, and the rules that force documentation updates alongside code changes.
+alwaysApply: true
+---
+
+# Versioning & Documentation Maintenance
+
+Full reference: `docs/rules/documentation-maintenance.html`.
+
+## Two versions
+
+| Version | Where | Bumps when |
+|---|---|---|
+| **Template version** | `CHANGELOG.md` at repo root, semver | Each tagged release of the template |
+| **Docs version** | `docs/README.html` header, semver | Doc family adds, retires, or restructures a doc; brief revisions |
+
+Per-client builds **pin to a template version tag**, not a branch. Bumping a client is `git pull` to a new tag + smoke test.
+
+## Semver discipline
+
+- **MAJOR** — breaking change to the template's public surface: SiteConfig shape, ThemeTokens shape, the resolver's contract, a feature pack's API. Client builds need migration steps.
+- **MINOR** — new feature pack, new vertical preset, new payment adapter, new registry entry, new top-level capability. Backward compatible.
+- **PATCH** — bug fixes, internal refactors, additive vertical-preset tweaks (still Type B — opt-in).
+
+## CHANGELOG protocol
+
+`CHANGELOG.md` at repo root. Keep-a-Changelog style. Sections per release:
+
+```
+## [v0.4.2] — 2026-XX-XX
+
+### Added
+- ...
+
+### Changed
+- ...
+
+### Fixed
+- ...
+
+### Thesis           # rare — brief revisions
+- ...
+
+### Docs            # docs-only changes
+- ...
+```
+
+**Every PR appends to an `[Unreleased]` section.** Release tagging consolidates `[Unreleased]` into a versioned heading.
+
+## Doc-update triggers
+
+When you make a code change, the rule decides whether docs must update *in the same PR*. The matrix:
+
+### Code change that requires a brief revision (rare — stop and ask)
+- Changing the four-vertical roster (adding a fifth, removing one).
+- Changing the change-type taxonomy (A/B/C).
+- Changing the phase plan (adding/removing/reordering build-doc phases).
+- Changing what "tenant" means.
+- Adding a new payment provider permanently to the abstraction (the *first* third provider is a brief-level moment).
+
+### Code change that requires a context update (in the same PR)
+- New dependency → `docs/contexts/stack-context.html` §03.
+- New top-level folder → `docs/contexts/repo-context.html` §05 file map.
+- New project-specific term in chat or in comments → `docs/contexts/glossary.html`.
+- Cross-repo flow change (e.g., new submodule, new sync script) → `docs/contexts/repo-context.html` §06.
+
+### Code change that requires a phase-prompt update (in the same PR)
+- The phase doc said a thing would have a specific acceptance criterion and that turned out wrong → fix the acceptance criterion.
+- A phase prompt's "Prompts to run, in order" missed a step that proved necessary → add it.
+- A phase doc's "Prerequisites" understated what you actually needed → tighten it.
+
+### Code change that requires only CHANGELOG (no other doc)
+- Internal refactor with no surface change.
+- Bug fix that doesn't change behavior of any public surface.
+- Test additions.
+- CI changes.
+
+## What "the same PR" means
+
+A PR that changes code without the doc updates the matrix demands is not merge-ready. The CI doc-check (see `docs/rules/documentation-maintenance.html` §05) catches the obvious cases by checking that certain code paths force certain doc edits. Reviewers catch the subtle ones.
+
+## When asked "do I need to update docs?"
+
+Default answer: **yes, somewhere.** The minimum is a CHANGELOG line under `[Unreleased]`. If you're asking the question, you probably also need a context line. If you find yourself wanting to *change* a brief, that's a thesis-level moment — surface it explicitly rather than silently editing.
+
+## Brief revisions
+
+Briefs are not edited to match code. They are edited because the *strategy* changed. When a brief is edited:
+
+1. Bump the brief's version in its header (`v1 → v2`).
+2. Bump `docs/README.html`'s docs version (minor or major).
+3. Add a CHANGELOG entry under **Thesis** explaining the revision in one paragraph.
+4. Cross-check the other briefs and the contexts — anything that referenced the changed section is flagged for review in the same PR.
+
+## When to ask before coding
+
+- Anything that touches `CHANGELOG.md` from a feature branch in a way that isn't `[Unreleased]` append.
+- Anything that proposes a brief edit.
+- Anything that proposes retiring a documentation file.
