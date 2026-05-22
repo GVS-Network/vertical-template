@@ -6,25 +6,51 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-05-21
+
+Phase 5 (Visual system) closed. Four-layer token resolution, WCAG contrast validation, CSS variable emission, and token-backed UI across feature packs and app shell.
+
+### Phase 5 — closed (prompt log)
+
+| Prompt | Outcome |
+|--------|---------|
+| **5.1** | Opinionated brand confirmed; `theme/verticals/*.brief.md`; resolutions doc |
+| **5.2** | Full `ThemeTokens` leaf set; `DeepPartial` helper |
+| **5.3** | `theme/foundation.tokens.ts`; contract-check covers all leaves |
+| **5.4** | L2 `theme/verticals/*.tokens.ts` (one commit per vertical) |
+| **5.5** | Tenant pick + override stubs; `theme/tenants/registry.ts` |
+| **5.6** | `resolveTokens()` + leaf-only override validator + smoke tests |
+| **5.7** | WCAG contrast validator; wired to doctor, contract-check, CI prebuild |
+| **5.8** | `emitCssVars()`; `/api/_meta/theme.css`; production SPA injection |
+| **5.9** | All five feature packs → `var(--…)` via `pack-*` classes |
+| **5.10** | Docs + tag `v0.6.0`; Phase 6 open questions |
+
 ### Added
 
-- Phase 5.1: opinionated brand per vertical confirmed; `theme/verticals/*.brief.md` brand voice briefs; token build order locked; Phase 4 open questions resolved in `docs/phase-5-prompt-5.1-resolutions.md`.
-- Phase 5.2: full `ThemeTokens` leaf set (color, type, size, space, radius, shadow, motion); `DeepPartial` helper for override layers.
-- Phase 5.3: `theme/foundation.tokens.ts` L1 defaults; `contract:check` asserts every `ThemeTokens` leaf is populated in foundation.
-- Phase 5.4: L2 vertical token overrides for `screen-printer`, `bar-restaurant`, `food-truck`, and `farm-source` in `theme/verticals/*.tokens.ts`.
-- Phase 5.5: empty L3/L4 tenant theme stubs (`theme/tenants/demo-*.pick.ts`, `*.override.ts`) and `theme/tenants/registry.ts` keyed by demo tenantId.
-- Phase 5.6: `resolveTokens()` four-layer merge, leaf-only override validator, vertical theme registry, and smoke tests.
-- Phase 5.7: WCAG contrast validator for resolved tokens; wired into doctor, contract-check (prebuild), and resolve-tokens smoke tests.
-- Phase 5.8: `emitCssVars()` + server HTML injection (dev Vite plugin, production SPA fallback); `ProductCard` uses CSS variables.
-- Phase 5.9: all five feature packs converted to token-backed `pack-*` / `btn-*` CSS classes.
+- **`theme/`** — foundation, vertical, tenant layers; `resolve.ts`, `emit-css-vars.ts`, `validate-contrast.ts`, `validate-leaf-override.ts`.
+- **`ThemeTokens`** — 38 primitive leaves (color, type, size, space, radius, shadow, motion); byte-identical client/server types.
+- **`resolveTokens(siteConfig, tenantId)`** — L1→L4 deep merge; L4 leaf-only guardrail.
+- **`GET /api/_meta/theme.css`** — per-request resolved `:root` CSS variables.
+- **`npm run test:resolve-tokens`** — resolver, contrast matrix, emit smoke tests.
+- **Token-backed UI** — `pack-*` component classes; shell (`Navbar`, `Layout`, `Home`, `Loading`).
 
 ### Fixed
 
-- Dev theme injection: load `/api/_meta/theme.css` on every page (Vite startup injection was silently skipped); convert Navbar, Layout, Loading, and Home shell to CSS variables so vertical accent/type tokens are visible.
+- Dev theme injection: runtime `/api/_meta/theme.css` link (startup-only Vite fetch was silently skipped).
+- Shell components converted from Tailwind `primary-*` to CSS variables so vertical accent/type are visible.
+
+### Changed
+
+- `contract-check` validates `ThemeTokens` foundation + WCAG contrast matrix (vertical × demo-tenant).
+- `prebuild` runs `contract:check` and `test:resolve-tokens`.
+- Root, client, server `package.json` → **0.6.0**.
 
 ### Docs
 
-- Phase 5.1: `theme/README.md`, four vertical brand briefs, `docs/phase-5-prompt-5.1-resolutions.md`; updated `phase-5-open-questions.md`, `phase-4-open-questions.md`.
+- `docs/phase-5-prompt-5.1-resolutions.md`, `docs/phase-5-close-verification.md`
+- `docs/phase-6-open-questions.md` — P6-1 pick-list workflow
+- `docs/contexts/repo-context.html` §05, `glossary.html` (visual-system terms)
+- Build docs family **v0.6.0** in `docs/README.html`
 
 ## [0.5.0] — 2026-05-21
 

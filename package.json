@@ -1,6 +1,6 @@
 {
   "name": "vertical-template",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "MERN vertical SaaS template — multi-tenant-ready starter for small businesses",
   "private": true,
   "scripts": {

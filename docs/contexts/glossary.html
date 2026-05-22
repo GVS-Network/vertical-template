@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Glossary · v0.5.0</span>
+      <span>Glossary · v0.6.0</span>
     </div>
     <h1 class="doc-title">Words that mean <em>specific things</em> here.</h1>
     <p class="doc-subtitle">Project-internal vocabulary. When Claude (or anyone) uses these terms in a PR or a prompt, they carry the definitions below — not the generic ones.</p>
@@ -75,7 +75,56 @@
       <div class="decision-row">
         <div class="key">Seam</div>
         <div class="val">
-          <p>A single function boundary the rest of the codebase reads through. Two seams live under <code>server/src/seams/</code>: <code>getSiteConfig(req)</code> (tenant context) and <code>getPaymentProvider(siteConfig)</code> (payments). The point of a seam is that the body can change without callers changing.</p>
+          <p>A single function boundary the rest of the codebase reads through. Under <code>server/src/seams/</code>: <code>getSiteConfig(req)</code> (tenant context) and <code>getPaymentProvider(siteConfig)</code> (payments). Visual system resolver: <code>theme/resolve.ts</code> → <code>resolveTokens(siteConfig, tenantId)</code>. The point of a seam is that the body can change without callers changing.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Token</div>
+        <div class="val">
+          <p>A named primitive in the visual registry — a color, font stack, spacing step, radius, shadow, or motion duration. Stored in <code>ThemeTokens</code> (client/server twin types). At runtime, resolved tokens become CSS custom properties via <code>emitCssVars()</code> (e.g. <code>--color-accent</code>). Components consume <code>var(--…)</code>; they do not read token objects in JS.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Leaf</div>
+        <div class="val">
+          <p>A terminal primitive in <code>ThemeTokens</code> — every value is a string (hex, rem, font stack, etc.). Override layers may only set leaves; setting a non-leaf path (e.g. entire <code>color.bg</code> object) throws. The allowed leaf set lives in <code>theme/theme-token-leaf-paths.ts</code>; <code>contract:check</code> asserts foundation fills every leaf.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Foundation</div>
+        <div class="val">
+          <p><strong>L1</strong> in the four-layer model. Platform-wide defaults in <code>theme/foundation.tokens.ts</code>. Every leaf has a value; a site using only L1 should look quiet and legible. Type-A propagation — existing builds pick up changes on pull + rebuild.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Vertical layer</div>
+        <div class="val">
+          <p><strong>L2</strong> — opinionated overrides per vertical preset. Brand voice in <code>theme/verticals/&lt;key&gt;.brief.md</code>; tokens in <code>theme/verticals/&lt;key&gt;.tokens.ts</code>. Merged by <code>resolveTokens</code> using <code>SiteConfig.vertical</code>. Does not introduce new leaves — only overrides existing ones.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Pick</div>
+        <div class="val">
+          <p><strong>L3</strong> — tenant choices from curated bundles (palette ID, type pairing, density preset). Lives in <code>theme/tenants/&lt;tenantId&gt;.pick.ts</code> as <code>DeepPartial&lt;ThemeTokens&gt;</code>. Demo stubs are empty until Phase 6 client builds populate them. Picks merge before overrides.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Override</div>
+        <div class="val">
+          <p><strong>L4</strong> — leaf-level escape hatch in <code>theme/tenants/&lt;tenantId&gt;.override.ts</code>. A specific hex, font, or spacing that wins over pick + vertical + foundation. Validated by <code>validateLeafOnlyOverride</code> and WCAG contrast checks. Failed validation fails the build — not a runtime surprise.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
+        <div class="key">Resolution</div>
+        <div class="val">
+          <p>The ordered merge of all four theme layers into one fully populated <code>ThemeTokens</code> object: foundation → vertical → pick → override. Implemented in <code>resolveTokens(siteConfig, tenantId)</code>. Emission to CSS is a separate step (<code>emitCssVars</code>). Components never know which layer supplied a value.</p>
         </div>
       </div>
 
@@ -222,8 +271,8 @@
     <h2>How this glossary updates</h2>
     <p>This is a working document. When a phase prompt introduces a new term that's specific to the project, that term lands here in the same PR. When a term changes meaning (or stops being used), it moves into §05 with a note explaining what replaced it.</p>
 
-    <h4>Open questions — Phase 5</h4>
-    <p>See <code>docs/phase-5-open-questions.md</code> — lead: which preset is the brand test case for the visual system (P5-1).</p>
+    <h4>Open questions — Phase 6</h4>
+    <p>See <code>docs/phase-6-open-questions.md</code> — lead: workflow when a client wants something the pick list doesn't offer (P6-1).</p>
 
     <h4>Anticipated additions</h4>
     <div class="open-q">

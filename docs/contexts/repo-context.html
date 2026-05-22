@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Repository Context · v0.5.0</span>
+      <span>Repository Context · v0.6.0</span>
     </div>
     <h1 class="doc-title">The <em>codebase family</em>.</h1>
     <p class="doc-subtitle">Three repositories, one lineage. What lives where, what each is for, and which conventions cross repo boundaries unchanged.</p>
@@ -200,7 +200,7 @@
     <span class="section-num">05 — Reference: file map</span>
     <h2>What lives where in the template</h2>
 
-<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.5.0 — phase 4 closed</span>
+<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.6.0 — phase 5 closed</span>
 ├── client/
 │   ├── src/
 │   │   ├── types/
@@ -233,9 +233,15 @@
 │   │   │   └── tenant-schema.ts
 │   │   ├── middleware/
 │   │   │   ├── site-config.ts
+│   │   │   ├── client-with-theme.ts     <span class="dim">prod SPA + :root injection</span>
 │   │   │   └── auth.ts                  <span class="dim">re-export → features/auth</span>
+│   │   ├── theme/
+│   │   │   ├── load-repo-module.ts      <span class="dim">require theme/ from repo root</span>
+│   │   │   └── resolved-theme-css.ts    <span class="dim">GET /api/_meta/theme.css</span>
 │   │   ├── types/                       <span class="dim">site-config, payment-provider, theme-tokens</span>
-│   │   ├── routes/health.ts
+│   │   ├── routes/
+│   │   │   ├── health.ts
+│   │   │   └── meta.ts                  <span class="dim">/config, /theme.css</span>
 │   │   ├── providers/                   <span class="dim">stripe.ts, square.ts (SDKs only here)</span>
 │   │   ├── scripts/                     <span class="dim">stripe/square happy-path smokes</span>
 │   │   ├── features/
@@ -268,15 +274,25 @@
 │
 ├── theme/                               <span class="dim">Phase 5 visual system — see README.md</span>
 │   ├── README.md
-│   ├── foundation.tokens.ts             <span class="dim">L1 — Prompt 5.3</span>
+│   ├── foundation.tokens.ts             <span class="dim">L1 defaults</span>
+│   ├── resolve.ts                       <span class="dim">resolveTokens(siteConfig, tenantId)</span>
+│   ├── emit-css-vars.ts                 <span class="dim">:root CSS emission</span>
+│   ├── validate-contrast.ts             <span class="dim">WCAG pairs + matrix</span>
+│   ├── validate-leaf-override.ts        <span class="dim">L4 leaf-only guard</span>
+│   ├── deep-merge-tokens.ts
+│   ├── theme-token-leaf-paths.ts
+│   ├── inject-theme-html.ts             <span class="dim">prod SPA &lt;style&gt; injection</span>
+│   ├── resolve.smoke.ts                 <span class="dim">npm run test:resolve-tokens</span>
 │   ├── verticals/
+│   │   ├── registry.ts                  <span class="dim">L2 lookup by SiteConfig.vertical</span>
 │   │   ├── *.brief.md                   <span class="dim">brand voice (words before tokens)</span>
-│   │   └── *.tokens.ts                  <span class="dim">L2 — one commit per vertical @ 5.4</span>
-│   ├── tenants/                         <span class="dim">L3 picks + L4 overrides — Prompt 5.5</span>
-│   └── resolve-tokens.ts                <span class="dim">Prompt 5.6</span>
+│   │   └── *.tokens.ts                  <span class="dim">L2 overrides per vertical</span>
+│   └── tenants/
+│       ├── registry.ts                  <span class="dim">demo tenantId → pick + override</span>
+│       └── demo-*.pick.ts / *.override.ts
 │
 ├── scripts/
-│   ├── contract-check.ts
+│   ├── contract-check.ts              <span class="dim">SiteConfig + ThemeTokens + contrast</span>
 │   ├── doctor.ts                        <span class="dim">env, mongo, bound-tenant seeds (4.6)</span>
 │   ├── init-vertical.ts                 <span class="dim">--preset --tenant [--force]</span>
 │   ├── init-vertical.smoke.ts
