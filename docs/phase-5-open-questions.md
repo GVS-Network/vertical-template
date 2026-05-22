@@ -39,7 +39,7 @@
 | ID | Topic | Notes |
 |----|--------|--------|
 | **P5-5** | Server `:root` injection vs client-only CSS vars | Decide in Prompt 5.8 |
-| **P5-6** | Curated pick registry shape | Prompt 5.5 — named bundles vs raw partials |
+| **P5-6** | Curated pick registry shape | **Resolved @ 5.5** — `tenantThemes[tenantId].pick` + `.override` in `theme/tenants/registry.ts` |
 
 ---
 
