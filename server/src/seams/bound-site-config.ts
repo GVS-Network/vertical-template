@@ -1,5 +1,6 @@
+import { existsSync } from 'fs';
+import { createRequire } from 'module';
 import { join } from 'path';
-import { pathToFileURL } from 'url';
 
 import { TenantRegistry, type ITenantRegistry } from '../models/tenant-registry';
 import type { SiteConfig } from '../types/site-config';
@@ -7,15 +8,28 @@ import type { PaymentProviderName } from '../types/site-config';
 import { defaultSiteConfig } from '../types/site-config.defaults';
 
 const REPO_ROOT = join(__dirname, '../../..');
+const requireFromRepo = createRequire(join(REPO_ROOT, 'package.json'));
+
+/** Loaded at runtime from repo-root verticals/ (avoids server rootDir import + file:// .ts under ts-node). */
+type VerticalRegistryModule = {
+  verticalPresets: Record<
+    string,
+    { preset: Partial<SiteConfig> }
+  >;
+  isVerticalPresetKey: (value: string) => boolean;
+  mergePreset: (partial: Partial<SiteConfig>) => SiteConfig;
+};
 
 let cachedBoundConfig: SiteConfig | null | undefined;
 
-const PRESET_KEYS = new Set([
-  'screen-printer',
-  'bar-restaurant',
-  'food-truck',
-  'farm-source',
-]);
+function getVerticalRegistry(): VerticalRegistryModule {
+  // Prefer TypeScript source — stale verticals/registry.js from accidental tsc breaks branding.
+  const registryTs = join(REPO_ROOT, 'verticals/registry.ts');
+  const specifier = existsSync(registryTs)
+    ? './verticals/registry.ts'
+    : './verticals/registry';
+  return requireFromRepo(specifier) as VerticalRegistryModule;
+}
 
 function paymentProviderFromEnv(): PaymentProviderName {
   const raw = process.env.PAYMENT_PROVIDER?.trim().toLowerCase();
@@ -23,37 +37,6 @@ function paymentProviderFromEnv(): PaymentProviderName {
     return raw;
   }
   return defaultSiteConfig.payment.provider;
-}
-
-function mergePresetPartial(
-  partial: Partial<SiteConfig>,
-  tenantId: string
-): SiteConfig {
-  return {
-    ...defaultSiteConfig,
-    ...partial,
-    tenantId,
-    features: {
-      ...defaultSiteConfig.features,
-      ...partial.features,
-    },
-    payment: {
-      ...defaultSiteConfig.payment,
-      ...partial.payment,
-    },
-    branding: {
-      ...defaultSiteConfig.branding,
-      ...partial.branding,
-    },
-    contact: {
-      ...defaultSiteConfig.contact,
-      ...partial.contact,
-    },
-    locale: {
-      ...defaultSiteConfig.locale,
-      ...partial.locale,
-    },
-  };
 }
 
 function applyPaymentOverride(config: SiteConfig): SiteConfig {
@@ -64,22 +47,22 @@ function applyPaymentOverride(config: SiteConfig): SiteConfig {
   return { ...config, payment: { provider } };
 }
 
-async function loadPresetPartial(
-  presetKey: string
-): Promise<Partial<SiteConfig>> {
-  if (!PRESET_KEYS.has(presetKey)) {
+function loadBoundConfig(tenantId: string, presetKey: string): SiteConfig {
+  const { verticalPresets, isVerticalPresetKey, mergePreset } =
+    getVerticalRegistry();
+
+  if (!isVerticalPresetKey(presetKey)) {
     throw new Error(`Unknown preset: ${presetKey}`);
   }
-  const presetPath = join(
-    REPO_ROOT,
-    'verticals',
-    presetKey,
-    'site-config.preset.ts'
+
+  const entry = verticalPresets[presetKey];
+  return applyPaymentOverride(
+    mergePreset({
+      ...entry.preset,
+      tenantId,
+      vertical: presetKey as SiteConfig['vertical'],
+    })
   );
-  const mod = (await import(pathToFileURL(presetPath).href)) as {
-    preset: Partial<SiteConfig>;
-  };
-  return mod.preset;
 }
 
 /**
@@ -102,10 +85,7 @@ export async function primeBoundSiteConfig(): Promise<SiteConfig | null> {
     );
   }
 
-  const partial = await loadPresetPartial(registry.preset);
-  cachedBoundConfig = applyPaymentOverride(
-    mergePresetPartial(partial, bound)
-  );
+  cachedBoundConfig = loadBoundConfig(bound, registry.preset);
   console.log(
     `[site-config] BOUND_TENANT_ID=${bound} preset=${registry.preset}`
   );

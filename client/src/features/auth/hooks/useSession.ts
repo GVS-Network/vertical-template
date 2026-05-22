@@ -1,7 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect, useState } from 'react';
 import api from '../../../services/api';
-import { defaultSiteConfig } from '../../../types/site-config.defaults';
+import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 
 export interface SessionUser {
   sub: string | null;
@@ -21,13 +21,14 @@ interface MeResponse {
 }
 
 export function useSession() {
+  const { config } = useSiteConfig();
   const { isAuthenticated, isLoading: auth0Loading } = useAuth0();
   const [session, setSession] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!defaultSiteConfig.features.auth) {
+    if (!config.features.auth) {
       setSession(null);
       setLoading(false);
       return;
@@ -69,7 +70,7 @@ export function useSession() {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, auth0Loading]);
+  }, [isAuthenticated, auth0Loading, config.features.auth]);
 
   return {
     session,

@@ -1,4 +1,4 @@
-import { defaultSiteConfig } from '../types/site-config.defaults';
+import { useSiteConfig } from '../contexts/SiteConfigContext';
 import { LoginButton } from '../features/auth';
 import { CheckoutButton } from '../features/payments';
 
@@ -7,20 +7,23 @@ const DEMO_CHECKOUT_ITEMS = [
 ];
 
 function Home() {
+  const { config } = useSiteConfig();
+
   return (
     <div className="py-12">
       <div className="text-center max-w-3xl mx-auto">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-balance">
-          vertical-template
+          {config.branding.name}
         </h1>
         <p className="text-xl text-gray-600 mb-8">
-          Phase 2 feature packs — catalog, content, intake, and payments scaffold.
+          {config.branding.tagline ??
+            'Catalog, content, intake, and payments — vertical-template demo.'}
         </p>
         <div className="flex flex-col items-center gap-4">
-          {defaultSiteConfig.features.payments && (
+          {config.features.payments && (
             <CheckoutButton items={DEMO_CHECKOUT_ITEMS} />
           )}
-          {defaultSiteConfig.features.auth && (
+          {config.features.auth && (
             <LoginButton className="btn-secondary text-lg px-8 py-3" />
           )}
         </div>

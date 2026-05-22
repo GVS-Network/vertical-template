@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { attachSiteConfig } from './middleware/site-config';
 import healthRoutes from './routes/health';
+import metaRoutes from './routes/meta';
 import { mountFeaturePacks } from './features/registry';
 import type { SiteConfig } from './types/site-config';
 import { defaultSiteConfig } from './types/site-config.defaults';
@@ -44,6 +45,7 @@ export async function createApp(
   app.use(attachSiteConfig);
 
   app.use('/api/health', healthRoutes);
+  app.use('/api/_meta', metaRoutes);
 
   await mountFeaturePacks(app, siteConfig);
 

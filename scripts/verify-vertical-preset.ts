@@ -13,8 +13,11 @@ import { Product } from '../server/src/features/catalog/schemas/product';
 import { Page } from '../server/src/features/content/schemas/page';
 import { FormDefinition } from '../server/src/features/intake/schemas/form-definition';
 import { createApp } from '../server/src/app';
-import { primeBoundSiteConfig } from '../server/src/seams/bound-site-config';
-import { getSiteConfig } from '../server/src/seams/get-site-config';
+import {
+  getBoundSiteConfig,
+  primeBoundSiteConfig,
+} from '../server/src/seams/bound-site-config';
+import { defaultSiteConfig } from '../server/src/types/site-config.defaults';
 import type { PaymentProviderName } from '../server/src/types/site-config';
 
 type PresetExpectation = {
@@ -124,7 +127,8 @@ async function main(): Promise<void> {
     throw new Error(`expected form ${expected.formSlug}`);
   }
 
-  const app = await createApp();
+  const boundConfig = getBoundSiteConfig() ?? defaultSiteConfig;
+  const app = await createApp({ siteConfig: boundConfig });
   const server = app.listen(0);
   const port = await new Promise<number>((resolve) => {
     server.once('listening', () => {
@@ -159,7 +163,10 @@ async function main(): Promise<void> {
 
   server.close();
 
-  const config = getSiteConfig({} as import('express').Request);
+  const config = getBoundSiteConfig();
+  if (!config) {
+    throw new Error('bound site config not primed');
+  }
   if (config.tenantId !== expected.tenantId || config.vertical !== presetKey) {
     throw new Error('BOUND_TENANT_ID site config mismatch');
   }

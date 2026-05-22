@@ -1,14 +1,26 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
-import { defaultSiteConfig } from '../types/site-config.defaults';
 import { LoginButton, LogoutButton, useSession } from '../features/auth';
+import { useSiteConfig } from '../contexts/SiteConfigContext';
 
 function Navbar() {
   const { isAuthenticated, user } = useAuth0();
   const { user: sessionUser } = useSession();
   const location = useLocation();
+  const { config } = useSiteConfig();
 
   const isActive = (path: string) => location.pathname === path;
+  const intakePath = config.primaryFormSlug
+    ? `/forms/${config.primaryFormSlug}`
+    : '/forms/contact';
+  const intakeNavLabels: Record<string, string> = {
+    'project-quote': 'Get a quote',
+    'private-event': 'Private events',
+    catering: 'Catering',
+    'wholesale-inquiry': 'Wholesale',
+  };
+  const intakeLabel =
+    intakeNavLabels[config.primaryFormSlug ?? ''] ?? 'Contact';
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -16,9 +28,13 @@ function Navbar() {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">V</span>
+              <span className="text-white font-bold text-sm">
+                {config.branding.name.charAt(0)}
+              </span>
             </div>
-            <span className="font-semibold text-gray-900">vertical-template</span>
+            <span className="font-semibold text-gray-900">
+              {config.branding.name}
+            </span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
@@ -30,7 +46,7 @@ function Navbar() {
             >
               Home
             </Link>
-            {defaultSiteConfig.features.catalog && (
+            {config.features.catalog && (
               <Link
                 to="/catalog"
                 className={`text-sm font-medium transition-colors ${
@@ -42,7 +58,7 @@ function Navbar() {
                 Catalog
               </Link>
             )}
-            {defaultSiteConfig.features.content && (
+            {config.features.content && (
               <>
                 <Link
                   to="/about"
@@ -66,22 +82,22 @@ function Navbar() {
                 </Link>
               </>
             )}
-            {defaultSiteConfig.features.intake && (
+            {config.features.intake && config.primaryFormSlug && (
               <Link
-                to="/forms/contact"
+                to={intakePath}
                 className={`text-sm font-medium transition-colors ${
                   location.pathname.startsWith('/forms')
                     ? 'text-primary-600'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Contact
+                {intakeLabel}
               </Link>
             )}
           </div>
 
           <div className="flex items-center space-x-4">
-            {defaultSiteConfig.features.auth ? (
+            {config.features.auth ? (
               isAuthenticated ? (
                 <div className="flex items-center space-x-4">
                   {(sessionUser?.picture ?? user?.picture) && (

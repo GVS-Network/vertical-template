@@ -123,10 +123,42 @@ function checkEnvFiles(skipKeys: Set<string> = new Set()): string[] {
   return errors;
 }
 
+/** Duplicate keys in server/.env — dotenv last-wins; common when swapping vertical walks. */
+function checkServerEnvDuplicates(): string[] {
+  const errors: string[] = [];
+  const serverEnv = join(ROOT, 'server/.env');
+  if (!existsSync(serverEnv)) {
+    return errors;
+  }
+
+  const counts = new Map<string, number>();
+  for (const line of readFileSync(serverEnv, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq <= 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  for (const [key, count] of counts) {
+    if (count > 1) {
+      errors.push(
+        `server: duplicate ${key} in server/.env (${count}×) — last value wins; keep one active walk block`
+      );
+    }
+  }
+
+  return errors;
+}
+
 type BoundTenantResult = {
   errors: string[];
   notices: string[];
+  warnings: string[];
   activeConfig: SiteConfig;
+  /** Preset default before PAYMENT_PROVIDER env override */
+  presetProvider?: PaymentProviderName;
 };
 
 async function checkBoundTenant(tenantId: string): Promise<BoundTenantResult> {
@@ -140,6 +172,7 @@ async function checkBoundTenant(tenantId: string): Promise<BoundTenantResult> {
         `bound tenant: no _tenants document for BOUND_TENANT_ID=${tenantId} — run init-vertical`,
       ],
       notices: [],
+      warnings: [],
       activeConfig: defaultSiteConfig,
     };
   }
@@ -150,13 +183,21 @@ async function checkBoundTenant(tenantId: string): Promise<BoundTenantResult> {
         `bound tenant: preset "${String(registry.preset)}" is not a registered vertical`,
       ],
       notices: [],
+      warnings: [],
       activeConfig: defaultSiteConfig,
     };
   }
 
-  const config = applyPaymentEnvOverride(
-    resolveSiteConfigForPreset(registry.preset, tenantId)
-  );
+  const presetConfig = resolveSiteConfigForPreset(registry.preset, tenantId);
+  const presetProvider = presetConfig.payment.provider;
+  const config = applyPaymentEnvOverride(presetConfig);
+
+  const envProvider = effectivePaymentProvider();
+  if (envProvider !== presetProvider) {
+    notices.push(
+      `PAYMENT_PROVIDER=${envProvider} overrides preset default ${presetProvider} — set PAYMENT_PROVIDER=${presetProvider} for a clean ${registry.preset} walk`
+    );
+  }
 
   if (config.features.catalog) {
     const count = await scopedForTenant(Product, tenantId).countDocuments();
@@ -194,23 +235,25 @@ async function checkBoundTenant(tenantId: string): Promise<BoundTenantResult> {
     );
   }
 
-  return { errors, notices, activeConfig: config };
+  return { errors, notices, warnings: [], activeConfig: config, presetProvider };
 }
 
 async function checkMongo(): Promise<BoundTenantResult> {
   const errors: string[] = [];
   const notices: string[] = [];
+  const warnings: string[] = [];
   let activeConfig = defaultSiteConfig;
+  let presetProvider: PaymentProviderName | undefined;
   const serverEnv = join(ROOT, 'server/.env');
 
   if (!existsSync(serverEnv)) {
     errors.push('server: cannot check Mongo — server/.env missing');
-    return { errors, notices, activeConfig };
+    return { errors, notices, warnings, activeConfig, presetProvider };
   }
 
   if (!process.env.MONGODB_URI) {
     errors.push('server: MONGODB_URI not set in server/.env');
-    return { errors, notices, activeConfig };
+    return { errors, notices, warnings, activeConfig, presetProvider };
   }
 
   try {
@@ -221,8 +264,10 @@ async function checkMongo(): Promise<BoundTenantResult> {
       const boundResult = await checkBoundTenant(bound);
       errors.push(...boundResult.errors);
       notices.push(...boundResult.notices);
+      warnings.push(...boundResult.warnings);
       if (boundResult.errors.length === 0) {
         activeConfig = boundResult.activeConfig;
+        presetProvider = boundResult.presetProvider;
       }
     }
 
@@ -237,7 +282,7 @@ async function checkMongo(): Promise<BoundTenantResult> {
     }
   }
 
-  return { errors, notices, activeConfig };
+  return { errors, notices, warnings, activeConfig, presetProvider };
 }
 
 function requireEnvVar(name: string): string | null {
@@ -366,6 +411,7 @@ async function checkPayments(siteConfig: SiteConfig): Promise<{
   }
 
   const errors: string[] = [];
+  const warnings: string[] = [];
 
   if (provider === 'stripe') {
     const secret = requireEnvVar('STRIPE_SECRET_KEY');
@@ -382,7 +428,7 @@ async function checkPayments(siteConfig: SiteConfig): Promise<{
         errors.push(`payments/stripe: ${apiError}`);
       }
     }
-    return { errors, warnings: [] };
+    return { errors, warnings };
   }
 
   if (provider === 'square') {
@@ -398,9 +444,13 @@ async function checkPayments(siteConfig: SiteConfig): Promise<{
       errors.push('payments/square: missing SQUARE_LOCATION_ID in server/.env');
     }
     if (!signatureKey) {
-      errors.push(
-        'payments/square: missing SQUARE_WEBHOOK_SIGNATURE_KEY in server/.env'
-      );
+      const msg =
+        'payments/square: SQUARE_WEBHOOK_SIGNATURE_KEY unset — Square webhooks will not verify';
+      if (process.env.NODE_ENV === 'production') {
+        errors.push(`${msg} (required in production)`);
+      } else {
+        warnings.push(`${msg} (OK for catalog/content walk)`);
+      }
     }
     if (!squareEnv) {
       errors.push('payments/square: missing SQUARE_ENV in server/.env');
@@ -415,10 +465,13 @@ async function checkPayments(siteConfig: SiteConfig): Promise<{
         errors.push(`payments/square: ${apiError}`);
       }
     }
-    return { errors, warnings: [] };
+    return { errors, warnings };
   }
 
-  return { errors: [`payments: unknown provider ${String(provider)}`], warnings: [] };
+  return {
+    errors: [`payments: unknown provider ${String(provider)}`],
+    warnings: [],
+  };
 }
 
 async function main(): Promise<void> {
@@ -433,12 +486,27 @@ async function main(): Promise<void> {
   const activeConfig = mongoResult.activeConfig;
 
   const paymentResult = await checkPayments(activeConfig);
-  const envSkipKeys = activeConfig.features.payments
-    ? paymentEnvKeysToSkip(effectivePaymentProvider(activeConfig.payment.provider))
-    : new Set([...STRIPE_ENV_KEYS, ...SQUARE_ENV_KEYS, 'PAYMENT_PROVIDER']);
+  const envProviderForKeys =
+    mongoResult.presetProvider ??
+    effectivePaymentProvider(activeConfig.payment.provider);
+  const envSkipKeys = new Set(
+    activeConfig.features.payments
+      ? paymentEnvKeysToSkip(envProviderForKeys)
+      : [...STRIPE_ENV_KEYS, ...SQUARE_ENV_KEYS, 'PAYMENT_PROVIDER']
+  );
+  // Dev vertical walks do not need Square webhook signing; checkPayments still warns.
+  if (process.env.NODE_ENV !== 'production') {
+    envSkipKeys.add('SQUARE_WEBHOOK_SIGNATURE_KEY');
+  }
+
+  const warnings: string[] = [
+    ...mongoResult.warnings,
+    ...paymentResult.warnings,
+  ];
 
   const errors: string[] = [
     ...checkNodeVersion(),
+    ...checkServerEnvDuplicates(),
     ...checkEnvFiles(envSkipKeys),
     ...mongoResult.errors,
     ...(await runContractCheck()),
@@ -453,9 +521,9 @@ async function main(): Promise<void> {
     console.log('');
   }
 
-  if (paymentResult.warnings.length > 0) {
+  if (warnings.length > 0) {
     console.log('⚠️  Warnings:\n');
-    for (const warn of paymentResult.warnings) {
+    for (const warn of warnings) {
       console.log(`  • ${warn}`);
     }
     console.log('');
