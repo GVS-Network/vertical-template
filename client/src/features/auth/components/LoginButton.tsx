@@ -5,15 +5,14 @@ interface LoginButtonProps {
   label?: string;
 }
 
-function LoginButton({ className = 'btn-primary text-sm', label = 'Log In' }: LoginButtonProps) {
+function LoginButton({
+  className = 'btn btn-primary pack-btn-sm',
+  label = 'Log In',
+}: LoginButtonProps) {
   const { loginWithRedirect } = useAuth0();
 
   return (
-    <button
-      type="button"
-      onClick={() => loginWithRedirect()}
-      className={className}
-    >
+    <button type="button" onClick={() => loginWithRedirect()} className={className}>
       {label}
     </button>
   );

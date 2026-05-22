@@ -6,7 +6,7 @@ interface LogoutButtonProps {
 }
 
 function LogoutButton({
-  className = 'btn-secondary text-sm',
+  className = 'btn btn-secondary pack-btn-sm',
   label = 'Log Out',
 }: LogoutButtonProps) {
   const { logout } = useAuth0();
