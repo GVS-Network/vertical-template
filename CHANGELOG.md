@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Phase 5.1: opinionated brand per vertical confirmed; `theme/verticals/*.brief.md` brand voice briefs; token build order locked; Phase 4 open questions resolved in `docs/phase-5-prompt-5.1-resolutions.md`.
+- Phase 5.2: full `ThemeTokens` leaf set (color, type, size, space, radius, shadow, motion); `DeepPartial` helper for override layers.
 
 ### Docs
 
