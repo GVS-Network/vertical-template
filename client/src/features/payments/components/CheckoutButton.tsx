@@ -59,25 +59,22 @@ function CheckoutButton({
     }
   };
 
+  const messageClass =
+    message === LATER_PHASE_MESSAGE
+      ? 'pack-message pack-message--warn'
+      : 'pack-message pack-message--error';
+
   return (
-    <div className="inline-block text-left">
+    <div className="pack-inline">
       <button
         type="button"
         onClick={handleCheckout}
         disabled={loading || items.length === 0}
-        className="btn-primary disabled:opacity-50"
+        className="btn btn-primary"
       >
         {loading ? 'Checking…' : label}
       </button>
-      {message && (
-        <p
-          className={`mt-2 text-sm ${
-            message === LATER_PHASE_MESSAGE ? 'text-amber-700' : 'text-red-600'
-          }`}
-        >
-          {message}
-        </p>
-      )}
+      {message && <p className={messageClass}>{message}</p>}
     </div>
   );
 }
