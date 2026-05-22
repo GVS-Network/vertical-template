@@ -1,0 +1,3 @@
+# bar-restaurant — brand brief
+
+Harbor & Hearth and peers sell warmth and occasion, not fast food. The palette is **low-light dining room**: cream or warm paper backgrounds, **deep ink** body text (not harsh pure black), and muted brass or burgundy accent — think candlelight on a menu, not neon bar sign. **Serif headings** carry the hospitality; body stays in a clean humanist sans for legibility at small sizes on phones. Corners are softly rounded; shadows are gentle and lifted, never Material-flat. Photography-forward pages should breathe; the catalog/menu reads like a printed insert. Tone is inviting and unhurried — “Private events,” “Tonight’s menu,” never startup jargon.

@@ -1,0 +1,3 @@
+# food-truck — brand brief
+
+Sidewalk Tacos and mobile vendors compete for attention in three seconds on a phone in full sun. Brand expression is **high-contrast and punchy**: near-white or true white background, **very dark ink**, and one **saturated accent** (tomato red, mustard, or lime — pick one and commit) for the order path and location callouts. **Condensed sans headlines** feel street-poster; body type stays generous for menu scanning. Radius stays tight; borders can be heavier than other verticals. Motion, if used later, is snappy. The UI should read “open now / here today” at a glance — location and hours are hero information, not footer clutter.

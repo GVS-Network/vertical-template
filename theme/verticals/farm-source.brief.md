@@ -1,0 +1,3 @@
+# farm-source — brand brief
+
+Black Oak Farm and similar operators sell trust, seasonality, and place — not discount ecommerce. Visual language is **earthy and paper-native**: warm off-white or kraft-toned background, **forest-leaning greens** for accent and success states, and ink brown for text rather than blue-black corporate. **Serif headings** nod to farm journals; body sans stays warm and readable for ingredient lists and CSA copy. Accent-soft carries “field / barn” warmth without texture images in CSS. Density is comfortable — product cards feel like market labels, not Amazon tiles. Checkout and inventory UI should feel calm and honest; urgency is seasonal (“this week’s share”), not flash-sale hype.

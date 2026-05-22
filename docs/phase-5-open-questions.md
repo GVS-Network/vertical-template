@@ -1,46 +1,50 @@
 # Open questions for Phase 5 (Visual system)
 
-**Status:** Phase 4 closed @ **v0.5.0** (2026-05-21).  
-**Prerequisite:** All four vertical presets ship real seed copy; `brand-stub.ts` is empty until Phase 5 fills token overrides.
+**Status:** Prompt **5.1** closed (2026-05-21). Resolutions: [`phase-5-prompt-5.1-resolutions.md`](phase-5-prompt-5.1-resolutions.md)  
+**Prerequisite:** Phase 4 closed @ **v0.5.0**
 
 ---
 
-## P5-1 — Brand test case: which preset goes first?
+## Resolved @ 5.1
 
-Phase 5 needs one preset whose **brand identity is closest to "ready"** — the first full `theme.preset.ts` (or `brand-stub.ts` values) and the contrast-validator golden path.
-
-| Candidate | Case for "ready" | Case against |
-|-----------|------------------|--------------|
-| **`screen-printer`** | Strongest operator knowledge; `askanddeliverwebapp` is the live reference for quote → invoice → Stripe; Inkline seed copy is production-shaped, not lorem. | Visual brief describes screen-printer as "graphic" — may need more design iteration than a food vertical. |
-| **`bar-restaurant`** | Phase 5 prompt draft already specifies warm, low-light, ink-on-cream — clearest **visual** brief before tokens exist. | Less production history in-repo than print; Square staff-only posture is simpler commerce surface. |
-| **`food-truck`** | High-contrast mobile brand is easy to validate (contrast, punchy accent). | Schedule/location complexity is content, not theme — weaker first token story. |
-| **`farm-source`** | Most packs on; stress-tests auth + public checkout in UI. | Earthy farm palette is well-specified but commerce UI (cart, stock) is not wired — theme work risks coupling to unfinished checkout UX (P4-4 carry-forward). |
-
-**Recommendation for 5.1 discussion:** Start token work on **`screen-printer`** (operator + agency alignment), use **`bar-restaurant`** as the second palette pass to prove vertical token files diverge correctly. Lock the choice in Prompt 5.1 before implementing `resolveTokens`.
+| ID | Question | Outcome |
+|----|----------|---------|
+| **P5-1** | Opinionated vs neutral brand per vertical? | **Opinionated** — per concept + visual briefs; no operator override |
+| **P5-2** | Brand documented outside code? | **Yes** — `theme/verticals/*.brief.md` (no Figma/mood board) |
+| **P5-3** | Token build order? | **screen-printer → bar-restaurant → food-truck → farm-source** |
 
 ---
 
-## Carried forward from Phase 4
+## Carried forward (implementation prompts)
+
+| ID | Topic | Target |
+|----|--------|--------|
+| **P4-4** | Catalog ↔ checkout | Phase 6 — wire `CheckoutButton` to seeded products |
+| **P4-7** | Intake email | Deferred |
+| **P5-4** | `brand-stub.ts` vs `theme/verticals/*.tokens.ts` | Align when first vertical tokens ship (5.4) |
+
+---
+
+## Resolved from Phase 4 @ 5.1
+
+| ID | Topic | Outcome |
+|----|--------|---------|
+| **P4-3** | Inventory sync trigger | Push on catalog **stock write**; manual/seed until hook exists |
+| **P4-5** | Square POS read-sync | Out of scope |
+
+---
+
+## Still open (Phase 5+)
 
 | ID | Topic | Notes |
 |----|--------|--------|
-| **P4-3** | Square inventory sync trigger | Cron vs catalog mutation vs manual — first hook when farm/bar/truck write paths land |
-| **P4-4** | Catalog ↔ checkout | Replace demo `CheckoutButton` line items with seeded catalog products |
-| **P4-5** | Square POS read-sync | Still out of scope; thesis-level |
-| **P4-7** | Intake email notifications | Deferred from 2.6 |
-
----
-
-## Phase 5 scope reminders (from visual brief)
-
-- Four-layer token resolution: foundation → vertical → tenant pick → tenant override.
-- WCAG contrast validator in CI + doctor for resolved tokens.
-- `brand-stub.ts` → real overrides per vertical; no hardcoded hex outside `theme/`.
-- Client still reads `defaultSiteConfig` in Navbar/Home until phase 7 runtime config — theme work may need a small **bound-tenant display seam** (flag in 5.1 if walk tests require it).
+| **P5-5** | Server `:root` injection vs client-only CSS vars | Decide in Prompt 5.8 |
+| **P5-6** | Curated pick registry shape | Prompt 5.5 — named bundles vs raw partials |
 
 ---
 
 ## Resolved — do not re-litigate
 
-- Phase 4 build order, provider defaults, staggered presets — `docs/phase-4-prompt-4.1-resolutions.md`
-- Dual payment provider per site — rejected @ v0.4.0
+- Phase 4 preset build order, provider defaults — `phase-4-prompt-4.1-resolutions.md`
+- Dual payment provider — rejected @ v0.4.0
+- Opinionated vertical presets (SiteConfig/features) — Phase 4

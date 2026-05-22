@@ -175,7 +175,7 @@
 
     <div class="callout opportunity">
       <span class="icon">✓</span>
-      <p><strong>Vertical presets.</strong> The agency app is one shape; the template is four. Verticals live in <code>verticals/&lt;key&gt;/</code> — <code>site-config.preset.ts</code>, <code>seed/*.json</code>, <code>product-attributes.schema.ts</code>, <code>brand-stub.ts</code> (Phase 5 tokens). Provision with <code>npm run init:vertical</code>; local demo binds via <code>BOUND_TENANT_ID</code> in <code>server/.env</code>.</p>
+      <p><strong>Vertical presets.</strong> The agency app is one shape; the template is four. Verticals live in <code>verticals/&lt;key&gt;/</code> — <code>site-config.preset.ts</code>, <code>seed/*.json</code>, <code>product-attributes.schema.ts</code>, <code>brand-stub.ts</code> (tenant Type-C token overrides). Brand voice words live in <code>theme/verticals/*.brief.md</code>; L2 tokens in <code>theme/verticals/*.tokens.ts</code> (Phase 5). Provision with <code>npm run init:vertical</code>; local demo binds via <code>BOUND_TENANT_ID</code> in <code>server/.env</code>.</p>
     </div>
     <div class="callout opportunity">
       <span class="icon">✓</span>
@@ -265,6 +265,15 @@
 │   ├── bar-restaurant/
 │   ├── food-truck/
 │   └── farm-source/                     <span class="dim">each: preset.ts, seed/, brand-stub.ts</span>
+│
+├── theme/                               <span class="dim">Phase 5 visual system — see README.md</span>
+│   ├── README.md
+│   ├── foundation.tokens.ts             <span class="dim">L1 — Prompt 5.3</span>
+│   ├── verticals/
+│   │   ├── *.brief.md                   <span class="dim">brand voice (words before tokens)</span>
+│   │   └── *.tokens.ts                  <span class="dim">L2 — one commit per vertical @ 5.4</span>
+│   ├── tenants/                         <span class="dim">L3 picks + L4 overrides — Prompt 5.5</span>
+│   └── resolve-tokens.ts                <span class="dim">Prompt 5.6</span>
 │
 ├── scripts/
 │   ├── contract-check.ts

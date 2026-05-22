@@ -1,0 +1,3 @@
+# screen-printer — brand brief
+
+Inkline and shops like it sell craft and reliability, not whimsy. The site should feel like a working print floor translated to the web: **ink black** and off-white grounds, **bold headline type** with a mechanical edge (condensed sans or mono-adjacent — never playful script), and a single **high-saturation accent** used sparingly for CTAs and proof links. Density is medium — enough air to show portfolio photography and garment specs without looking like a consumer fashion brand. Status colors stay functional (success/warn/error) and never compete with the accent. Voice in UI chrome is direct and confident: “Get a quote,” not “Explore our journey.”

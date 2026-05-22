@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Phase 5.1: opinionated brand per vertical confirmed; `theme/verticals/*.brief.md` brand voice briefs; token build order locked; Phase 4 open questions resolved in `docs/phase-5-prompt-5.1-resolutions.md`.
+
+### Docs
+
+- Phase 5.1: `theme/README.md`, four vertical brand briefs, `docs/phase-5-prompt-5.1-resolutions.md`; updated `phase-5-open-questions.md`, `phase-4-open-questions.md`.
+
 ## [0.5.0] — 2026-05-21
 
 Phase 4 (Vertical presets) closed. Four opinionated vertical presets, `init-vertical` provisioning, `BOUND_TENANT_ID` local binding, tenant-aware doctor, and per-preset verification smokes.

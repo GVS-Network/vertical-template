@@ -59,9 +59,16 @@
       </div>
 
       <div class="decision-row">
+        <div class="key">Brand brief</div>
+        <div class="val">
+          <p>One-paragraph written brand voice for a vertical in <code>theme/verticals/&lt;key&gt;.brief.md</code>. Source of truth for L2 token decisions — palette, type, density, tone. Tokens are derived from briefs, not invented in <code>*.tokens.ts</code> without updating the brief first. Locked @ Phase 5.1.</p>
+        </div>
+      </div>
+
+      <div class="decision-row">
         <div class="key">Preset</div>
         <div class="val">
-          <p>A vertical's opinionated starter kit in <code>verticals/&lt;key&gt;/</code>: <code>site-config.preset.ts</code> (partial <code>SiteConfig</code> merged via <code>mergePreset</code>), <code>seed/*.json</code> (catalog/content/intake data), <code>product-attributes.schema.ts</code> (Zod), and <code>brand-stub.ts</code> (<code>ThemeTokens</code> overrides — empty until Phase 5). <code>npm run init:vertical -- --preset=&lt;key&gt; --tenant=&lt;id&gt;</code> stamps <code>tenantId</code> on seeded rows and writes <code>_tenants</code>. <strong>tenantId</strong> is chosen at init time, not inside the preset file. <strong>Existing tenants do not retroactively change when a preset changes</strong> — Type-B propagation.</p>
+          <p>A vertical's opinionated starter kit in <code>verticals/&lt;key&gt;/</code>: <code>site-config.preset.ts</code> (partial <code>SiteConfig</code> merged via <code>mergePreset</code>), <code>seed/*.json</code> (catalog/content/intake data), <code>product-attributes.schema.ts</code> (Zod), and <code>brand-stub.ts</code> (tenant Type-C <code>ThemeTokens</code> overrides — empty until wired in 5.5). L2 vertical tokens live in <code>theme/verticals/&lt;key&gt;.tokens.ts</code>; brand voice in <code>theme/verticals/&lt;key&gt;.brief.md</code>. <code>npm run init:vertical -- --preset=&lt;key&gt; --tenant=&lt;id&gt;</code> stamps <code>tenantId</code> on seeded rows and writes <code>_tenants</code>. <strong>tenantId</strong> is chosen at init time, not inside the preset file. <strong>Existing tenants do not retroactively change when a preset changes</strong> — Type-B propagation.</p>
         </div>
       </div>
 
