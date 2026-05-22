@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Phase 5.6: `resolveTokens()` four-layer merge, leaf-only override validator, vertical theme registry, and smoke tests.
 - Phase 5.7: WCAG contrast validator for resolved tokens; wired into doctor, contract-check (prebuild), and resolve-tokens smoke tests.
 - Phase 5.8: `emitCssVars()` + server HTML injection (dev Vite plugin, production SPA fallback); `ProductCard` uses CSS variables.
+- Phase 5.9: all five feature packs converted to token-backed `pack-*` / `btn-*` CSS classes.
 
 ### Docs
 
