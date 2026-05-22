@@ -6,14 +6,14 @@ function ProductDetail() {
   const { product, loading, error } = useProduct(slug);
 
   if (loading) {
-    return <p className="text-gray-600">Loading product…</p>;
+    return <p className="pack-loading">Loading product…</p>;
   }
 
   if (error || !product) {
     return (
       <div>
-        <p className="text-red-600">{error ?? 'Product not found'}</p>
-        <Link to="/catalog" className="text-primary-600 text-sm mt-4 inline-block">
+        <p className="pack-error">{error ?? 'Product not found'}</p>
+        <Link to="/catalog" className="pack-link-back pack-link-back--after-error">
           ← Back to catalog
         </Link>
       </div>
@@ -22,18 +22,16 @@ function ProductDetail() {
 
   return (
     <div>
-      <Link to="/catalog" className="text-primary-600 text-sm mb-4 inline-block">
+      <Link to="/catalog" className="pack-link-back">
         ← Back to catalog
       </Link>
-      <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-      <p className="text-gray-500 mt-2">SKU {product.sku}</p>
-      <p className="text-2xl font-semibold text-primary-600 mt-4">
-        {formatPriceCents(product.price)}
-      </p>
+      <h1 className="pack-detail-title">{product.name}</h1>
+      <p className="pack-meta">SKU {product.sku}</p>
+      <p className="pack-detail-price">{formatPriceCents(product.price)}</p>
       {product.stock !== null && (
-        <p className="text-gray-600 mt-2">{product.stock} in stock</p>
+        <p className="pack-body-soft">{product.stock} in stock</p>
       )}
-      <p className="text-sm text-gray-500 mt-4 capitalize">Status: {product.status}</p>
+      <p className="pack-meta pack-meta--tight capitalize">Status: {product.status}</p>
     </div>
   );
 }
