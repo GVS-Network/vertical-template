@@ -139,7 +139,7 @@ function checkDefaultsAgainstType(
   return errors;
 }
 
-export async function runContractCheck(): Promise<string[]> {
+export async function runContractCheck(): Promise<{ errors: string[]; warnings: string[] }> {
   const errors: string[] = [...checkTwinFiles()];
 
   const siteInterfaces = parseInterfaces(SITE_CONFIG_PATH);
@@ -166,13 +166,25 @@ export async function runContractCheck(): Promise<string[]> {
     );
   }
 
-  return errors;
+  const { runThemeContrastMatrix } = await import(join(ROOT, 'theme/validate-contrast.ts'));
+  const contrast = runThemeContrastMatrix();
+  errors.push(...contrast.errors);
+
+  return { errors, warnings: contrast.warnings };
 }
 
 async function main(): Promise<void> {
   console.log('vertical-template contract-check\n');
 
-  const errors = await runContractCheck();
+  const { errors, warnings } = await runContractCheck();
+
+  if (warnings.length > 0) {
+    console.log('⚠️  Contrast warnings:\n');
+    for (const warn of warnings) {
+      console.log(`  • ${warn}`);
+    }
+    console.log('');
+  }
 
   if (errors.length === 0) {
     const sitePaths = collectRequiredPaths('SiteConfig', parseInterfaces(SITE_CONFIG_PATH));
@@ -181,6 +193,7 @@ async function main(): Promise<void> {
     console.log(`   ${sitePaths.length} required SiteConfig fields have defaults.`);
     console.log(`   ${themePaths.length} required ThemeTokens leaves have foundation values.`);
     console.log(`   ${TWIN_PAIRS.length} twin type file pairs are byte-identical.`);
+    console.log('   Theme contrast matrix checked (vertical × demo-tenant).');
     process.exit(0);
   }
 

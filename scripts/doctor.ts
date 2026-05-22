@@ -504,15 +504,19 @@ async function main(): Promise<void> {
     ...paymentResult.warnings,
   ];
 
+  const contract = await runContractCheck();
+
   const errors: string[] = [
     ...checkNodeVersion(),
     ...checkServerEnvDuplicates(),
     ...checkEnvFiles(envSkipKeys),
     ...mongoResult.errors,
-    ...(await runContractCheck()),
+    ...contract.errors,
     ...checkAuth(activeConfig),
     ...paymentResult.errors,
   ];
+
+  warnings.push(...contract.warnings);
 
   if (mongoResult.notices.length > 0) {
     for (const notice of mongoResult.notices) {

@@ -30,6 +30,7 @@ theme/
 ├── resolve.ts                    # Prompt 5.6 — resolveTokens()
 ├── deep-merge-tokens.ts
 ├── validate-leaf-override.ts
+├── validate-contrast.ts          # Prompt 5.7 — WCAG pairs
 └── resolve.smoke.ts
 ```
 

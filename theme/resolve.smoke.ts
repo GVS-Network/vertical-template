@@ -11,6 +11,11 @@ import {
   validateLeafOnlyOverride,
 } from './resolve';
 import { verticalTokens as screenPrinterVertical } from './verticals/screen-printer.tokens';
+import {
+  contrastRatio,
+  runThemeContrastMatrix,
+  validateContrast,
+} from './validate-contrast';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
@@ -116,12 +121,52 @@ function testOverrideAtLeafWins(): void {
   assertEqual(tokens.color.ink.DEFAULT, '#0a0a0a', 'non-overridden leaves unchanged');
 }
 
+function testContrastRatioHelper(): void {
+  assert(contrastRatio('#000000', '#ffffff') >= 21, 'black on white contrast');
+  assert(contrastRatio('#ffffff', '#000000') >= 21, 'white on black contrast');
+}
+
+function testFoundationContrastPasses(): void {
+  const result = validateContrast(foundation);
+  if (result.errors.length > 0) {
+    throw new Error(`foundation contrast failed: ${result.errors.join('; ')}`);
+  }
+}
+
+function testLowContrastBodyTextFails(): void {
+  const bad = deepMergeThemeTokens(foundation, {
+    color: {
+      ink: {
+        DEFAULT: '#cccccc',
+      },
+    },
+  });
+  const result = validateContrast(bad);
+  assert(result.errors.length > 0, 'low-contrast ink on bg must fail');
+  assert(
+    result.errors.some((message) => message.includes('color.ink on color.bg')),
+    'failure cites ink-on-bg pair'
+  );
+}
+
+function testThemeContrastMatrix(): void {
+  const matrix = runThemeContrastMatrix();
+  if (matrix.errors.length > 0) {
+    throw new Error(`theme contrast matrix failed:\n  ${matrix.errors.join('\n  ')}`);
+  }
+  assert(matrix.checked === 16, 'checks all vertical × demo-tenant combos');
+}
+
 function main(): void {
   testFoundationOnly();
   testVerticalOverridesFoundation();
   testPickAddsBundledLeafChanges();
   testOverrideAtNonLeafThrows();
   testOverrideAtLeafWins();
+  testContrastRatioHelper();
+  testFoundationContrastPasses();
+  testLowContrastBodyTextFails();
+  testThemeContrastMatrix();
 
   console.log('resolve-tokens smoke: all tests passed');
   console.log('  foundation-only resolves correctly');
@@ -129,6 +174,7 @@ function main(): void {
   console.log('  pick adds bundled leaf changes');
   console.log('  override at non-leaf throws');
   console.log('  override at leaf wins');
+  console.log('  contrast validator passes foundation + theme matrix');
 }
 
 main();

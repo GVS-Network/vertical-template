@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Phase 5.4: L2 vertical token overrides for `screen-printer`, `bar-restaurant`, `food-truck`, and `farm-source` in `theme/verticals/*.tokens.ts`.
 - Phase 5.5: empty L3/L4 tenant theme stubs (`theme/tenants/demo-*.pick.ts`, `*.override.ts`) and `theme/tenants/registry.ts` keyed by demo tenantId.
 - Phase 5.6: `resolveTokens()` four-layer merge, leaf-only override validator, vertical theme registry, and smoke tests.
+- Phase 5.7: WCAG contrast validator for resolved tokens; wired into doctor, contract-check (prebuild), and resolve-tokens smoke tests.
 
 ### Docs
 
