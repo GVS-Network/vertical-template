@@ -1,6 +1,7 @@
 /**
  * Dual-file contract: client/server site-config.ts must match, and
  * defaultSiteConfig must supply every required SiteConfig field.
+ * ThemeTokens twin files must match; foundation must supply every leaf.
  */
 
 import { readFileSync } from 'fs';
@@ -24,7 +25,9 @@ const TWIN_PAIRS = [
 ];
 
 const SITE_CONFIG_PATH = join(ROOT, 'server/src/types/site-config.ts');
+const THEME_TOKENS_PATH = join(ROOT, 'client/src/types/theme-tokens.ts');
 const DEFAULTS_PATH = join(ROOT, 'server/src/types/site-config.defaults.ts');
+const FOUNDATION_PATH = join(ROOT, 'theme/foundation.tokens.ts');
 
 function parseInterfaces(filePath: string): Map<string, ts.InterfaceDeclaration> {
   const content = readFileSync(filePath, 'utf8');
@@ -47,7 +50,7 @@ function referencedInterfaceName(type: ts.TypeNode): string | null {
   return null;
 }
 
-/** Required field paths (dot notation) derived from SiteConfig and nested interfaces. */
+/** Required field paths (dot notation) derived from an interface and nested interfaces. */
 function collectRequiredPaths(
   interfaceName: string,
   interfaces: Map<string, ts.InterfaceDeclaration>,
@@ -87,6 +90,11 @@ function collectRequiredPaths(
   return paths;
 }
 
+/** Canonical leaf path for messages (`color.bg.DEFAULT` → `color.bg`). */
+function toCanonicalLeafPath(path: string): string {
+  return path.endsWith('.DEFAULT') ? path.slice(0, -'.DEFAULT'.length) : path;
+}
+
 function getAtPath(value: unknown, path: string): unknown {
   let current: unknown = value;
   for (const segment of path.split('.')) {
@@ -114,13 +122,17 @@ function checkTwinFiles(): string[] {
   return errors;
 }
 
-function checkDefaultsAgainstType(requiredPaths: string[], defaults: unknown): string[] {
+function checkDefaultsAgainstType(
+  label: string,
+  requiredPaths: string[],
+  defaults: unknown
+): string[] {
   const errors: string[] = [];
 
   for (const path of requiredPaths) {
     const value = getAtPath(defaults, path);
     if (value === undefined) {
-      errors.push(`defaultSiteConfig: missing required field "${path}"`);
+      errors.push(`${label}: missing required field "${toCanonicalLeafPath(path)}"`);
     }
   }
 
@@ -130,16 +142,29 @@ function checkDefaultsAgainstType(requiredPaths: string[], defaults: unknown): s
 export async function runContractCheck(): Promise<string[]> {
   const errors: string[] = [...checkTwinFiles()];
 
-  const interfaces = parseInterfaces(SITE_CONFIG_PATH);
-  const requiredPaths = collectRequiredPaths('SiteConfig', interfaces);
+  const siteInterfaces = parseInterfaces(SITE_CONFIG_PATH);
+  const siteRequiredPaths = collectRequiredPaths('SiteConfig', siteInterfaces);
 
-  if (requiredPaths.length === 0) {
+  if (siteRequiredPaths.length === 0) {
     errors.push('contract-check: could not parse SiteConfig required fields');
-    return errors;
+  } else {
+    const { defaultSiteConfig } = await import(DEFAULTS_PATH);
+    errors.push(
+      ...checkDefaultsAgainstType('defaultSiteConfig', siteRequiredPaths, defaultSiteConfig)
+    );
   }
 
-  const { defaultSiteConfig } = await import(DEFAULTS_PATH);
-  errors.push(...checkDefaultsAgainstType(requiredPaths, defaultSiteConfig));
+  const themeInterfaces = parseInterfaces(THEME_TOKENS_PATH);
+  const themeRequiredPaths = collectRequiredPaths('ThemeTokens', themeInterfaces);
+
+  if (themeRequiredPaths.length === 0) {
+    errors.push('contract-check: could not parse ThemeTokens required fields');
+  } else {
+    const { foundation } = await import(FOUNDATION_PATH);
+    errors.push(
+      ...checkDefaultsAgainstType('foundation', themeRequiredPaths, foundation)
+    );
+  }
 
   return errors;
 }
@@ -150,8 +175,11 @@ async function main(): Promise<void> {
   const errors = await runContractCheck();
 
   if (errors.length === 0) {
+    const sitePaths = collectRequiredPaths('SiteConfig', parseInterfaces(SITE_CONFIG_PATH));
+    const themePaths = collectRequiredPaths('ThemeTokens', parseInterfaces(THEME_TOKENS_PATH));
     console.log('✅ Contract check passed.');
-    console.log(`   ${collectRequiredPaths('SiteConfig', parseInterfaces(SITE_CONFIG_PATH)).length} required SiteConfig fields have defaults.`);
+    console.log(`   ${sitePaths.length} required SiteConfig fields have defaults.`);
+    console.log(`   ${themePaths.length} required ThemeTokens leaves have foundation values.`);
     console.log(`   ${TWIN_PAIRS.length} twin type file pairs are byte-identical.`);
     process.exit(0);
   }
