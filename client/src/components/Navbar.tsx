@@ -22,98 +22,71 @@ function Navbar() {
   const intakeLabel =
     intakeNavLabels[config.primaryFormSlug ?? ''] ?? 'Contact';
 
+  const linkClass = (active: boolean) =>
+    `shell-nav__link${active ? ' shell-nav__link--active' : ''}`;
+
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">
-                {config.branding.name.charAt(0)}
-              </span>
-            </div>
-            <span className="font-semibold text-gray-900">
-              {config.branding.name}
-            </span>
+    <nav className="shell-nav">
+      <div className="shell-container shell-nav__inner">
+        <Link to="/" className="shell-nav__brand">
+          <div className="shell-nav__mark">
+            <span>{config.branding.name.charAt(0)}</span>
+          </div>
+          <span className="shell-nav__name">{config.branding.name}</span>
+        </Link>
+
+        <div className="shell-nav__links">
+          <Link to="/" className={linkClass(isActive('/'))}>
+            Home
           </Link>
-
-          <div className="hidden md:flex items-center space-x-8">
+          {config.features.catalog && (
             <Link
-              to="/"
-              className={`text-sm font-medium transition-colors ${
-                isActive('/') ? 'text-primary-600' : 'text-gray-600 hover:text-gray-900'
-              }`}
+              to="/catalog"
+              className={linkClass(location.pathname.startsWith('/catalog'))}
             >
-              Home
+              Catalog
             </Link>
-            {config.features.catalog && (
-              <Link
-                to="/catalog"
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname.startsWith('/catalog')
-                    ? 'text-primary-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Catalog
+          )}
+          {config.features.content && (
+            <>
+              <Link to="/about" className={linkClass(isActive('/about'))}>
+                About
               </Link>
-            )}
-            {config.features.content && (
-              <>
-                <Link
-                  to="/about"
-                  className={`text-sm font-medium transition-colors ${
-                    isActive('/about')
-                      ? 'text-primary-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  About
-                </Link>
-                <Link
-                  to="/blog"
-                  className={`text-sm font-medium transition-colors ${
-                    location.pathname.startsWith('/blog')
-                      ? 'text-primary-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Blog
-                </Link>
-              </>
-            )}
-            {config.features.intake && config.primaryFormSlug && (
               <Link
-                to={intakePath}
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname.startsWith('/forms')
-                    ? 'text-primary-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                to="/blog"
+                className={linkClass(location.pathname.startsWith('/blog'))}
               >
-                {intakeLabel}
+                Blog
               </Link>
-            )}
-          </div>
+            </>
+          )}
+          {config.features.intake && config.primaryFormSlug && (
+            <Link
+              to={intakePath}
+              className={linkClass(location.pathname.startsWith('/forms'))}
+            >
+              {intakeLabel}
+            </Link>
+          )}
+        </div>
 
-          <div className="flex items-center space-x-4">
-            {config.features.auth ? (
-              isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  {(sessionUser?.picture ?? user?.picture) && (
-                    <img
-                      src={(sessionUser?.picture ?? user?.picture) as string}
-                      alt={sessionUser?.name ?? user?.name ?? 'User'}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  )}
-                  <LogoutButton />
-                </div>
-              ) : (
-                <LoginButton />
-              )
-            ) : null}
-          </div>
+        <div className="shell-nav__actions">
+          {config.features.auth ? (
+            isAuthenticated ? (
+              <>
+                {(sessionUser?.picture ?? user?.picture) && (
+                  <img
+                    src={(sessionUser?.picture ?? user?.picture) as string}
+                    alt={sessionUser?.name ?? user?.name ?? 'User'}
+                    className="shell-nav__avatar"
+                  />
+                )}
+                <LogoutButton />
+              </>
+            ) : (
+              <LoginButton />
+            )
+          ) : null}
         </div>
       </div>
     </nav>

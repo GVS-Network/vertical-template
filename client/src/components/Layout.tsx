@@ -1,20 +1,23 @@
 import { ReactNode } from 'react';
 import Navbar from './Navbar';
+import { useSiteConfig } from '../contexts/SiteConfigContext';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 function Layout({ children }: LayoutProps) {
+  const { config } = useSiteConfig();
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="shell-layout">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
-        {children}
-      </main>
-      <footer className="bg-white border-t border-gray-200 py-6">
-        <div className="container mx-auto px-4 text-center text-gray-600 text-sm">
-          <p>&copy; {new Date().getFullYear()} MERN Starter. Built with React, Express, MongoDB & Auth0.</p>
+      <main className="shell-main">{children}</main>
+      <footer className="shell-footer">
+        <div className="shell-footer__text">
+          <p>
+            &copy; {new Date().getFullYear()} {config.branding.name}
+          </p>
         </div>
       </footer>
     </div>

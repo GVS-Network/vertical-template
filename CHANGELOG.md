@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Phase 5.8: `emitCssVars()` + server HTML injection (dev Vite plugin, production SPA fallback); `ProductCard` uses CSS variables.
 - Phase 5.9: all five feature packs converted to token-backed `pack-*` / `btn-*` CSS classes.
 
+### Fixed
+
+- Dev theme injection: load `/api/_meta/theme.css` on every page (Vite startup injection was silently skipped); convert Navbar, Layout, Loading, and Home shell to CSS variables so vertical accent/type tokens are visible.
+
 ### Docs
 
 - Phase 5.1: `theme/README.md`, four vertical brand briefs, `docs/phase-5-prompt-5.1-resolutions.md`; updated `phase-5-open-questions.md`, `phase-4-open-questions.md`.
