@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Phase 5.1: opinionated brand per vertical confirmed; `theme/verticals/*.brief.md` brand voice briefs; token build order locked; Phase 4 open questions resolved in `docs/phase-5-prompt-5.1-resolutions.md`.
 - Phase 5.2: full `ThemeTokens` leaf set (color, type, size, space, radius, shadow, motion); `DeepPartial` helper for override layers.
 - Phase 5.3: `theme/foundation.tokens.ts` L1 defaults; `contract:check` asserts every `ThemeTokens` leaf is populated in foundation.
+- Phase 5.4: L2 vertical token overrides for `screen-printer`, `bar-restaurant`, `food-truck`, and `farm-source` in `theme/verticals/*.tokens.ts`.
 
 ### Docs
 

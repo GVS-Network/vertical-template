@@ -6,12 +6,12 @@ Four-layer token resolution: **foundation → vertical → tenant pick → tenan
 
 Each vertical's written brief is the source of truth for palette, type, and density decisions. Do not add token values without reading the brief first.
 
-| Vertical | Brief |
-|----------|--------|
-| `screen-printer` | [`verticals/screen-printer.brief.md`](verticals/screen-printer.brief.md) |
-| `bar-restaurant` | [`verticals/bar-restaurant.brief.md`](verticals/bar-restaurant.brief.md) |
-| `food-truck` | [`verticals/food-truck.brief.md`](verticals/food-truck.brief.md) |
-| `farm-source` | [`verticals/farm-source.brief.md`](verticals/farm-source.brief.md) |
+| Vertical | Brief | Tokens |
+|----------|--------|--------|
+| `screen-printer` | [`verticals/screen-printer.brief.md`](verticals/screen-printer.brief.md) | [`verticals/screen-printer.tokens.ts`](verticals/screen-printer.tokens.ts) |
+| `bar-restaurant` | [`verticals/bar-restaurant.brief.md`](verticals/bar-restaurant.brief.md) | [`verticals/bar-restaurant.tokens.ts`](verticals/bar-restaurant.tokens.ts) |
+| `food-truck` | [`verticals/food-truck.brief.md`](verticals/food-truck.brief.md) | [`verticals/food-truck.tokens.ts`](verticals/food-truck.tokens.ts) |
+| `farm-source` | [`verticals/farm-source.brief.md`](verticals/farm-source.brief.md) | [`verticals/farm-source.tokens.ts`](verticals/farm-source.tokens.ts) |
 
 **Build order for `*.tokens.ts`:** screen-printer → bar-restaurant → food-truck → farm-source (locked @ [`docs/phase-5-prompt-5.1-resolutions.md`](../docs/phase-5-prompt-5.1-resolutions.md)).
 
