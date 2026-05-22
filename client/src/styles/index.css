@@ -36,6 +36,45 @@ body {
   .link {
     @apply text-primary-600 hover:text-primary-700 underline-offset-2 hover:underline;
   }
+
+  .product-card {
+    display: block;
+    background: var(--color-bg-panel);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    transition: border-color var(--motion-duration-fast) var(--motion-ease);
+  }
+
+  .product-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  .product-card__title {
+    font-family: var(--type-heading-family);
+    font-weight: var(--type-heading-weight);
+    letter-spacing: var(--type-heading-tracking);
+    color: var(--color-ink);
+  }
+
+  .product-card__meta {
+    font-size: var(--size-small);
+    color: var(--color-ink-muted);
+    margin-top: var(--space-xs);
+  }
+
+  .product-card__price {
+    font-size: var(--size-h3);
+    font-weight: var(--type-body-weight);
+    color: var(--color-accent);
+    margin-top: var(--space-sm);
+  }
+
+  .product-card__stock {
+    font-size: var(--size-small);
+    color: var(--color-ink-soft);
+    margin-top: var(--space-xs);
+  }
 }
 
 /* Utility classes */

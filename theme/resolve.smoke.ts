@@ -16,6 +16,7 @@ import {
   runThemeContrastMatrix,
   validateContrast,
 } from './validate-contrast';
+import { emitCssVars, leafPathToCssVar } from './emit-css-vars';
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
@@ -157,6 +158,23 @@ function testThemeContrastMatrix(): void {
   assert(matrix.checked === 16, 'checks all vertical × demo-tenant combos');
 }
 
+function testEmitCssVars(): void {
+  const css = emitCssVars(foundation);
+  assert(css.includes(':root {'), 'wraps tokens in :root');
+  assert(
+    css.includes(`${leafPathToCssVar('color.bg.DEFAULT')}: ${foundation.color.bg.DEFAULT}`),
+    'emits page background'
+  );
+  assert(
+    css.includes(`${leafPathToCssVar('color.accent.DEFAULT')}: ${foundation.color.accent.DEFAULT}`),
+    'emits accent'
+  );
+  assert(
+    css.includes(`${leafPathToCssVar('type.heading.family')}:`),
+    'emits typography vars'
+  );
+}
+
 function main(): void {
   testFoundationOnly();
   testVerticalOverridesFoundation();
@@ -167,6 +185,7 @@ function main(): void {
   testFoundationContrastPasses();
   testLowContrastBodyTextFails();
   testThemeContrastMatrix();
+  testEmitCssVars();
 
   console.log('resolve-tokens smoke: all tests passed');
   console.log('  foundation-only resolves correctly');
@@ -175,6 +194,7 @@ function main(): void {
   console.log('  override at non-leaf throws');
   console.log('  override at leaf wins');
   console.log('  contrast validator passes foundation + theme matrix');
+  console.log('  emitCssVars produces :root CSS variables');
 }
 
 main();

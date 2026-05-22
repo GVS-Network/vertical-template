@@ -31,6 +31,8 @@ theme/
 ├── deep-merge-tokens.ts
 ├── validate-leaf-override.ts
 ├── validate-contrast.ts          # Prompt 5.7 — WCAG pairs
+├── emit-css-vars.ts              # Prompt 5.8 — :root emission
+├── inject-theme-html.ts          # Prompt 5.8 — `<head>` injection helper
 └── resolve.smoke.ts
 ```
 

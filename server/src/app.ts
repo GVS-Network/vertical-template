@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { mountClientWithTheme } from './middleware/client-with-theme';
 import { attachSiteConfig } from './middleware/site-config';
 import healthRoutes from './routes/health';
 import metaRoutes from './routes/meta';
@@ -48,6 +49,10 @@ export async function createApp(
   app.use('/api/_meta', metaRoutes);
 
   await mountFeaturePacks(app, siteConfig);
+
+  if (process.env.NODE_ENV === 'production') {
+    mountClientWithTheme(app);
+  }
 
   app.use(notFoundHandler);
   app.use(errorHandler);

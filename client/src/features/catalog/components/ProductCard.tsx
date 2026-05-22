@@ -8,17 +8,12 @@ interface ProductCardProps {
 
 function ProductCard({ product }: ProductCardProps) {
   return (
-    <Link
-      to={`/catalog/${product.slug}`}
-      className="block bg-white border border-gray-200 rounded-lg p-4 hover:border-primary-500 transition-colors"
-    >
-      <h3 className="font-semibold text-gray-900">{product.name}</h3>
-      <p className="text-sm text-gray-500 mt-1">SKU {product.sku}</p>
-      <p className="text-lg font-medium text-primary-600 mt-2">
-        {formatPriceCents(product.price)}
-      </p>
+    <Link to={`/catalog/${product.slug}`} className="product-card">
+      <h3 className="product-card__title">{product.name}</h3>
+      <p className="product-card__meta">SKU {product.sku}</p>
+      <p className="product-card__price">{formatPriceCents(product.price)}</p>
       {product.stock !== null && (
-        <p className="text-xs text-gray-500 mt-1">{product.stock} in stock</p>
+        <p className="product-card__stock">{product.stock} in stock</p>
       )}
     </Link>
   );

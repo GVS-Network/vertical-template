@@ -3,6 +3,7 @@ import { Router, type Request, type Response } from 'express';
 import { scopedForTenant } from '../db/scoped';
 import { FormDefinition } from '../features/intake/schemas/form-definition';
 import { getSiteConfig } from '../seams/get-site-config';
+import { resolvedThemeCssForRequest } from '../theme/resolved-theme-css';
 import type { SiteConfig } from '../types/site-config';
 
 export type PublicSiteMeta = Pick<
@@ -50,6 +51,12 @@ router.get('/config', async (req: Request, res: Response) => {
     status: 'success',
     data: toPublicMeta(config, primaryFormSlug),
   });
+});
+
+/** Resolved theme tokens as CSS custom properties (L1–L4). */
+router.get('/theme.css', (req: Request, res: Response) => {
+  const css = resolvedThemeCssForRequest(req);
+  res.type('text/css').set('Cache-Control', 'no-store').send(css);
 });
 
 export default router;
