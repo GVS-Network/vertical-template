@@ -5,41 +5,34 @@ function PostList() {
   const { posts, loading, error } = usePosts();
 
   if (loading) {
-    return <p className="text-gray-600">Loading posts…</p>;
+    return <p className="pack-loading">Loading posts…</p>;
   }
 
   if (error) {
-    return <p className="text-red-600">{error}</p>;
+    return <p className="pack-error">{error}</p>;
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Blog</h1>
+      <h1 className="pack-page-title">Blog</h1>
       {posts.length === 0 ? (
-        <p className="text-gray-600">No posts yet.</p>
+        <p className="pack-empty">No posts yet.</p>
       ) : (
-        <ul className="space-y-6">
+        <ul className="pack-list">
           {posts.map((post) => (
-            <li key={post._id} className="border-b border-gray-200 pb-6">
-              <Link
-                to={`/blog/${post.slug}`}
-                className="text-xl font-semibold text-gray-900 hover:text-primary-600"
-              >
+            <li key={post._id} className="pack-list-item">
+              <Link to={`/blog/${post.slug}`} className="pack-list-link">
                 {post.title}
               </Link>
               {post.publishedAt && (
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="pack-meta pack-meta--tight">
                   {new Date(post.publishedAt).toLocaleDateString()}
                 </p>
               )}
               {post.tags.length > 0 && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {post.tags.join(' · ')}
-                </p>
+                <p className="pack-meta pack-meta--tight">{post.tags.join(' · ')}</p>
               )}
-              <p className="text-gray-600 mt-2 line-clamp-2 whitespace-pre-wrap">
-                {post.body}
-              </p>
+              <p className="pack-excerpt">{post.body}</p>
             </li>
           ))}
         </ul>
