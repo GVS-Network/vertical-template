@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Phase 5.3: `theme/foundation.tokens.ts` L1 defaults; `contract:check` asserts every `ThemeTokens` leaf is populated in foundation.
 - Phase 5.4: L2 vertical token overrides for `screen-printer`, `bar-restaurant`, `food-truck`, and `farm-source` in `theme/verticals/*.tokens.ts`.
 - Phase 5.5: empty L3/L4 tenant theme stubs (`theme/tenants/demo-*.pick.ts`, `*.override.ts`) and `theme/tenants/registry.ts` keyed by demo tenantId.
+- Phase 5.6: `resolveTokens()` four-layer merge, leaf-only override validator, vertical theme registry, and smoke tests.
 
 ### Docs
 

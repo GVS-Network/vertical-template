@@ -25,6 +25,7 @@
     "test:square-sync-inventory": "npm run test:square-sync-inventory --prefix server",
     "test:webhook-idempotency": "npm run test:webhook-idempotency --prefix server",
     "test:vertical-registry": "tsx verticals/registry.smoke.ts",
+    "test:resolve-tokens": "tsx theme/resolve.smoke.ts",
     "init:vertical": "tsx scripts/init-vertical.ts",
     "test:init-vertical": "tsx scripts/init-vertical.smoke.ts",
     "test:screen-printer-preset": "tsx scripts/verify-vertical-preset.ts screen-printer",

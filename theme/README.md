@@ -27,7 +27,10 @@ theme/
 ├── tenants/
 │   ├── registry.ts               # Prompt 5.5
 │   └── demo-*.pick.ts / override.ts
-└── resolve-tokens.ts             # Prompt 5.6
+├── resolve.ts                    # Prompt 5.6 — resolveTokens()
+├── deep-merge-tokens.ts
+├── validate-leaf-override.ts
+└── resolve.smoke.ts
 ```
 
 Implementation lives under `client/src/theme/` once types and resolver are wired (Prompt 5.2–5.7).
