@@ -42,24 +42,19 @@ function GenericFormRenderer({ form, onSubmit }: GenericFormRendererProps) {
 
   if (success) {
     return (
-      <p className="text-green-700 font-medium">
-        Thank you — your submission was received.
-      </p>
+      <p className="pack-success">Thank you — your submission was received.</p>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-      <h1 className="text-3xl font-bold text-gray-900">{form.title}</h1>
+    <form onSubmit={handleSubmit} className="pack-form">
+      <h1 className="pack-detail-title">{form.title}</h1>
 
       {form.fields.map((field) => (
         <div key={field.name}>
-          <label
-            htmlFor={field.name}
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
+          <label htmlFor={field.name} className="pack-form-label">
             {fieldLabel(field)}
-            {field.required && <span className="text-red-500"> *</span>}
+            {field.required && <span className="pack-form-required"> *</span>}
           </label>
 
           {field.type === 'textarea' ? (
@@ -68,7 +63,7 @@ function GenericFormRenderer({ form, onSubmit }: GenericFormRendererProps) {
               name={field.name}
               required={field.required}
               rows={4}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="pack-field"
               value={String(values[field.name] ?? '')}
               onChange={(e) => handleChange(field.name, e.target.value)}
             />
@@ -77,7 +72,7 @@ function GenericFormRenderer({ form, onSubmit }: GenericFormRendererProps) {
               id={field.name}
               name={field.name}
               required={field.required}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="pack-field"
               value={String(values[field.name] ?? '')}
               onChange={(e) => handleChange(field.name, e.target.value)}
             >
@@ -93,7 +88,7 @@ function GenericFormRenderer({ form, onSubmit }: GenericFormRendererProps) {
               id={field.name}
               name={field.name}
               type="checkbox"
-              className="rounded border-gray-300"
+              className="pack-checkbox"
               checked={Boolean(values[field.name])}
               onChange={(e) => handleChange(field.name, e.target.checked)}
             />
@@ -103,7 +98,7 @@ function GenericFormRenderer({ form, onSubmit }: GenericFormRendererProps) {
               name={field.name}
               type={field.type === 'email' ? 'email' : 'text'}
               required={field.required}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              className="pack-field"
               value={String(values[field.name] ?? '')}
               onChange={(e) => handleChange(field.name, e.target.value)}
             />
@@ -111,13 +106,9 @@ function GenericFormRenderer({ form, onSubmit }: GenericFormRendererProps) {
         </div>
       ))}
 
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && <p className="pack-message pack-message--error">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="btn-primary disabled:opacity-50"
-      >
+      <button type="submit" disabled={submitting} className="btn btn-primary">
         {submitting ? 'Sending…' : form.submitButtonLabel}
       </button>
     </form>

@@ -7,11 +7,11 @@ function FormPage() {
   const { form, loading, error, submit } = useFormDefinition(slug);
 
   if (loading) {
-    return <p className="text-gray-600">Loading form…</p>;
+    return <p className="pack-loading">Loading form…</p>;
   }
 
   if (error || !form) {
-    return <p className="text-red-600">{error ?? 'Form not found'}</p>;
+    return <p className="pack-error">{error ?? 'Form not found'}</p>;
   }
 
   return (
