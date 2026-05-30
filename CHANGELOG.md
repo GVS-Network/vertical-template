@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Admin submissions inbox (Phase 6.11): `/admin/submissions` with paginated list, filter tabs, and mark processed/unprocessed via intake API.
 - Admin products UI (Phase 6.10): `/admin/products` list + create/edit form (name, slug, price, description in attributes, status); catalog write API.
 - Admin events UI (Phase 6.9): `/admin/events` list + create/edit form with event fields; `tag=event` on save; timezone-aware datetime editors (P6-6).
 - Admin pages UI (Phase 6.8): `/admin/pages` list + create/edit form; auth-gated `GET /api/admin/pages` reads; writes via content API.

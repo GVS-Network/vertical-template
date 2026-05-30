@@ -70,3 +70,30 @@ export interface ProductWriteInput {
 }
 
 export const PRODUCT_DESCRIPTION_KEY = 'description' as const;
+
+export interface IntakeSubmission {
+  _id: string;
+  formSlug: string;
+  data: Record<string, unknown>;
+  createdAt: string;
+  ip?: string;
+  processed: boolean;
+}
+
+export interface SubmissionsListResponse {
+  status: string;
+  data: IntakeSubmission[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface SubmissionResponse {
+  status: string;
+  data: IntakeSubmission;
+}
+
+export type SubmissionProcessedFilter = 'all' | 'new' | 'processed';

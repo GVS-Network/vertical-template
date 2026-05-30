@@ -623,6 +623,52 @@ body {
     color: var(--color-ink-soft);
   }
 
+  .pack-admin-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+
+  .pack-submission__title {
+    font-family: var(--type-heading-family);
+    font-size: var(--size-h3);
+    font-weight: var(--type-heading-weight);
+    color: var(--color-ink);
+    text-transform: capitalize;
+  }
+
+  .pack-submission__fields {
+    margin-top: var(--space-md);
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .pack-submission__field {
+    margin: 0;
+  }
+
+  .pack-submission__value {
+    margin: var(--space-xs) 0 0;
+    font-family: var(--type-body-family);
+    color: var(--color-ink);
+    white-space: pre-wrap;
+  }
+
+  .pack-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  .pack-pagination__label {
+    font-size: var(--size-small);
+    color: var(--color-ink-soft);
+    font-family: var(--type-body-family);
+  }
+
   .pack-form-label {
     display: block;
     font-size: var(--size-small);

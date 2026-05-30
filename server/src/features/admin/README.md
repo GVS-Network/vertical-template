@@ -27,6 +27,12 @@ Toggle-mounted at `features.admin` (requires `features.auth` when on). Client UI
 - Client `/admin/products` list + create/edit forms; writes use `POST/PUT /api/catalog/products`
 - Description stored in `attributes.description`; other attribute keys preserved on update; SKU auto-generated from slug on create
 
+## Phase 6.11 — Submissions inbox
+
+- Client `/admin/submissions` — paginated inbox with All / New / Processed filters
+- Uses existing `GET /api/intake/submissions` and `PATCH /api/intake/submissions/:id` (Phase 6.5)
+- Nav and route gated on `features.intake`
+
 ## Distinction
 
 | Route | Actor |
