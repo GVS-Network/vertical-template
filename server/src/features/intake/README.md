@@ -2,6 +2,21 @@
 
 Conditional forms and submission persistence. Public `POST /api/intake/forms/:slug` creates a tenant-scoped `Submission`.
 
+## Admin inbox API (Phase 6.5)
+
+Auth-gated when `features.auth: true` via `writeGuards` + `requireAuth`.
+
+| Method | Path | Notes |
+|--------|------|--------|
+| `GET` | `/api/intake/submissions` | Paginated list; newest first |
+| `PATCH` | `/api/intake/submissions/:id` | Body `{ "processed": true \| false }` |
+
+**Query params (list):** `page` (default 1), `limit` (default 20, max 100), optional `processed` (`true`/`false`), optional `formSlug`.
+
+**Response:** `{ status, data: Submission[], meta: { page, limit, total, totalPages } }`. Each item includes Mongo `_id` for PATCH.
+
+Tenant scope: `scoped(Submission, req)` on all inbox queries.
+
 ## Notifications (Phase 6.4)
 
 On successful submission, the pack emails `siteConfig.contact.email` when a notification provider is configured.

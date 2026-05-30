@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Intake submissions inbox API (Phase 6.5): auth-gated `GET /api/intake/submissions` (paginated) and `PATCH` mark processed.
 - Intake email notifications (Phase 6.4): `providers/notifications/` + Resend adapter, `getNotificationProvider()` seam, hook in `createSubmission`; closes P4-7.
 - Post event metadata (Phase 6.3): optional `eventStart`, `eventEnd`, `eventLocation`, `links` on Post schema + zod writes; client `ContentPost` shape updated.
 - Content write API: `POST/PUT` pages and posts with zod validation, `scoped(Model, req)` writes, and `test:content` smoke (Phase 6.2).

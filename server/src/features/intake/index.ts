@@ -10,5 +10,5 @@ export async function register(
   siteConfig: SiteConfig
 ): Promise<void> {
   await seedIntakeForms(siteConfig.tenantId);
-  app.use('/api/intake', createIntakeRouter());
+  app.use('/api/intake', createIntakeRouter(siteConfig));
 }
