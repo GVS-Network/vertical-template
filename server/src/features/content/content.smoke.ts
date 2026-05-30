@@ -20,6 +20,7 @@ dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 const TEST_PAGE_SLUG = 'content-smoke-page';
 const TEST_POST_SLUG = 'content-smoke-post';
+const TEST_EVENT_SLUG = 'content-smoke-event';
 
 async function main(): Promise<void> {
   process.env.SKIP_PACK_SEEDS = '1';
@@ -155,11 +156,62 @@ async function main(): Promise<void> {
     throw new Error(`invalid body expected 400, got ${invalidRes.status}`);
   }
 
+  await posts.deleteMany({ slug: TEST_EVENT_SLUG });
+
+  const eventStart = '2026-06-01T18:00:00.000Z';
+  const eventEnd = '2026-06-01T22:00:00.000Z';
+  const createEventRes = await request(app)
+    .post('/api/content/posts')
+    .send({
+      slug: TEST_EVENT_SLUG,
+      title: 'Smoke event',
+      body: 'Pop-up stop',
+      status: 'published',
+      tags: ['event', 'smoke'],
+      eventStart,
+      eventEnd,
+      eventLocation: 'Main St lot',
+      links: {
+        map: 'https://maps.example.com/stop',
+        facebook: 'https://facebook.com/events/1',
+      },
+    });
+  if (createEventRes.status !== 201) {
+    throw new Error(`create event post expected 201, got ${createEventRes.status}`);
+  }
+
+  const eventGetRes = await request(app).get(
+    `/api/content/posts/${TEST_EVENT_SLUG}`
+  );
+  const eventData = eventGetRes.body?.data;
+  if (
+    eventGetRes.status !== 200 ||
+    eventData?.eventLocation !== 'Main St lot' ||
+    eventData?.links?.map !== 'https://maps.example.com/stop'
+  ) {
+    throw new Error('published event post should return structured event fields');
+  }
+
+  const badLinkRes = await request(app)
+    .post('/api/content/posts')
+    .send({
+      slug: 'bad-event-links',
+      title: 'Bad links',
+      links: { map: 'not-a-url' },
+    });
+  if (badLinkRes.status !== 400) {
+    throw new Error(`invalid event link URL expected 400, got ${badLinkRes.status}`);
+  }
+  await posts.deleteMany({ slug: 'bad-event-links' });
+
   await pages.deleteMany({ slug: TEST_PAGE_SLUG });
   await posts.deleteMany({ slug: TEST_POST_SLUG });
+  await posts.deleteMany({ slug: TEST_EVENT_SLUG });
   await disconnectDatabase();
 
-  console.log('content.smoke: writes OK; public GET/list published-only (P6-4); zod + duplicate slug');
+  console.log(
+    'content.smoke: writes OK; public GET/list published-only (P6-4); zod + duplicate slug; event metadata'
+  );
 }
 
 main().catch(async (err) => {

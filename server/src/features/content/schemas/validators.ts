@@ -31,6 +31,22 @@ export const updatePageBodySchema = z
   })
   .strict();
 
+const optionalUrl = z.string().trim().url();
+
+const postEventLinksSchema = z
+  .object({
+    map: optionalUrl.optional(),
+    facebook: optionalUrl.optional(),
+  })
+  .strict();
+
+const postEventFieldsSchema = {
+  eventStart: z.coerce.date().nullable().optional(),
+  eventEnd: z.coerce.date().nullable().optional(),
+  eventLocation: z.string().trim().min(1).max(500).optional(),
+  links: postEventLinksSchema.optional(),
+};
+
 export const createPostBodySchema = z
   .object({
     slug: z.string().trim().min(1).max(200),
@@ -39,6 +55,7 @@ export const createPostBodySchema = z
     publishedAt: z.coerce.date().nullable().optional(),
     tags: z.array(z.string().trim().min(1)).default([]),
     status: contentStatusSchema.default('draft'),
+    ...postEventFieldsSchema,
   })
   .strict();
 
@@ -49,6 +66,7 @@ export const updatePostBodySchema = z
     publishedAt: z.coerce.date().nullable().optional(),
     tags: z.array(z.string().trim().min(1)).optional(),
     status: contentStatusSchema.optional(),
+    ...postEventFieldsSchema,
   })
   .strict();
 

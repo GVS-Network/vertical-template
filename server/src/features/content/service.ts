@@ -124,6 +124,33 @@ export async function updatePage(
   return doc ? doc.toObject() : null;
 }
 
+function eventFieldsFromInput(input: CreatePostBody | UpdatePostBody): {
+  eventStart?: Date | null;
+  eventEnd?: Date | null;
+  eventLocation?: string;
+  links?: IPost['links'];
+} {
+  const fields: {
+    eventStart?: Date | null;
+    eventEnd?: Date | null;
+    eventLocation?: string;
+    links?: IPost['links'];
+  } = {};
+  if ('eventStart' in input && input.eventStart !== undefined) {
+    fields.eventStart = input.eventStart;
+  }
+  if ('eventEnd' in input && input.eventEnd !== undefined) {
+    fields.eventEnd = input.eventEnd;
+  }
+  if (input.eventLocation !== undefined) {
+    fields.eventLocation = input.eventLocation;
+  }
+  if (input.links !== undefined) {
+    fields.links = input.links;
+  }
+  return fields;
+}
+
 export async function createPost(
   req: Request,
   input: CreatePostBody
@@ -139,6 +166,7 @@ export async function createPost(
       tags: input.tags,
       status,
       publishedAt,
+      ...eventFieldsFromInput(input),
     });
     return doc.toObject();
   } catch (err) {
@@ -170,7 +198,12 @@ export async function updatePost(
     existing.publishedAt
   );
 
-  const update: Record<string, unknown> = { ...input, publishedAt };
+  const { links, ...inputRest } = input;
+  const update: Record<string, unknown> = { ...inputRest, publishedAt };
+  if (links !== undefined) {
+    update.links = { ...existing.toObject().links, ...links };
+  }
+
   await posts.updateOne({ slug: normalized }, update);
   const doc = (await posts.findOne({
     slug: normalized,

@@ -25,8 +25,10 @@ Auth-gated when `features.auth: true` via `writeGuards` + `requireAuth`. When au
 |--------|------|------------|
 | `POST` | `/api/content/pages` | `slug`, `title`, optional `body`, `hero`, `status` |
 | `PUT` | `/api/content/pages/:slug` | partial page fields |
-| `POST` | `/api/content/posts` | `slug`, `title`, optional `body`, `tags`, `publishedAt`, `status` |
+| `POST` | `/api/content/posts` | `slug`, `title`, optional `body`, `tags`, `publishedAt`, `status`, event fields (below) |
 | `PUT` | `/api/content/posts/:slug` | partial post fields |
+
+**Event posts (Phase 6.3):** optional structured fields for `tags` including `event` — `eventStart`, `eventEnd` (UTC `Date` in Mongo, ISO on the wire), `eventLocation`, `links.map`, `links.facebook`. All optional on create/update; existing posts without these fields are unchanged.
 
 - Status values: `draft` \| `published` \| `archived` (default `draft` on create).
 - Writes use `scoped(Model, req)` — tenant filter baked in.
@@ -42,4 +44,8 @@ Anonymous `GET` list and detail return **`status: published` only**. The service
 npm run test:content --prefix server
 ```
 
-Requires `MONGODB_URI`. Smoke covers create/update, zod rejection, duplicate slug (409), and published-only public GET/list.
+Requires `MONGODB_URI`. Smoke covers create/update, zod rejection, duplicate slug (409), published-only public GET/list, and optional event metadata on posts.
+
+## Seeds
+
+Dev `seedContent` inserts generic news posts without event fields — **no migration required**. For `demo-food-truck` (and other presets): posts are not in vertical JSON seeds today; when adding event posts via admin or future `seed/posts.json`, use `tags: ['event']` plus the structured event fields above. Existing `demo-food-truck` page/product seeds remain valid without posts.

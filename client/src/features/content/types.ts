@@ -15,6 +15,11 @@ export interface ContentPage {
   status: ContentStatus;
 }
 
+export interface PostEventLinks {
+  map?: string;
+  facebook?: string;
+}
+
 export interface ContentPost {
   _id: string;
   slug: string;
@@ -23,6 +28,10 @@ export interface ContentPost {
   publishedAt: string | null;
   tags: string[];
   status: ContentStatus;
+  eventStart?: string | null;
+  eventEnd?: string | null;
+  eventLocation?: string;
+  links?: PostEventLinks;
 }
 
 export interface PageResponse {

@@ -5,6 +5,11 @@ import {
 } from '../../../db/tenant-schema';
 import type { ContentStatus } from './page';
 
+export interface PostEventLinks {
+  map?: string;
+  facebook?: string;
+}
+
 export interface IPost {
   tenantId: string;
   slug: string;
@@ -13,9 +18,21 @@ export interface IPost {
   publishedAt: Date | null;
   tags: string[];
   status: ContentStatus;
+  eventStart?: Date | null;
+  eventEnd?: Date | null;
+  eventLocation?: string;
+  links?: PostEventLinks;
 }
 
 export type PostDocument = IPost & Document;
+
+const postEventLinksSchema = new Schema<PostEventLinks>(
+  {
+    map: { type: String, trim: true },
+    facebook: { type: String, trim: true },
+  },
+  { _id: false }
+);
 
 const postSchema = new Schema<IPost>(
   {
@@ -31,6 +48,10 @@ const postSchema = new Schema<IPost>(
       required: true,
       default: 'draft',
     },
+    eventStart: { type: Date, default: null },
+    eventEnd: { type: Date, default: null },
+    eventLocation: { type: String, trim: true },
+    links: { type: postEventLinksSchema, default: undefined },
   },
   { timestamps: true }
 );

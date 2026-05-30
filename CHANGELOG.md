@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Post event metadata (Phase 6.3): optional `eventStart`, `eventEnd`, `eventLocation`, `links` on Post schema + zod writes; client `ContentPost` shape updated.
 - Content write API: `POST/PUT` pages and posts with zod validation, `scoped(Model, req)` writes, and `test:content` smoke (Phase 6.2).
 
 ### Fixed

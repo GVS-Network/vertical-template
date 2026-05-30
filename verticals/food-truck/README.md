@@ -48,3 +48,9 @@ Restart `npm run dev`, then walk:
 ## Product attributes (Zod)
 
 `dailyAvailable`, `locationToday` — see `product-attributes.schema.ts`.
+
+## Event posts (Phase 6.3)
+
+Posts support optional structured event metadata: `eventStart`, `eventEnd`, `eventLocation`, `links.map`, `links.facebook`. Tag posts with `event` for public listing via `GET /api/content/posts?tag=event`.
+
+This preset has **no post seeds** today — only pages (`home`, `about`, `locations`). No breaking change for `demo-food-truck`; add event posts in admin (Phase 6.9) or a future `seed/posts.json` when needed.
