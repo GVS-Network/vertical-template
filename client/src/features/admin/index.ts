@@ -1,0 +1,1 @@
+export { adminRouteElements } from './routes';

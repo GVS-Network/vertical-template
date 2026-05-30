@@ -9,6 +9,7 @@ export const defaultSiteConfig: SiteConfig = {
     intake: true,
     payments: true,
     auth: true,
+    admin: true,
   },
   payment: {
     provider: 'none',

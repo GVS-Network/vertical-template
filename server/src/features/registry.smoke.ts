@@ -17,6 +17,7 @@ const allFeaturesOff: SiteConfig = {
     intake: false,
     payments: false,
     auth: false,
+    admin: false,
   },
 };
 

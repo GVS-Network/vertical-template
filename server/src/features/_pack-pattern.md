@@ -15,6 +15,7 @@ Paths below use `server/src/features/` and `client/src/features/` (TypeScript `r
 | `intake` | `features.intake` | `/api/intake` |
 | `payments` | `features.payments` | `/api/payments` |
 | `auth` | `features.auth` | `/api/auth` |
+| `admin` | `features.admin` + `features.auth` | `/api/admin` (tenant CMS; Phase 6) |
 
 **Naming:** camelCase pack ids only (`catalog`, not `feature-catalog` or `feature_catalog`). Config keys match: `features.catalog`, `features.content`, `features.intake`, `features.payments`, `features.auth`. No kebab-case pack identifiers.
 

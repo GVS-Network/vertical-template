@@ -6,13 +6,19 @@ import type { SiteConfig } from '../server/src/types/site-config';
  * Deep-merges features; replaces payment/branding/contact/locale when provided.
  */
 export function mergePreset(partial: Partial<SiteConfig>): SiteConfig {
+  const features = {
+    ...defaultSiteConfig.features,
+    ...partial.features,
+  };
+  // see phase-6.1 — admin defaults on when auth is on unless preset overrides
+  if (partial.features?.admin === undefined) {
+    features.admin = features.auth;
+  }
+
   return {
     ...defaultSiteConfig,
     ...partial,
-    features: {
-      ...defaultSiteConfig.features,
-      ...partial.features,
-    },
+    features,
     payment: {
       ...defaultSiteConfig.payment,
       ...partial.payment,

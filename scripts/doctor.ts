@@ -382,6 +382,15 @@ function checkAuth(siteConfig: SiteConfig): string[] {
   return errors;
 }
 
+function checkAdmin(siteConfig: SiteConfig): string[] {
+  if (siteConfig.features.admin && !siteConfig.features.auth) {
+    return [
+      'admin: features.admin is on but features.auth is off — enable auth or disable admin',
+    ];
+  }
+  return [];
+}
+
 async function checkPayments(siteConfig: SiteConfig): Promise<{
   errors: string[];
   warnings: string[];
@@ -502,6 +511,7 @@ async function main(): Promise<void> {
   const warnings: string[] = [
     ...mongoResult.warnings,
     ...paymentResult.warnings,
+    ...checkAdmin(activeConfig),
   ];
 
   const contract = await runContractCheck();

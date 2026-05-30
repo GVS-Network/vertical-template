@@ -13,6 +13,7 @@ export interface SiteConfigFeatures {
   intake: boolean;
   payments: boolean;
   auth: boolean;
+  admin: boolean;
 }
 
 export interface SiteConfigPayment {

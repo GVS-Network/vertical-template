@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 
 import { useSiteConfig } from '../contexts/SiteConfigContext';
 import Home from '../pages/Home';
+import { adminRouteElements } from './admin/routes';
 import { catalogRouteElements } from './catalog/routes';
 import { contentRouteElements } from './content/routes';
 import { intakeRouteElements } from './intake/routes';
@@ -20,6 +21,7 @@ export function AppRoutes() {
       {features.catalog && catalogRouteElements()}
       {features.content && contentRouteElements()}
       {features.intake && intakeRouteElements()}
+      {features.admin && features.auth && adminRouteElements()}
     </Routes>
   );
 }

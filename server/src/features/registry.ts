@@ -8,6 +8,7 @@ export const FEATURE_PACK_KEYS = [
   'intake',
   'payments',
   'auth',
+  'admin',
 ] as const;
 
 export type FeaturePackKey = (typeof FEATURE_PACK_KEYS)[number];
@@ -25,12 +26,16 @@ const packLoaders: Record<
   intake: () => import('./intake'),
   payments: () => import('./payments'),
   auth: () => import('./auth'),
+  admin: () => import('./admin'),
 };
 
 function isPackEnabled(
   features: SiteConfigFeatures,
   key: FeaturePackKey
 ): boolean {
+  if (key === 'admin') {
+    return features.admin === true && features.auth === true;
+  }
   return features[key] === true;
 }
 
@@ -44,7 +49,13 @@ export async function mountFeaturePacks(
 ): Promise<void> {
   for (const key of FEATURE_PACK_KEYS) {
     if (!isPackEnabled(siteConfig.features, key)) {
-      console.log(`[feature:off] ${key}`);
+      if (key === 'admin' && siteConfig.features.admin && !siteConfig.features.auth) {
+        console.warn(
+          '[feature:admin] features.admin is on but features.auth is off — admin not mounted'
+        );
+      } else {
+        console.log(`[feature:off] ${key}`);
+      }
       continue;
     }
 

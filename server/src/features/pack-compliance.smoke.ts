@@ -18,6 +18,7 @@ const allFeaturesOn: SiteConfig['features'] = {
   intake: true,
   payments: true,
   auth: true,
+  admin: true,
 };
 
 const PROBES: Record<
@@ -35,6 +36,7 @@ const PROBES: Record<
     },
   },
   auth: { method: 'get', path: '/api/auth/me' },
+  admin: { method: 'get', path: '/api/admin/status' },
 };
 
 async function probe(
@@ -55,11 +57,20 @@ async function assertSiblingMounted(
   offKey: FeaturePackKey,
   features: SiteConfig['features']
 ): Promise<void> {
-  if (features.auth && offKey !== 'auth') {
+  if (features.auth && offKey !== 'auth' && offKey !== 'admin') {
     const status = await probe(app, 'auth');
     if (status === 404) {
       throw new Error(
         `only-${offKey}-off: auth should stay mounted but got 404 on ${PROBES.auth.path}`
+      );
+    }
+    return;
+  }
+  if (features.admin && features.auth && offKey !== 'admin') {
+    const status = await probe(app, 'admin');
+    if (status === 404) {
+      throw new Error(
+        `only-${offKey}-off: admin should stay mounted but got 404 on ${PROBES.admin.path}`
       );
     }
     return;
@@ -92,6 +103,7 @@ async function main(): Promise<void> {
       intake: false,
       payments: false,
       auth: false,
+      admin: false,
     },
   };
 
