@@ -32,11 +32,17 @@
 
 ---
 
+## Resolved @ 6.7
+
+| ID | Topic | Outcome |
+|----|--------|---------|
+| **P6-3** | Markdown renderer | **`react-markdown`** — safe defaults (no raw HTML); `client/src/shared/MarkdownBody.tsx` |
+
+---
+
 ## Open during Phase 6 build
 
-| ID | Topic | Notes |
-|----|--------|--------|
-| **P6-3** | Markdown renderer | `marked` vs `react-markdown` — prefer smallest bundle with safe defaults @ **6.7** |
+*(none — admin UI prompts 6.8–6.11 remain implementation work, not open decisions)*
 
 ---
 
@@ -66,3 +72,4 @@
 - Intake form definition editor — defer; seed-only @ 6.1
 - WYSIWYG admin — Markdown textarea MVP @ 6.1
 - Intake email (P4-7) — closed @ 6.4
+- Markdown renderer (P6-3) — `react-markdown` @ 6.7

@@ -15,7 +15,7 @@
 - Smallest Type-C surface: one field, no nested AST in Mongo.
 - Does not block MDX later: add optional `bodyFormat: 'markdown' \| 'mdx'` or a separate `bodyMdx` field when a vertical needs it.
 - Does not block a headless editor: a future admin UI can still persist Markdown (or serialize Tiptap → Markdown on save).
-- Server validates length and required presence only; rendering is a **client concern** (Phase 6.7 adds `MarkdownBody` on public routes).
+- Server validates length and required presence only; rendering is **`client/src/shared/MarkdownBody.tsx`** (`react-markdown`, Phase 6.7).
 
 ## Write API (Phase 6.2)
 

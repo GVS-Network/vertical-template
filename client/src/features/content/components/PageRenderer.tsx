@@ -1,3 +1,4 @@
+import MarkdownBody from '../../../shared/MarkdownBody';
 import { usePage } from '../hooks/useContent';
 
 interface PageRendererProps {
@@ -5,8 +6,7 @@ interface PageRendererProps {
 }
 
 /**
- * Renders a tenant Page by slug. Body is Markdown in storage; displayed as
- * pre-wrapped text until a Markdown renderer is added (see server README).
+ * Renders a tenant Page by slug. Body is Markdown via shared MarkdownBody.
  */
 function PageRenderer({ slug }: PageRendererProps) {
   const { page, loading, error } = usePage(slug);
@@ -29,7 +29,7 @@ function PageRenderer({ slug }: PageRendererProps) {
       {page.hero?.subheadline && (
         <p className="pack-subhead">{page.hero.subheadline}</p>
       )}
-      <div className="pack-prose">{page.body}</div>
+      <MarkdownBody markdown={page.body} />
     </article>
   );
 }

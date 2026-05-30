@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Public Markdown rendering (Phase 6.7): `client/src/shared/MarkdownBody.tsx` with `react-markdown`; wired in PageRenderer + PostDetail.
 - `features.admin` pack (Phase 6.6): dual SiteConfig boolean, registry gate, lazy client `/admin/*`, doctor warning when admin without auth.
 - Intake submissions inbox API (Phase 6.5): auth-gated `GET /api/intake/submissions` (paginated) and `PATCH` mark processed.
 - Intake email notifications (Phase 6.4): `providers/notifications/` + Resend adapter, `getNotificationProvider()` seam, hook in `createSubmission`; closes P4-7.

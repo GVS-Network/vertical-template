@@ -395,7 +395,65 @@ body {
     font-family: var(--type-body-family);
     font-size: var(--size-body);
     line-height: 1.625;
-    white-space: pre-wrap;
+  }
+
+  .pack-prose :where(h1, h2, h3, h4) {
+    color: var(--color-ink);
+    font-family: var(--type-heading-family);
+    font-weight: var(--type-heading-weight);
+    line-height: 1.25;
+    margin-top: var(--space-lg);
+  }
+
+  .pack-prose :where(h1) {
+    font-size: var(--size-h1);
+  }
+
+  .pack-prose :where(h2) {
+    font-size: var(--size-h2);
+  }
+
+  .pack-prose :where(h3) {
+    font-size: var(--size-h3);
+  }
+
+  .pack-prose :where(p + p, ul, ol, blockquote, pre) {
+    margin-top: var(--space-md);
+  }
+
+  .pack-prose :where(ul, ol) {
+    padding-left: var(--space-lg);
+  }
+
+  .pack-prose :where(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .pack-prose :where(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-md);
+    color: var(--color-ink-soft);
+  }
+
+  .pack-prose :where(code) {
+    font-family: var(--type-mono-family, monospace);
+    font-size: 0.9em;
+    background: var(--color-surface-muted, rgba(0, 0, 0, 0.06));
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-sm);
+  }
+
+  .pack-prose :where(pre) {
+    overflow-x: auto;
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted, rgba(0, 0, 0, 0.06));
+  }
+
+  .pack-prose :where(pre code) {
+    background: transparent;
+    padding: 0;
   }
 
   .pack-hero-image {

@@ -1,4 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
+
+import MarkdownBody from '../../../shared/MarkdownBody';
 import { usePost } from '../hooks/useContent';
 
 function PostDetail() {
@@ -32,7 +34,7 @@ function PostDetail() {
       {post.tags.length > 0 && (
         <p className="pack-meta pack-meta--tight">{post.tags.join(' · ')}</p>
       )}
-      <div className="pack-prose">{post.body}</div>
+      <MarkdownBody markdown={post.body} />
     </article>
   );
 }
