@@ -16,7 +16,7 @@
 | **A3** | `features.admin` | Explicit boolean; default `true` when auth on; requires auth when on |
 | **A4** | Submissions inbox in MVP | Yes — list API + admin UI + email |
 | **A5** | Phase 7 first client | Terrible Gerald's (`terrible-geralds`, `food-truck`) |
-| **P4-7** | Intake email | Implement in Phase 6 (6.4); P6-2/P6-5 for failure + from-address behavior |
+| **P4-7** | Intake email | Implement in Phase 6 (6.4); P6-2/P6-5/P6-7 for failure, from-address, missing recipient |
 
 ---
 
@@ -28,6 +28,8 @@
 | **P6-3** | Markdown renderer | `marked` vs `react-markdown` — prefer smallest bundle with safe defaults @ **6.7** |
 | **P6-4** | Public GET draft leakage | Confirm list/detail endpoints filter `status: published` only @ **6.2** (service already filters; audit routes) |
 | **P6-5** | Resend `from` address | Verified sending domain vs env `NOTIFICATION_FROM_EMAIL` — lock @ **6.4** |
+| **P6-6** | Event datetime timezone | Store `eventStart`/`eventEnd` as UTC ISO vs interpret in `siteConfig.locale.timezone` — lock @ **6.3** |
+| **P6-7** | Missing `contact.email` | When intake + notifications on but no recipient — skip send + log vs doctor-only block — lock @ **6.4** / **6.12** |
 
 ---
 

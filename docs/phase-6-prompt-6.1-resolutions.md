@@ -12,7 +12,7 @@
 | ID | Decision | Outcome |
 |----|----------|---------|
 | **A1** | Email provider for v1 | **Resend** — `NOTIFICATION_PROVIDER=resend`, `RESEND_API_KEY`; provider abstraction in `server/src/providers/notifications/` (mirror payments pattern) |
-| **A2** | Event shape | **Structured fields** on `Post`: `eventStart`, `eventEnd`, `eventLocation`, `links.map`, `links.facebook` (optional URLs). Reject YAML-frontmatter-only fallback — admin UX and typed queries win |
+| **A2** | Event shape | **Structured fields** on `Post`: `eventStart`, `eventEnd`, `eventLocation`, `links.map`, `links.facebook` (optional URLs). Reject YAML-frontmatter-only fallback — admin UX and typed queries win. Datetime timezone semantics → **P6-6** @ 6.3 |
 | **A3** | `features.admin` | **Explicit boolean** in `SiteConfig.features`; requires `features.auth: true` when on; **default `true` when auth is on** in preset/helper logic (explicit off for headless/API-only tenants) |
 | **A4** | Submissions inbox | **MVP includes** `GET /api/intake/submissions` (auth, paginated) + PATCH mark `processed` + admin inbox UI. Email is additive, not a substitute for persistence/inbox |
 | **A5** | Phase 7 first client | **Terrible Gerald's** — tenant `terrible-geralds`, vertical `food-truck`, auth+admin on (see payments below) |
@@ -65,7 +65,7 @@ Sixth feature pack **`admin`**, toggle-mounted at `/admin/*`:
 |----------|---------|
 | On email failure | **Log + succeed** — submission is not lost |
 | Strict mode | `NOTIFICATION_STRICT=true` fails the HTTP request if send fails |
-| Recipient | `siteConfig.contact.email` |
+| Recipient | `siteConfig.contact.email` — missing address → **P6-7** @ 6.4 / doctor @ 6.12 |
 | `from` address | Open **P6-5** — lock @ 6.4 (`NOTIFICATION_FROM_EMAIL` or Resend domain default) |
 
 ---

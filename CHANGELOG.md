@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Docs
 
-- Phase **6.1** resolutions confirmed: Resend, structured event fields, explicit `features.admin`, submissions inbox MVP, TG/Barry payment notes; open index P6-2–P6-5.
+- Phase **6.1** resolutions confirmed: Resend, structured event fields, explicit `features.admin`, submissions inbox MVP, TG/Barry payment notes; open index P6-2–P6-7.
 - Added `docs/amendments/`, `docs/prompts/phase-6-operator-surface.html`; renamed first-client and multi-tenant prompts to phase 7/8.
 - Updated `phase-6-prompt-6.1-resolutions.md` (TG Square, Barry Stripe); added `customers/_template/onboarding/brief.md`.
 - Added `docs/phase-6-open-questions.md`, `docs/phase-6-prompt-6.1-resolutions.md`, `docs/phase-6-handoff.md`; renumbered `phase-7-open-questions.md`.
