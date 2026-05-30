@@ -2,6 +2,7 @@
  * Phase 0 environment check — Node, env files, Mongo connectivity.
  * Phase 3.6 — payment provider env + credential smoke when payments pack is on.
  * Phase 4.6 — when BOUND_TENANT_ID is set, verify _tenants row, preset, and seeded packs.
+ * Phase 6.12 — auth client env, admin/auth coupling, intake notification env (P6-7).
  * Run from repo root: npm run doctor
  */
 
@@ -379,16 +380,82 @@ function checkAuth(siteConfig: SiteConfig): string[] {
     errors.push('auth: missing AUTH0_AUDIENCE in server/.env');
   }
 
+  const clientEnv = join(ROOT, 'client/.env');
+  if (!existsSync(clientEnv)) {
+    errors.push('auth: missing client/.env (copy from client/.env.example)');
+  } else {
+    const clientMap = parseEnvMap(clientEnv);
+    for (const key of [
+      'VITE_AUTH0_DOMAIN',
+      'VITE_AUTH0_CLIENT_ID',
+      'VITE_AUTH0_AUDIENCE',
+    ]) {
+      const value = clientMap.get(key);
+      if (value === undefined || value === '') {
+        errors.push(`auth: missing or empty ${key} in client/.env`);
+      }
+    }
+  }
+
   return errors;
 }
 
 function checkAdmin(siteConfig: SiteConfig): string[] {
+  const warnings: string[] = [];
+
   if (siteConfig.features.admin && !siteConfig.features.auth) {
-    return [
-      'admin: features.admin is on but features.auth is off — enable auth or disable admin',
-    ];
+    warnings.push(
+      'admin: features.admin is on but features.auth is off — enable auth or disable admin'
+    );
   }
-  return [];
+
+  return warnings;
+}
+
+function checkNotifications(siteConfig: SiteConfig): {
+  errors: string[];
+  warnings: string[];
+} {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!siteConfig.features.intake) {
+    return { errors, warnings };
+  }
+
+  const email = siteConfig.contact?.email?.trim();
+  if (!email) {
+    warnings.push(
+      'intake/notifications: contact.email is unset — submission emails will be skipped (submissions still saved)'
+    );
+  }
+
+  const provider = process.env.NOTIFICATION_PROVIDER?.trim().toLowerCase();
+  if (!provider || provider === 'none' || provider === 'off') {
+    if (email) {
+      warnings.push(
+        'intake/notifications: NOTIFICATION_PROVIDER unset or none — intake email disabled (inbox UI still works)'
+      );
+    }
+    return { errors, warnings };
+  }
+
+  if (provider === 'resend') {
+    if (!requireEnvVar('RESEND_API_KEY')) {
+      errors.push(
+        'intake/notifications: NOTIFICATION_PROVIDER=resend but RESEND_API_KEY is missing in server/.env'
+      );
+    }
+    if (!process.env.NOTIFICATION_FROM_EMAIL?.trim()) {
+      warnings.push(
+        'intake/notifications: NOTIFICATION_FROM_EMAIL unset — using Resend sandbox sender onboarding@resend.dev'
+      );
+    }
+    return { errors, warnings };
+  }
+
+  errors.push(`intake/notifications: unknown NOTIFICATION_PROVIDER "${provider}"`);
+  return { errors, warnings };
 }
 
 async function checkPayments(siteConfig: SiteConfig): Promise<{
@@ -495,6 +562,7 @@ async function main(): Promise<void> {
   const activeConfig = mongoResult.activeConfig;
 
   const paymentResult = await checkPayments(activeConfig);
+  const notificationResult = checkNotifications(activeConfig);
   const envProviderForKeys =
     mongoResult.presetProvider ??
     effectivePaymentProvider(activeConfig.payment.provider);
@@ -511,6 +579,7 @@ async function main(): Promise<void> {
   const warnings: string[] = [
     ...mongoResult.warnings,
     ...paymentResult.warnings,
+    ...notificationResult.warnings,
     ...checkAdmin(activeConfig),
   ];
 
@@ -524,6 +593,7 @@ async function main(): Promise<void> {
     ...contract.errors,
     ...checkAuth(activeConfig),
     ...paymentResult.errors,
+    ...notificationResult.errors,
   ];
 
   warnings.push(...contract.warnings);

@@ -28,7 +28,7 @@
 | **P4-7** | Intake email | `providers/notifications/` + Resend; hook in `createSubmission` |
 | **P6-2** | `NOTIFICATION_STRICT` | Default log + succeed; `NOTIFICATION_STRICT=true` → 502 on send failure |
 | **P6-5** | Resend `from` address | `NOTIFICATION_FROM_EMAIL` env; fallback `onboarding@resend.dev` (sandbox) |
-| **P6-7** | Missing `contact.email` | Skip send + warn; submission saved; doctor check deferred to **6.12** |
+| **P6-7** | Missing `contact.email` | Skip send + warn; submission saved; doctor warns when intake on @ **6.12** |
 
 ---
 
@@ -37,6 +37,14 @@
 | ID | Topic | Outcome |
 |----|--------|---------|
 | **P6-3** | Markdown renderer | **`react-markdown`** — safe defaults (no raw HTML); `client/src/shared/MarkdownBody.tsx` |
+
+---
+
+## Resolved @ 6.12
+
+| ID | Topic | Outcome |
+|----|--------|---------|
+| **P6-7** | Doctor for missing `contact.email` | `scripts/doctor.ts` warns when `features.intake` on and `contact.email` unset |
 
 ---
 

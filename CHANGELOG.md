@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Doctor Phase 6.12 checks: client Auth0 env when auth on; admin-without-auth warning; intake notification env (`RESEND_API_KEY` when provider is resend; `contact.email` warning — P6-7).
 - Admin submissions inbox (Phase 6.11): `/admin/submissions` with paginated list, filter tabs, and mark processed/unprocessed via intake API.
 - Admin products UI (Phase 6.10): `/admin/products` list + create/edit form (name, slug, price, description in attributes, status); catalog write API.
 - Admin events UI (Phase 6.9): `/admin/events` list + create/edit form with event fields; `tag=event` on save; timezone-aware datetime editors (P6-6).
