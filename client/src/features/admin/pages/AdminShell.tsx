@@ -2,6 +2,8 @@ import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import Loading from '../../../components/Loading';
+import AdminEventEditor from './AdminEventEditor';
+import AdminEventsList from './AdminEventsList';
 import AdminPageEditor from './AdminPageEditor';
 import AdminPagesList from './AdminPagesList';
 
@@ -27,11 +29,16 @@ function AdminShell() {
         <NavLink to="/admin/pages" className={navLinkClass}>
           Pages
         </NavLink>
+        <NavLink to="/admin/events" className={navLinkClass}>
+          Events
+        </NavLink>
       </nav>
       <Routes>
         <Route index element={<Navigate to="pages" replace />} />
         <Route path="pages" element={<AdminPagesList />} />
         <Route path="pages/:slug" element={<AdminPageEditor />} />
+        <Route path="events" element={<AdminEventsList />} />
+        <Route path="events/:slug" element={<AdminEventEditor />} />
       </Routes>
     </main>
   );

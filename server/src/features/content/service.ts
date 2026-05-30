@@ -15,6 +15,7 @@ import type {
 
 export type PostListFilter = {
   tag?: string;
+  status?: ContentStatus;
 };
 
 export type PageListFilter = {
@@ -104,6 +105,37 @@ export async function getPostBySlug(
   const doc = (await posts.findOne({
     slug: slug.toLowerCase(),
     status: 'published',
+  })) as HydratedDocument<IPost> | null;
+  return doc ? doc.toObject() : null;
+}
+
+/** Auth-gated admin list — any status; optional tag filter (Phase 6.9). */
+export async function listPostsAdmin(
+  tenantId: string,
+  filter: PostListFilter = {}
+): Promise<IPost[]> {
+  const posts = scopedForTenant(Post, tenantId);
+  const query: Record<string, unknown> = {};
+  if (filter.status) {
+    query.status = filter.status;
+  }
+  if (filter.tag) {
+    query.tags = filter.tag;
+  }
+  const docs = (await posts
+    .find(query)
+    .sort({ eventStart: 1, title: 1 })) as HydratedDocument<IPost>[];
+  return docs.map((d) => d.toObject());
+}
+
+/** Auth-gated admin detail — any status (Phase 6.9). */
+export async function getPostBySlugAdmin(
+  tenantId: string,
+  slug: string
+): Promise<IPost | null> {
+  const posts = scopedForTenant(Post, tenantId);
+  const doc = (await posts.findOne({
+    slug: slug.toLowerCase(),
   })) as HydratedDocument<IPost> | null;
   return doc ? doc.toObject() : null;
 }

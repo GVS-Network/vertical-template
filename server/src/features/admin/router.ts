@@ -16,6 +16,8 @@ export function createAdminRouter(siteConfig: SiteConfig): Router {
 
   router.get('/pages', ...guards, controller.listPages);
   router.get('/pages/:slug', ...guards, controller.getPage);
+  router.get('/posts', ...guards, controller.listPosts);
+  router.get('/posts/:slug', ...guards, controller.getPost);
 
   return router;
 }

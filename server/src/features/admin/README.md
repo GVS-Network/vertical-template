@@ -13,6 +13,13 @@ Toggle-mounted at `features.admin` (requires `features.auth` when on). Client UI
 - `GET /api/admin/pages/:slug` — page detail for editor (any status)
 - Client `/admin/pages` list + create/edit forms; writes use `POST/PUT /api/content/pages`
 
+## Phase 6.9 — Events
+
+- `GET /api/admin/posts?tag=event` — list event posts (any status), auth-gated
+- `GET /api/admin/posts/:slug` — post detail for editor (any status)
+- Client `/admin/events` list + create/edit forms; writes use `POST/PUT /api/content/posts` with `tags: ['event']`
+- Event datetimes displayed in `siteConfig.locale.timezone`; stored UTC (P6-6)
+
 ## Distinction
 
 | Route | Actor |

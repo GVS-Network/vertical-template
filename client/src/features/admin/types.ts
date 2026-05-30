@@ -1,6 +1,12 @@
-import type { ContentPage, ContentStatus, PageHero } from '../content/types';
+import type {
+  ContentPage,
+  ContentPost,
+  ContentStatus,
+  PageHero,
+  PostEventLinks,
+} from '../content/types';
 
-export type { ContentPage, ContentStatus, PageHero };
+export type { ContentPage, ContentPost, ContentStatus, PageHero, PostEventLinks };
 
 export interface PagesResponse {
   status: string;
@@ -19,3 +25,26 @@ export interface PageWriteInput {
   hero?: PageHero;
   status: ContentStatus;
 }
+
+export interface PostsResponse {
+  status: string;
+  data: ContentPost[];
+}
+
+export interface PostResponse {
+  status: string;
+  data: ContentPost;
+}
+
+export interface EventWriteInput {
+  slug?: string;
+  title: string;
+  body: string;
+  status: ContentStatus;
+  eventStart: string | null;
+  eventEnd: string | null;
+  eventLocation?: string;
+  links?: PostEventLinks;
+}
+
+export const EVENT_TAG = 'event' as const;

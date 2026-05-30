@@ -22,3 +22,21 @@ export const getPage = asyncHandler(async (req: Request, res: Response) => {
   }
   res.json({ status: 'success', data: page });
 });
+
+export const listPosts = asyncHandler(async (req: Request, res: Response) => {
+  const tag =
+    typeof req.query.tag === 'string' ? req.query.tag : undefined;
+  const posts = await contentService.listPostsAdmin(tenantId(req), { tag });
+  res.json({ status: 'success', data: posts });
+});
+
+export const getPost = asyncHandler(async (req: Request, res: Response) => {
+  const post = await contentService.getPostBySlugAdmin(
+    tenantId(req),
+    req.params.slug
+  );
+  if (!post) {
+    throw createError('Post not found', 404);
+  }
+  res.json({ status: 'success', data: post });
+});
