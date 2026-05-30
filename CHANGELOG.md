@@ -6,36 +6,57 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-05-30
+
+Phase 6 (Operator surface) closed. Tenant admin at `/admin`, content writes, intake email, public Markdown rendering, and submissions inbox — core before first client.
+
+### Phase 6 — closed (prompt log)
+
+| Prompt | Outcome |
+|--------|---------|
+| **6.1** | Resolutions A1–A5; phase plan amendment accepted |
+| **6.2** | Content write API; `test:content` smoke; P6-4 published-only audit |
+| **6.3** | Post event metadata (`eventStart`, `eventEnd`, `eventLocation`, `links`) |
+| **6.4** | Notification provider + Resend; P4-7 closed |
+| **6.5** | Submissions inbox API (list + mark processed) |
+| **6.6** | `features.admin` pack; registry gate; lazy `/admin/*` |
+| **6.7** | `MarkdownBody` (`react-markdown`); P6-3 closed |
+| **6.8** | Admin pages CRUD |
+| **6.9** | Admin events CRUD; P6-6 timezone display |
+| **6.10** | Admin products CRUD |
+| **6.11** | Admin submissions inbox |
+| **6.12** | Doctor auth/admin/notification checks; food-truck self-service README |
+| **6.13** | Close verification; tag `v0.7.0`; Phase 7 open questions |
+
 ### Added
 
-- Doctor Phase 6.12 checks: client Auth0 env when auth on; admin-without-auth warning; intake notification env (`RESEND_API_KEY` when provider is resend; `contact.email` warning — P6-7).
-- Admin submissions inbox (Phase 6.11): `/admin/submissions` with paginated list, filter tabs, and mark processed/unprocessed via intake API.
-- Admin products UI (Phase 6.10): `/admin/products` list + create/edit form (name, slug, price, description in attributes, status); catalog write API.
-- Admin events UI (Phase 6.9): `/admin/events` list + create/edit form with event fields; `tag=event` on save; timezone-aware datetime editors (P6-6).
-- Admin pages UI (Phase 6.8): `/admin/pages` list + create/edit form; auth-gated `GET /api/admin/pages` reads; writes via content API.
-- Public Markdown rendering (Phase 6.7): `client/src/shared/MarkdownBody.tsx` with `react-markdown`; wired in PageRenderer + PostDetail.
-- `features.admin` pack (Phase 6.6): dual SiteConfig boolean, registry gate, lazy client `/admin/*`, doctor warning when admin without auth.
-- Intake submissions inbox API (Phase 6.5): auth-gated `GET /api/intake/submissions` (paginated) and `PATCH` mark processed.
-- Intake email notifications (Phase 6.4): `providers/notifications/` + Resend adapter, `getNotificationProvider()` seam, hook in `createSubmission`; closes P4-7.
-- Post event metadata (Phase 6.3): optional `eventStart`, `eventEnd`, `eventLocation`, `links` on Post schema + zod writes; client `ContentPost` shape updated.
-- Content write API: `POST/PUT` pages and posts with zod validation, `scoped(Model, req)` writes, and `test:content` smoke (Phase 6.2).
+- **Sixth feature pack `admin`** — `/admin/*` UI; `/api/admin` read proxies; requires `auth` when on.
+- **Content write API** — `POST/PUT` pages and posts; zod; `scoped(Model, req)`; public GET published-only.
+- **Post event fields** — structured metadata for event posts; public list via `?tag=event`.
+- **Intake notifications** — `providers/notifications/` + Resend; `getNotificationProvider()` seam.
+- **Submissions inbox** — `GET/PATCH /api/intake/submissions`; admin UI with filters + mark processed.
+- **Public Markdown** — `client/src/shared/MarkdownBody.tsx`; wired in PageRenderer + PostDetail.
+- **Admin CRUD** — pages, events, products at `/admin/*`; catalog/content write APIs on save.
+- **Doctor Phase 6 checks** — client Auth0 env; admin-without-auth warning; intake notification env (P6-7).
 
 ### Fixed
 
-- `npm run dev`: Vite no longer starts until `GET /api/health` succeeds, avoiding a one-shot `ECONNREFUSED` on `/api/_meta/theme.css` when the client wins the startup race.
+- `npm run dev`: Vite waits for API health before start (theme CSS race).
 
 ### Thesis
 
-- Build phase plan amended (v1): insert **Phase 6 · Operator surface** (tenant `/admin`, content writes, intake email, Markdown); renumber first client → Phase 7 (`v0.8.0`), multi-tenant → Phase 8 (`v1.0.0`). See `docs/amendments/phase-plan-amendment-v1.md`.
-- `template-architecture-brief.html` v0.1 → v0.2: tenant admin in core Phase 6; sixth pack `admin`; platform `/__admin` stays Phase 8.
+- Build phase plan amended (v1): Phase 6 operator surface; Phase 7 first client (`v0.8.0`); Phase 8 multi-tenant (`v1.0.0`).
+- `template-architecture-brief.html` v0.1 → v0.2: tenant admin in core Phase 6; platform `/__admin` stays Phase 8.
+
+### Changed
+
+- Root, client, server `package.json` → **0.7.0**.
 
 ### Docs
 
-- Phase **6.1** resolutions confirmed: Resend, structured event fields, explicit `features.admin`, submissions inbox MVP, TG/Barry payment notes; open index P6-2–P6-7.
-- Added `docs/amendments/`, `docs/prompts/phase-6-operator-surface.html`; renamed first-client and multi-tenant prompts to phase 7/8.
-- Updated `phase-6-prompt-6.1-resolutions.md` (TG Square, Barry Stripe); added `customers/_template/onboarding/brief.md`.
-- Added `docs/phase-6-open-questions.md`, `docs/phase-6-prompt-6.1-resolutions.md`, `docs/phase-6-handoff.md`; renumbered `phase-7-open-questions.md`.
-- Updated `docs/README.html` to doc set v0.7.0 and phases 0–8 index.
+- `docs/phase-6-close-verification.md`, `docs/phase-6-handoff.md` (complete)
+- `docs/phase-6-open-questions.md` (closed); `docs/phase-7-open-questions.md` (active)
+- `docs/prompts/phase-6-operator-surface.html`; amendment v1; food-truck self-service README
 
 ## [0.6.0] — 2026-05-21
 

@@ -1,8 +1,9 @@
 # Open questions for Phase 7 (First client)
 
-**Status:** Phase 6 not started (amendment applied 2026-05-29).  
-**Prerequisite:** Phase 6 closed @ **v0.7.0** — see [`phase-6-handoff.md`](phase-6-handoff.md)  
-**Phase prompt:** [`prompts/phase-7-first-client.html`](prompts/phase-7-first-client.html)
+**Status:** Phase 7 **active** — Phase 6 closed @ **`v0.7.0`** (2026-05-30).  
+**Prerequisite:** [`phase-6-close-verification.md`](phase-6-close-verification.md) · [`phase-6-handoff.md`](phase-6-handoff.md)  
+**Phase prompt:** [`prompts/phase-7-first-client.html`](prompts/phase-7-first-client.html)  
+**Target tag:** `v0.8.0` at Phase 7 close
 
 ---
 
@@ -21,17 +22,17 @@
 
 ---
 
-## Terrible Gerald's (planned)
+## Terrible Gerald's (planned first client)
 
 | Setting | Value |
 |---------|--------|
 | Vertical | `food-truck` |
 | Tenant | `terrible-geralds` |
-| Payments | **Square** on (phased public checkout) — see `phase-6-prompt-6.1-resolutions.md` |
-| Auth + admin | on |
-| External CMS | none (platform posts/events) |
+| Auth + admin | on (Phase 6 operator surface — no rebuild) |
+| Payments | Per `phase-6-prompt-6.1-resolutions.md` — site config at client build |
+| External CMS | none (platform posts/events via `/admin`) |
 | Custom frontend | Type C — port Astro styling |
-| Phase 7 gate | P4-4 catalog checkout + Square queue validation with client |
+| Phase 7 gate | P4-4 catalog checkout when payments on; Square queue validation with client |
 
 ## Barry O's Tavern (planned)
 
@@ -44,24 +45,28 @@
 
 ---
 
-## Carried forward
+## Open during Phase 7 build
 
 | ID | Topic | Notes |
 |----|--------|--------|
-| **P4-4** | Catalog ↔ checkout | N/A for TG if payments off |
-| **P5-4** | brand-stub wiring | Tenant pick/override in Phase 7 |
+| **P7-1** | Visual pick-list workflow | Lock in prompt 7.1 or first brand session |
+| **P4-4** | Catalog ↔ checkout | Required when `features.payments: true` on client site |
+| **P5-4** | `brand-stub.ts` wiring | Tenant pick/override in client build |
 
 ---
 
 ## Phase 7 scope reminders
 
 - **Single-tenant deploy** — separate infra until Phase 8.
-- **No rebuilding admin** — Phase 6 owns operator surface.
+- **No rebuilding admin** — Phase 6 owns operator surface (`/admin`, content writes, intake email, Markdown).
 - **Payment acceptance** — only when `features.payments: true`.
+- **Intake form editor** — still defer; seed forms via `init-vertical`.
 
 ---
 
 ## Resolved — do not re-litigate
 
-- P4-7 intake email — closed in Phase 6
-- Phase renumber — amendment v1
+- P4-7 intake email — closed Phase 6 @ v0.7.0
+- Phase 6 operator surface — closed @ v0.7.0
+- Phase plan renumber — amendment v1 (6 operator → 7 first client → 8 multi-tenant)
+- WYSIWYG admin — Markdown textarea MVP @ Phase 6.1

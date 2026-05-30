@@ -1,7 +1,8 @@
 # Open questions for Phase 6 (Operator surface)
 
-**Status:** Prompt **6.1** confirmed (2026-05-30). Phase 5 closed @ **v0.6.0**. Amendment v1 **accepted**.  
-**Prerequisite:** Visual system — [`phase-5-close-verification.md`](phase-5-close-verification.md)  
+**Status:** Phase 6 **closed** @ **`v0.7.0`** (2026-05-30).  
+**Verification:** [`phase-6-close-verification.md`](phase-6-close-verification.md)  
+**Handoff:** [`phase-6-handoff.md`](phase-6-handoff.md)  
 **Phase prompt:** [`prompts/phase-6-operator-surface.html`](prompts/phase-6-operator-surface.html)  
 **Resolutions @ 6.1:** [`phase-6-prompt-6.1-resolutions.md`](phase-6-prompt-6.1-resolutions.md)
 
@@ -50,7 +51,7 @@
 
 ## Open during Phase 6 build
 
-*(none — admin UI prompts 6.8–6.11 remain implementation work, not open decisions)*
+*(none — phase closed @ v0.7.0)*
 
 ---
 
@@ -67,7 +68,7 @@
 
 - **Platform work only** — no Terrible Gerald's custom frontend in this phase (that's Phase 7 Type C).
 - **Sixth feature pack** `admin` — toggle-mounted; zero surface when off.
-- **Tag target** `v0.7.0` at phase close.
+- **Tag target** `v0.7.0` at phase close — **done**
 
 ---
 

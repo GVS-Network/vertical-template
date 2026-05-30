@@ -1,36 +1,44 @@
 # Phase 6 handoff — Operator surface
 
-**Status:** In progress — Prompt **6.1** confirmed (2026-05-30).  
-**Target tag:** `v0.7.0`  
+**Closed:** 2026-05-30 · tag **`v0.7.0`**  
+**Verification:** [`phase-6-close-verification.md`](phase-6-close-verification.md)  
 **Prompt guide:** [`prompts/phase-6-operator-surface.html`](prompts/phase-6-operator-surface.html)
 
 ---
 
-## What Phase 7 (first client) inherits
+## What's true now
 
-When Phase 6 closes, every client build gets:
+- **Content write API** — `POST/PUT` pages and posts; zod validation; public GET published-only.
+- **Post event fields** — `eventStart`, `eventEnd`, `eventLocation`, `links`; admin events UI tags `event` on save.
+- **Intake notifications** — `providers/notifications/` + Resend; `getNotificationProvider()` seam; P4-7 closed.
+- **Submissions inbox API** — auth-gated list + mark processed.
+- **`features.admin` pack** — lazy `/admin/*`; `/api/admin` read proxies; doctor auth/admin/notification checks.
+- **Public Markdown** — `client/src/shared/MarkdownBody.tsx` (`react-markdown`).
 
-- Content write API (pages + posts)
-- Post event metadata + public event listing
-- Intake email on submission (Resend)
-- `GET /api/intake/submissions` for admin inbox
-- `features.admin` pack at `/admin/*` (auth required)
-- Public `MarkdownBody` rendering
+## Prompt log
 
-Phase 7 adds: real tenant data, brand picks, **custom public frontend**, deploy, runbook.
+| Prompt | Outcome |
+|--------|---------|
+| **6.1** | Resolutions A1–A5; `phase-6-prompt-6.1-resolutions.md` |
+| **6.2** | Content write service + routes; `test:content` smoke |
+| **6.3** | Post event metadata on schema + zod |
+| **6.4** | Notification provider + Resend; hook in `createSubmission` |
+| **6.5** | `GET/PATCH /api/intake/submissions` |
+| **6.6** | `features.admin` pack; registry gate; dual SiteConfig |
+| **6.7** | `MarkdownBody`; PageRenderer + PostDetail |
+| **6.8** | Admin pages CRUD |
+| **6.9** | Admin events CRUD; timezone-aware datetimes |
+| **6.10** | Admin products CRUD |
+| **6.11** | Admin submissions inbox |
+| **6.12** | Doctor auth/admin/notification checks; food-truck README self-service note |
+| **6.13** | Close verification; tag `v0.7.0`; Phase 7 open questions |
 
 ---
 
-## Start here
+## Phase 7 entry
 
-1. ~~Run prompt **6.1**~~ — done; resolutions in [`phase-6-prompt-6.1-resolutions.md`](phase-6-prompt-6.1-resolutions.md).
-2. Proceed **6.2 → 6.13** in order.
+Read [`prompts/phase-7-first-client.html`](prompts/phase-7-first-client.html) and [`phase-7-open-questions.md`](phase-7-open-questions.md).
 
----
+**Do not rebuild:** admin UI, content writes, intake email, Markdown rendering — all core.
 
-## Terrible Gerald's (Phase 7)
-
-- Preset: `food-truck`
-- Tenant: `terrible-geralds`
-- `features.auth: true`, `features.admin: true`, `features.payments: false`
-- Replace Storyblok/Getform with platform APIs + admin
+**Terrible Gerald's (planned):** preset `food-truck`, tenant `terrible-geralds`, auth + admin on, Type C public frontend, real content + deploy.
