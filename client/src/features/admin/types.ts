@@ -5,8 +5,10 @@ import type {
   PageHero,
   PostEventLinks,
 } from '../content/types';
+import type { CatalogProduct, ProductStatus } from '../catalog/types';
 
 export type { ContentPage, ContentPost, ContentStatus, PageHero, PostEventLinks };
+export type { CatalogProduct, ProductStatus };
 
 export interface PagesResponse {
   status: string;
@@ -48,3 +50,23 @@ export interface EventWriteInput {
 }
 
 export const EVENT_TAG = 'event' as const;
+
+export interface ProductsResponse {
+  status: string;
+  data: CatalogProduct[];
+}
+
+export interface ProductResponse {
+  status: string;
+  data: CatalogProduct;
+}
+
+export interface ProductWriteInput {
+  slug?: string;
+  name: string;
+  priceCents: number;
+  description: string;
+  status: ProductStatus;
+}
+
+export const PRODUCT_DESCRIPTION_KEY = 'description' as const;

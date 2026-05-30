@@ -6,6 +6,8 @@ import AdminEventEditor from './AdminEventEditor';
 import AdminEventsList from './AdminEventsList';
 import AdminPageEditor from './AdminPageEditor';
 import AdminPagesList from './AdminPagesList';
+import AdminProductEditor from './AdminProductEditor';
+import AdminProductsList from './AdminProductsList';
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
   return isActive ? 'pack-admin-nav__link pack-admin-nav__link--active' : 'pack-admin-nav__link';
@@ -32,6 +34,9 @@ function AdminShell() {
         <NavLink to="/admin/events" className={navLinkClass}>
           Events
         </NavLink>
+        <NavLink to="/admin/products" className={navLinkClass}>
+          Products
+        </NavLink>
       </nav>
       <Routes>
         <Route index element={<Navigate to="pages" replace />} />
@@ -39,6 +44,8 @@ function AdminShell() {
         <Route path="pages/:slug" element={<AdminPageEditor />} />
         <Route path="events" element={<AdminEventsList />} />
         <Route path="events/:slug" element={<AdminEventEditor />} />
+        <Route path="products" element={<AdminProductsList />} />
+        <Route path="products/:slug" element={<AdminProductEditor />} />
       </Routes>
     </main>
   );

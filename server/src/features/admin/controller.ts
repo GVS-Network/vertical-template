@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import { asyncHandler, createError } from '../../middleware/errorHandler';
+import * as catalogService from '../catalog/service';
 import * as contentService from '../content/service';
 
 function tenantId(req: Request): string {
@@ -39,4 +40,20 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
     throw createError('Post not found', 404);
   }
   res.json({ status: 'success', data: post });
+});
+
+export const listProducts = asyncHandler(async (req: Request, res: Response) => {
+  const products = await catalogService.listProducts(tenantId(req));
+  res.json({ status: 'success', data: products });
+});
+
+export const getProduct = asyncHandler(async (req: Request, res: Response) => {
+  const product = await catalogService.getProductBySlug(
+    tenantId(req),
+    req.params.slug
+  );
+  if (!product) {
+    throw createError('Product not found', 404);
+  }
+  res.json({ status: 'success', data: product });
 });

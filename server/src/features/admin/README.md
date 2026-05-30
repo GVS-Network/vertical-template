@@ -20,6 +20,13 @@ Toggle-mounted at `features.admin` (requires `features.auth` when on). Client UI
 - Client `/admin/events` list + create/edit forms; writes use `POST/PUT /api/content/posts` with `tags: ['event']`
 - Event datetimes displayed in `siteConfig.locale.timezone`; stored UTC (P6-6)
 
+## Phase 6.10 — Products
+
+- `GET /api/admin/products` — list all products (any status), auth-gated
+- `GET /api/admin/products/:slug` — product detail for editor
+- Client `/admin/products` list + create/edit forms; writes use `POST/PUT /api/catalog/products`
+- Description stored in `attributes.description`; other attribute keys preserved on update; SKU auto-generated from slug on create
+
 ## Distinction
 
 | Route | Actor |
