@@ -25,6 +25,14 @@ export type {
   SendIntakeSubmissionParams,
 } from './notification-provider';
 
+export type { AssetRef, AssetResourceType } from './asset-ref';
+
+export type {
+  MediaProvider,
+  MediaUploadPurpose,
+  MediaUploadParams,
+} from './media-provider';
+
 // Note: Auth types are provided by express-oauth2-jwt-bearer
 
 export interface EnvConfig {

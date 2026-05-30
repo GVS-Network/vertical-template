@@ -15,6 +15,12 @@
 - **`features.admin` pack** — lazy `/admin/*`; `/api/admin` read proxies; doctor auth/admin/notification checks.
 - **Public Markdown** — `client/src/shared/MarkdownBody.tsx` (`react-markdown`).
 
+## Since v0.7.0 (`CHANGELOG` [Unreleased])
+
+- **Media uploads** — Cloudinary seam, `POST /api/media/upload`, admin hero `MediaUploadField`. See [`phase-7-media-upload-resolutions.md`](phase-7-media-upload-resolutions.md).
+- **Auth client fixes** — localStorage session, `/admin` login redirect, token restore race fix.
+- **Demo shell notes** — nav vs CMS, home route split, no public events UI yet. See [`phase-7-demo-public-shell.md`](phase-7-demo-public-shell.md).
+
 ## Prompt log
 
 | Prompt | Outcome |

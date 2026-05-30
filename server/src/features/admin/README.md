@@ -33,6 +33,23 @@ Toggle-mounted at `features.admin` (requires `features.auth` when on). Client UI
 - Uses existing `GET /api/intake/submissions` and `PATCH /api/intake/submissions/:id` (Phase 6.5)
 - Nav and route gated on `features.intake`
 
+## Media uploads (pre–Phase 7)
+
+Mounted with admin pack when `features.admin` + `features.auth` are on.
+
+- `POST /api/media/upload` — multipart `file` + `purpose` + optional `context`; auth-gated via `writeGuards`
+- `getMediaProvider()` seam → Cloudinary when `CLOUDINARY_URL` is set; **503** when unset
+- Tenant folder prefix: `gvsn/{tenantId}/{pages|products|posts|brand}/{context}`
+- Client `MediaUploadField` on page hero editor (image + video); stores `secureUrl` in `hero.imageUrl`
+- Doctor warns when admin is on but `CLOUDINARY_URL` missing
+- Resolutions: `docs/phase-7-media-upload-resolutions.md`
+- Smoke: `npm run test:media --prefix server`
+
+## Auth client (post–v0.7.0)
+
+- `Auth0ProviderWithNavigate` — `cacheLocation="localstorage"`; `/admin` redirect to login with return path
+- `useApiAuth` waits for Auth0 session restore before attaching bearer token
+
 ## Distinction
 
 | Route | Actor |

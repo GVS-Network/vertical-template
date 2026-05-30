@@ -209,7 +209,7 @@ Tag <span class="hl">v0.7.0</span>.</div>
     <h2>Phase 6 is done when…</h2>
     <ul>
       <li>Authenticated user can CRUD pages, event posts, and products via <code>/admin</code>.</li>
-      <li>Public site shows published Markdown; events list from API.</li>
+      <li>Public site shows published Markdown via <code>MarkdownBody</code>. Event posts are listable at <code>GET /api/content/posts?tag=event</code> — a public events UI is Phase 7 Type C (or a follow-on core component), not Phase 6.</li>
       <li>Intake form submission sends email to <code>contact.email</code> and appears in admin inbox.</li>
       <li><code>features.admin: false</code> mounts zero admin routes.</li>
       <li><code>contract:check</code>, <code>npm run build</code>, doctor pass.</li>

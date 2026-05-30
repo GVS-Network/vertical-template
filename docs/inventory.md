@@ -1,5 +1,7 @@
 # Phase 0 — Repository Inventory
 
+> **Archived snapshot (2026-05-21).** Do not use as current truth. For live stack, env, and file layout see [`contexts/stack-context.html`](contexts/stack-context.html) and [`contexts/repo-context.html`](contexts/repo-context.html). For operator testing gaps see [`phase-7-demo-public-shell.md`](phase-7-demo-public-shell.md).
+
 **Generated:** 2026-05-21  
 **Repo:** GVS-Network/vertical-template (fork of misterlinderman/baseapp)  
 **Session:** Phase 0 · Prompt 0.1 (read-only)  

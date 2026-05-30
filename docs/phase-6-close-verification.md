@@ -35,7 +35,8 @@ npm run dev
 | Criterion | Status |
 |-----------|--------|
 | Content write API (`POST/PUT` pages + posts; zod; `scoped` writes) | ✓ |
-| Post event metadata + public `?tag=event` list | ✓ |
+| Post event metadata + public `GET /api/content/posts?tag=event` API | ✓ |
+| Public `EventList` UI on demo shell | — deferred to Phase 7 Type C (API only at v0.7.0) |
 | Intake email (Resend seam) + submissions inbox API | ✓ |
 | `features.admin` pack — `/admin/*` + `/api/admin` reads | ✓ |
 | Admin UI: pages, events, products, submissions inbox | ✓ |
@@ -56,3 +57,11 @@ npm run dev
 | Intake email | `getNotificationProvider()` · Resend adapter · hook in `createSubmission` |
 
 Sixth feature pack **`admin`** — toggle-mounted; requires **`auth`** when on.
+
+## Known gaps at v0.7.0 (not regressions)
+
+Documented in [`phase-7-demo-public-shell.md`](phase-7-demo-public-shell.md):
+
+- Demo navbar is hardcoded — not generated from CMS pages.
+- `/` renders the template `Home.tsx` shell — CMS page slug `home` lives at `/home`.
+- Event posts are editable in `/admin/events` but no public events feed component ships until Phase 7 `CustomEvents` (or a core `EventList` generalization).

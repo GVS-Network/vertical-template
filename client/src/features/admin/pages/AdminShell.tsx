@@ -1,4 +1,5 @@
-import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import Loading from '../../../components/Loading';
@@ -16,15 +17,22 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
 }
 
 function AdminShell() {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const location = useLocation();
   const { config } = useSiteConfig();
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  useEffect(() => {
+    if (isLoading || isAuthenticated) {
+      return;
+    }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    void loginWithRedirect({
+      appState: { returnTo: location.pathname },
+    });
+  }, [isAuthenticated, isLoading, loginWithRedirect, location.pathname]);
+
+  if (isLoading || !isAuthenticated) {
+    return <Loading />;
   }
 
   return (

@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 
 import type { ContentPage, ContentStatus, PageHero, PageWriteInput } from '../types';
+import MediaUploadField from './MediaUploadField';
 
 interface AdminPageFormProps {
   mode: 'create' | 'edit';
@@ -123,19 +124,15 @@ function AdminPageForm({ mode, initial, onSubmit }: AdminPageFormProps) {
 
       <fieldset className="pack-fieldset">
         <legend className="pack-form-label">Hero (optional)</legend>
-        <div>
-          <label htmlFor="hero-image" className="pack-form-label">
-            Image URL
-          </label>
-          <input
-            id="hero-image"
-            name="heroImageUrl"
-            type="url"
-            className="pack-field"
-            value={hero.imageUrl ?? ''}
-            onChange={(e) => handleHeroChange('imageUrl', e.target.value)}
-          />
-        </div>
+        <MediaUploadField
+          id="hero-image"
+          label="Hero image or video"
+          value={hero.imageUrl ?? ''}
+          onChange={(url) => handleHeroChange('imageUrl', url)}
+          purpose="page-hero"
+          context={mode === 'edit' ? initial?.slug : slug || undefined}
+          helpText="Uploads to your tenant folder on Cloudinary. Images up to 10MB; video up to 100MB."
+        />
         <div>
           <label htmlFor="hero-headline" className="pack-form-label">
             Headline

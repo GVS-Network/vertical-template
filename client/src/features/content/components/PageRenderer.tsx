@@ -1,4 +1,5 @@
 import MarkdownBody from '../../../shared/MarkdownBody';
+import { isVideoUrl } from '../../../shared/media-url';
 import { usePage } from '../hooks/useContent';
 
 interface PageRendererProps {
@@ -21,9 +22,17 @@ function PageRenderer({ slug }: PageRendererProps) {
 
   return (
     <article>
-      {page.hero?.imageUrl && (
-        <img src={page.hero.imageUrl} alt="" className="pack-hero-image" />
-      )}
+      {page.hero?.imageUrl &&
+        (isVideoUrl(page.hero.imageUrl) ? (
+          <video
+            src={page.hero.imageUrl}
+            className="pack-hero-video"
+            controls
+            playsInline
+          />
+        ) : (
+          <img src={page.hero.imageUrl} alt="" className="pack-hero-image" />
+        ))}
       {page.hero?.headline && <p className="pack-eyebrow">{page.hero.headline}</p>}
       <h1 className="pack-detail-title">{page.title}</h1>
       {page.hero?.subheadline && (

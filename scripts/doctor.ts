@@ -458,6 +458,22 @@ function checkNotifications(siteConfig: SiteConfig): {
   return { errors, warnings };
 }
 
+function checkMedia(siteConfig: SiteConfig): string[] {
+  const warnings: string[] = [];
+
+  if (!siteConfig.features.admin || !siteConfig.features.auth) {
+    return warnings;
+  }
+
+  if (!requireEnvVar('CLOUDINARY_URL')) {
+    warnings.push(
+      'media: CLOUDINARY_URL unset — admin upload fields return 503 (paste URL still works)'
+    );
+  }
+
+  return warnings;
+}
+
 async function checkPayments(siteConfig: SiteConfig): Promise<{
   errors: string[];
   warnings: string[];
@@ -581,6 +597,7 @@ async function main(): Promise<void> {
     ...paymentResult.warnings,
     ...notificationResult.warnings,
     ...checkAdmin(activeConfig),
+    ...checkMedia(activeConfig),
   ];
 
   const contract = await runContractCheck();

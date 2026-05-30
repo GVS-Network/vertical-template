@@ -1,7 +1,7 @@
 # Open questions for Phase 7 (First client)
 
 **Status:** Phase 7 **active** — Phase 6 closed @ **`v0.7.0`** (2026-05-30).  
-**Prerequisite:** [`phase-6-close-verification.md`](phase-6-close-verification.md) · [`phase-6-handoff.md`](phase-6-handoff.md)  
+**Prerequisite:** [`phase-6-close-verification.md`](phase-6-close-verification.md) · [`phase-6-handoff.md`](phase-6-handoff.md) · [`phase-7-demo-public-shell.md`](phase-7-demo-public-shell.md) (demo shell vs client site)  
 **Phase prompt:** [`prompts/phase-7-first-client.html`](prompts/phase-7-first-client.html)  
 **Target tag:** `v0.8.0` at Phase 7 close
 
@@ -52,6 +52,7 @@
 | **P7-1** | Visual pick-list workflow | Lock in prompt 7.1 or first brand session |
 | **P4-4** | Catalog ↔ checkout | Required when `features.payments: true` on client site |
 | **P5-4** | `brand-stub.ts` wiring | Tenant pick/override in client build |
+| **P7-2** | Public events UI | API exists; demo shell has no `EventList` — `CustomEvents` at Phase 7 or core generalization |
 
 ---
 

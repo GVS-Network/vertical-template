@@ -246,7 +246,7 @@
       </div>
       <div class="decision-row">
         <div class="key">AssetRef</div>
-        <div class="val"><p>The shape of an uploaded asset (logo, etc.). Cloudinary-backed. Same pattern as the agency app's PortfolioProject uploads.</p></div>
+        <div class="val"><p>Upload response shape from <code>POST /api/media/upload</code>. Fields: <code>publicId</code>, <code>secureUrl</code>, <code>resourceType</code>, optional dimensions. Hero editor stores <code>secureUrl</code> in page <code>hero.imageUrl</code>. See <code>docs/phase-7-media-upload-resolutions.md</code>.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">IntakeSubmission</div>

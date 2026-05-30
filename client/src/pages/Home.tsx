@@ -1,3 +1,4 @@
+import { useAuth0 } from '@auth0/auth0-react';
 import { useSiteConfig } from '../contexts/SiteConfigContext';
 import { LoginButton } from '../features/auth';
 import { CheckoutButton } from '../features/payments';
@@ -7,6 +8,7 @@ const DEMO_CHECKOUT_ITEMS = [
 ];
 
 function Home() {
+  const { isAuthenticated } = useAuth0();
   const { config } = useSiteConfig();
 
   return (
@@ -21,7 +23,7 @@ function Home() {
           {config.features.payments && (
             <CheckoutButton items={DEMO_CHECKOUT_ITEMS} />
           )}
-          {config.features.auth && (
+          {config.features.auth && !isAuthenticated && (
             <LoginButton className="btn btn-secondary btn-lg" />
           )}
         </div>

@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Media uploads (Cloudinary)** — `getMediaProvider()` seam; auth-gated `POST /api/media/upload`; tenant folder prefix `gvsn/{tenantId}/…`; admin `MediaUploadField` on page hero (image + video); doctor warns when `CLOUDINARY_URL` unset.
+
+### Docs
+- **`phase-7-demo-public-shell.md`** — demo nav vs CMS, home route split, public events API vs UI gap, auth notes.
+- **`repo-context.html`** — file map through Phase 6 + media; v0.7.0 header.
+- **`phase-6-close-verification.md`** — clarify event API vs public EventList deferred.
+- **`phase-6-handoff.md`**, **`AGENTS.md`**, admin README, onboarding brief, glossary — aligned with media + admin surface.
+- **`inventory.md`** — archival banner (Phase 0 snapshot).
+- **`docs/README.html`** — doc set v0.7.1; Phase 7 operator notes.
+
+### Fixed
+- Auth client: wait for Auth0 session restore before clearing or using the API bearer token — fixes `/api/auth/me` 400 after login.
+- Auth client: persist Auth0 session in `localstorage` and redirect unauthenticated `/admin` visits to login (with return path) instead of silently sending users home.
+
 ## [0.7.0] — 2026-05-30
 
 Phase 6 (Operator surface) closed. Tenant admin at `/admin`, content writes, intake email, public Markdown rendering, and submissions inbox — core before first client.

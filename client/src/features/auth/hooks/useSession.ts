@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useEffect, useState } from 'react';
-import api from '../../../services/api';
+import api, { setAuthToken } from '../../../services/api';
 import { useSiteConfig } from '../../../contexts/SiteConfigContext';
 
 export interface SessionUser {
@@ -22,7 +22,8 @@ interface MeResponse {
 
 export function useSession() {
   const { config } = useSiteConfig();
-  const { isAuthenticated, isLoading: auth0Loading } = useAuth0();
+  const { isAuthenticated, isLoading: auth0Loading, getAccessTokenSilently } =
+    useAuth0();
   const [session, setSession] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +52,8 @@ export function useSession() {
       setLoading(true);
       setError(null);
       try {
+        const token = await getAccessTokenSilently();
+        setAuthToken(token);
         const { data } = await api.get<MeResponse>('/auth/me');
         if (!cancelled) {
           setSession(data.data);
@@ -70,7 +73,7 @@ export function useSession() {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, auth0Loading, config.features.auth]);
+  }, [isAuthenticated, auth0Loading, config.features.auth, getAccessTokenSilently]);
 
   return {
     session,

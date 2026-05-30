@@ -157,7 +157,7 @@
           <span class="why">single pipeline</span>
         </div>
         <div class="val">
-          <p>Cloudinary, same configuration as the agency app's <code>PortfolioProject</code> uploads. Logo slots in the visual system's <code>AssetRef</code> resolve through this. When phase-2 lifts <code>PortfolioProject</code> into the template, the upload code already matches.</p>
+          <p>Cloudinary via <code>getMediaProvider()</code> and <code>POST /api/media/upload</code> (pre–Phase 7 MVP: page hero in admin). Tenant folder prefix <code>gvsn/{tenantId}/…</code>. Logo slots and product images follow the same pipeline — see <code>docs/phase-7-media-upload-resolutions.md</code>.</p>
         </div>
       </div>
     </div>
@@ -200,20 +200,26 @@
     <span class="section-num">05 — Reference: file map</span>
     <h2>What lives where in the template</h2>
 
-<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.6.0 — phase 5 closed</span>
+<div class="tree"><span class="accent">vertical-template/</span>  <span class="dim">@ v0.7.0 — phase 6 closed; pre–Phase 7 [Unreleased] in CHANGELOG</span>
 ├── client/
 │   ├── src/
+│   │   ├── shared/
+│   │   │   ├── MarkdownBody.tsx           <span class="dim">public page/post markdown</span>
+│   │   │   └── media-url.ts               <span class="dim">video URL helper</span>
 │   │   ├── types/
 │   │   │   ├── site-config.ts           <span class="dim">contract-checked w/ server</span>
 │   │   │   ├── site-config.defaults.ts
-│   │   │   └── theme-tokens.ts
+│   │   │   ├── theme-tokens.ts
+│   │   │   └── asset-ref.ts               <span class="dim">upload response shape</span>
 │   │   ├── features/
-│   │   │   ├── registry.tsx             <span class="dim">FeatureRoutes() — flag gate</span>
+│   │   │   ├── registry.tsx             <span class="dim">AppRoutes() — flag gate</span>
 │   │   │   ├── catalog/                 <span class="dim">routes, hooks, ProductList/Detail</span>
 │   │   │   ├── content/                 <span class="dim">routes, PageRenderer, PostList/Detail</span>
 │   │   │   ├── intake/                  <span class="dim">routes, GenericFormRenderer</span>
-│   │   │   ├── payments/                <span class="dim">CheckoutButton (Home); no routes yet</span>
-│   │   │   └── auth/                    <span class="dim">Login/Logout, useSession — no routes.tsx</span>
+│   │   │   ├── payments/                <span class="dim">CheckoutButton</span>
+│   │   │   ├── auth/                    <span class="dim">Login/Logout, useSession, Auth0ProviderWithNavigate</span>
+│   │   │   └── admin/                   <span class="dim">/admin/*, MediaUploadField, CRUD forms</span>
+│   │   ├── components/                  <span class="dim">Layout, Navbar — demo shell</span>
 │   │   └── App.tsx
 │   └── package.json
 │
@@ -222,7 +228,9 @@
 │   │   ├── seams/
 │   │   │   ├── get-site-config.ts       <span class="dim">BOUND_TENANT_ID → bound preset</span>
 │   │   │   ├── bound-site-config.ts
-│   │   │   └── get-payment-provider.ts  <span class="dim">stripe | square factory</span>
+│   │   │   ├── get-payment-provider.ts  <span class="dim">stripe | square factory</span>
+│   │   │   ├── get-notification-provider.ts
+│   │   │   └── get-media-provider.ts    <span class="dim">Cloudinary when CLOUDINARY_URL set</span>
 │   │   ├── models/
 │   │   │   └── tenant-registry.ts       <span class="dim">_tenants collection (phase 4)</span>
 │   │   ├── shared/
@@ -238,11 +246,14 @@
 │   │   ├── theme/
 │   │   │   ├── load-repo-module.ts      <span class="dim">require theme/ from repo root</span>
 │   │   │   └── resolved-theme-css.ts    <span class="dim">GET /api/_meta/theme.css</span>
-│   │   ├── types/                       <span class="dim">site-config, payment-provider, theme-tokens</span>
+│   │   ├── types/                       <span class="dim">site-config, asset-ref, media-provider, …</span>
 │   │   ├── routes/
 │   │   │   ├── health.ts
 │   │   │   └── meta.ts                  <span class="dim">/config, /theme.css</span>
-│   │   ├── providers/                   <span class="dim">stripe.ts, square.ts (SDKs only here)</span>
+│   │   ├── providers/
+│   │   │   ├── stripe.ts · square.ts
+│   │   │   ├── media/cloudinary.ts      <span class="dim">SDK only here</span>
+│   │   │   └── notifications/resend.ts
 │   │   ├── scripts/                     <span class="dim">stripe/square happy-path smokes</span>
 │   │   ├── features/
 │   │   │   ├── _pack-pattern.md         <span class="dim">source of truth</span>
@@ -253,14 +264,17 @@
 │   │   │   ├── content/                 <span class="dim">Page, Post, /api/content</span>
 │   │   │   ├── intake/                  <span class="dim">FormDefinition, Submission</span>
 │   │   │   ├── payments/
-│   │   │   │   ├── providers/           <span class="dim">README → server/src/providers/</span>
 │   │   │   │   ├── schemas/             <span class="dim">order, webhook-event-log</span>
-│   │   │   │   ├── webhook-event-log.ts
 │   │   │   │   └── webhook-idempotency.smoke.ts
-│   │   │   └── auth/                    <span class="dim">requireAuth, /api/auth/me</span>
+│   │   │   ├── auth/                    <span class="dim">requireAuth, /api/auth/me</span>
+│   │   │   ├── admin/                   <span class="dim">/api/admin/* read proxies</span>
+│   │   │   └── media/                   <span class="dim">POST /api/media/upload (mounted w/ admin)</span>
 │   │   ├── app.ts                       <span class="dim">createApp() for tests + index</span>
 │   │   └── index.ts
 │   └── package.json
+│
+├── customers/
+│   └── _template/onboarding/            <span class="dim">Phase 7 client brief template</span>
 │
 ├── verticals/                           <span class="dim">four shipped presets — see README.md</span>
 │   ├── README.md                        <span class="dim">build order + provider defaults</span>
@@ -301,7 +315,9 @@
 ├── docs/
 ├── .cursor/rules/
 ├── CHANGELOG.md
-└── package.json                         <span class="dim">dev, doctor, registry/pack/webhook smokes</span></div>
+└── package.json                         <span class="dim">dev, doctor, contract:check, init:vertical, smokes</span></div>
+
+    <p>Demo public shell limitations (nav, home route, public events): <code>docs/phase-7-demo-public-shell.md</code>. Media upload resolutions: <code>docs/phase-7-media-upload-resolutions.md</code>.</p>
   </section>
 
   <!-- ===================== -->

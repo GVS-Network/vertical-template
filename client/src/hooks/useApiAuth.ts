@@ -7,9 +7,15 @@ import api, { setAuthToken } from '../services/api';
  * Call this once in a high-level component to set up token handling
  */
 export function useApiAuth() {
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
+    // Auth0 reports isAuthenticated=false while restoring a session — do not
+    // clear a stored token until loading finishes or /auth/me races with no header.
+    if (isLoading) {
+      return;
+    }
+
     const setupToken = async () => {
       if (isAuthenticated) {
         try {
@@ -25,7 +31,7 @@ export function useApiAuth() {
     };
 
     setupToken();
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated, isLoading, getAccessTokenSilently]);
 
   return api;
 }

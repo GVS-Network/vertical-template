@@ -54,7 +54,8 @@ One provider on the **website** (`SiteConfig.payment.provider`). In-person POS c
 
 | Field | Value |
 |-------|--------|
-| **Logo** | `assets/logo.{svg,png}` |
+| **Logo** | `assets/logo.{svg,png}` — upload via `/admin` when hero/media fields exist; operator sets `CLOUDINARY_URL` (see `docs/phase-7-media-upload-resolutions.md`) |
+| **Hero / marketing media** | Upload in `/admin/pages` (image or video) or seed URLs during 7.4 |
 | **Primary / accent colors** | `{hex}` — from reference site |
 | **Fonts** | `{headline}`, `{body}` |
 | **Theme** | Pick IDs or leaf overrides in Phase 7 (`theme/tenants/<slug>.*`) |

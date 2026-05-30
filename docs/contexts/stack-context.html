@@ -71,7 +71,7 @@
       </div>
       <div class="decision-row">
         <div class="key">Assets</div>
-        <div class="val"><p><strong>Planned.</strong> Cloudinary, aligned with <code>askanddeliverwebapp</code> — not installed in the fork yet.</p></div>
+        <div class="val"><p><strong>Installed (pre–Phase 7).</strong> Cloudinary via <code>CLOUDINARY_URL</code>; uploads through <code>getMediaProvider()</code> seam and <code>POST /api/media/upload</code> (auth-gated, tenant folder prefix). SDK in <code>server/src/providers/media/</code> only.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">Styling</div>
@@ -127,7 +127,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Installed.</strong> Client: <code>react-markdown</code> ^9 (public MarkdownBody, Phase 6.7). Server: <code>stripe</code> 17.7.0 · <code>square</code> 43.2.1 · <code>resend</code> (intake notifications, Phase 6.4) · <code>zod</code> ^3.23 (route-boundary validation, content pack Phase 6.2). Root (verticals / scripts): <code>zod</code> ^3.23 (product attribute schemas). <strong>Approved when their phase lands:</strong> cloudinary · vitest · express-async-errors.</p>
+      <p><strong>Installed.</strong> Client: <code>react-markdown</code> ^9 (public MarkdownBody, Phase 6.7). Server: <code>stripe</code> 17.7.0 · <code>square</code> 43.2.1 · <code>resend</code> (intake notifications, Phase 6.4) · <code>cloudinary</code> + <code>multer</code> (admin media uploads, pre–Phase 7) · <code>zod</code> ^3.23 (route-boundary validation, content pack Phase 6.2). Root (verticals / scripts): <code>zod</code> ^3.23 (product attribute schemas). <strong>Approved when their phase lands:</strong> vitest · express-async-errors.</p>
     </div>
     <div class="callout discipline">
       <span class="icon">→</span>
@@ -157,9 +157,10 @@
 
     <h4>Server env vars — planned (not in example yet)</h4>
     <ul>
-      <li><code>CLOUDINARY_URL</code> — content/uploads feature</li>
       <li><code>TENANT_ID</code> — defaults to <code>'default'</code> until Phase 7; not used in route handlers (use <code>getSiteConfig(req)</code> when seam exists)</li>
     </ul>
+
+    <p><code>CLOUDINARY_URL</code> is documented in <code>server/.env.example</code> (optional until admin uploads are used).</p>
 
     <h4>Required env vars (client) — in <code>client/.env.example</code> today</h4>
     <ul>

@@ -623,6 +623,54 @@ body {
     color: var(--color-ink-soft);
   }
 
+  .pack-media-field {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .pack-media-field__help {
+    font-size: var(--size-small);
+    color: var(--color-ink-muted);
+    margin: 0;
+  }
+
+  .pack-media-field__preview {
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  .pack-media-field__image,
+  .pack-media-field__video,
+  .pack-hero-video {
+    display: block;
+    width: 100%;
+    max-height: 16rem;
+    object-fit: cover;
+  }
+
+  .pack-media-field__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .pack-media-field__file {
+    font-size: var(--size-small);
+    color: var(--color-ink);
+  }
+
+  .pack-media-field__url-fallback {
+    font-size: var(--size-small);
+    color: var(--color-ink-muted);
+  }
+
+  .pack-media-field__url-summary {
+    cursor: pointer;
+    margin-bottom: var(--space-xs);
+  }
+
   .pack-admin-filters {
     display: flex;
     flex-wrap: wrap;
