@@ -127,7 +127,7 @@
     </div>
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>Installed.</strong> Server: <code>stripe</code> 17.7.0 · <code>square</code> 43.2.1 · <code>zod</code> ^3.23 (route-boundary validation, content pack Phase 6.2). Root (verticals / scripts): <code>zod</code> ^3.23 (product attribute schemas). <strong>Approved when their phase lands:</strong> cloudinary · vitest · express-async-errors.</p>
+      <p><strong>Installed.</strong> Server: <code>stripe</code> 17.7.0 · <code>square</code> 43.2.1 · <code>resend</code> (intake notifications, Phase 6.4) · <code>zod</code> ^3.23 (route-boundary validation, content pack Phase 6.2). Root (verticals / scripts): <code>zod</code> ^3.23 (product attribute schemas). <strong>Approved when their phase lands:</strong> cloudinary · vitest · express-async-errors.</p>
     </div>
     <div class="callout discipline">
       <span class="icon">→</span>
@@ -152,6 +152,7 @@
       <li><code>STRIPE_SECRET_KEY</code> · <code>STRIPE_WEBHOOK_SECRET</code> — when <code>payment.provider === 'stripe'</code></li>
       <li><code>SQUARE_ACCESS_TOKEN</code> · <code>SQUARE_LOCATION_ID</code> · <code>SQUARE_WEBHOOK_SIGNATURE_KEY</code> · <code>SQUARE_ENV</code> (<code>sandbox</code>|<code>production</code>) · optional <code>SQUARE_WEBHOOK_NOTIFICATION_URL</code> — when <code>payment.provider === 'square'</code></li>
       <li><code>PAYMENT_PROVIDER</code> — local dev override for <code>getSiteConfig()</code> (<code>stripe</code>|<code>square</code>|<code>none</code>)</li>
+      <li><code>NOTIFICATION_PROVIDER</code> — intake email adapter (<code>resend</code>|omit|<code>none</code>); <code>RESEND_API_KEY</code> when resend; optional <code>NOTIFICATION_FROM_EMAIL</code>, <code>NOTIFICATION_STRICT</code> (Phase 6.4)</li>
     </ul>
 
     <h4>Server env vars — planned (not in example yet)</h4>

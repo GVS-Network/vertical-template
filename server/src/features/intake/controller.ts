@@ -30,7 +30,7 @@ export const createSubmission = asyncHandler(
       req.socket.remoteAddress;
 
     const submission = await intakeService.createSubmission(
-      tenantId(req),
+      req.siteConfig,
       req.params.slug,
       data,
       ip

@@ -20,6 +20,11 @@ export type {
   WebhookEvent,
 } from './payment-provider';
 
+export type {
+  NotificationProvider,
+  SendIntakeSubmissionParams,
+} from './notification-provider';
+
 // Note: Auth types are provided by express-oauth2-jwt-bearer
 
 export interface EnvConfig {

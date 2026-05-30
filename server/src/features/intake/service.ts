@@ -1,6 +1,8 @@
 import type { HydratedDocument } from 'mongoose';
 import { scopedForTenant } from '../../db/scoped';
 import { createError } from '../../middleware/errorHandler';
+import type { SiteConfig } from '../../types/site-config';
+import { notifyIntakeSubmission } from './notify-submission';
 import {
   FormDefinition,
   type FormFieldDefinition,
@@ -45,11 +47,12 @@ function validateSubmissionData(
 }
 
 export async function createSubmission(
-  tenantId: string,
+  siteConfig: SiteConfig,
   formSlug: string,
   data: Record<string, unknown>,
   ip?: string
 ): Promise<ISubmission> {
+  const tenantId = siteConfig.tenantId;
   const form = await getFormBySlug(tenantId, formSlug);
   if (!form) {
     throw createError('Form not found', 404);
@@ -66,7 +69,8 @@ export async function createSubmission(
     processed: false,
   });
 
-  // TODO(later): intake-notifications — email/Slack/webhook when a submission is created.
+  const submission = doc.toObject() as ISubmission;
+  await notifyIntakeSubmission(siteConfig, form, submission);
 
-  return doc.toObject() as ISubmission;
+  return submission;
 }
