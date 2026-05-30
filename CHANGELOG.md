@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Content write API: `POST/PUT` pages and posts with zod validation, `scoped(Model, req)` writes, and `test:content` smoke (Phase 6.2).
+
 ### Fixed
 
 - `npm run dev`: Vite no longer starts until `GET /api/health` succeeds, avoiding a one-shot `ECONNREFUSED` on `/api/_meta/theme.css` when the client wins the startup race.

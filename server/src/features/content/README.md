@@ -15,8 +15,31 @@
 - Smallest Type-C surface: one field, no nested AST in Mongo.
 - Does not block MDX later: add optional `bodyFormat: 'markdown' \| 'mdx'` or a separate `bodyMdx` field when a vertical needs it.
 - Does not block a headless editor: a future admin UI can still persist Markdown (or serialize Tiptap → Markdown on save).
-- Server validates length and required presence only; rendering is a **client concern** (phase 2: plain/pre-wrap; phase 5+ can add `marked` or MDX in `PageRenderer` only).
+- Server validates length and required presence only; rendering is a **client concern** (Phase 6.7 adds `MarkdownBody` on public routes).
 
-## Rendering note (client)
+## Write API (Phase 6.2)
 
-`PageRenderer` and `PostDetail` display `body` as pre-wrapped text until build-doc **Phase 6** ships `MarkdownBody` + content write API. Write routes are scaffolded (501) until Phase 6 implements them.
+Auth-gated when `features.auth: true` via `writeGuards` + `requireAuth`. When auth is off, write routes are mounted without guards (same pattern as catalog).
+
+| Method | Path | Body (zod) |
+|--------|------|------------|
+| `POST` | `/api/content/pages` | `slug`, `title`, optional `body`, `hero`, `status` |
+| `PUT` | `/api/content/pages/:slug` | partial page fields |
+| `POST` | `/api/content/posts` | `slug`, `title`, optional `body`, `tags`, `publishedAt`, `status` |
+| `PUT` | `/api/content/posts/:slug` | partial post fields |
+
+- Status values: `draft` \| `published` \| `archived` (default `draft` on create).
+- Writes use `scoped(Model, req)` — tenant filter baked in.
+- Inbound bodies validated in `schemas/validators.ts` (zod).
+
+## Public reads (P6-4)
+
+Anonymous `GET` list and detail return **`status: published` only**. The service hard-codes published; controllers do not forward a `status` query param. Draft/archived records are invisible on public routes until published.
+
+## Tests
+
+```bash
+npm run test:content --prefix server
+```
+
+Requires `MONGODB_URI`. Smoke covers create/update, zod rejection, duplicate slug (409), and published-only public GET/list.

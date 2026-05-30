@@ -20,6 +20,7 @@
     "doctor": "tsx scripts/doctor.ts",
     "test:registry": "npm run test:registry --prefix server",
     "test:pack-compliance": "npm run test:pack-compliance --prefix server",
+    "test:content": "npm run test:content --prefix server",
     "test:stripe-happy-path": "npm run test:stripe-happy-path --prefix server",
     "test:square-happy-path": "npm run test:square-happy-path --prefix server",
     "test:square-sync-inventory": "npm run test:square-sync-inventory --prefix server",

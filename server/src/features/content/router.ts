@@ -10,10 +10,10 @@ export function createContentRouter(siteConfig: SiteConfig): Router {
   router.get('/pages/:slug', controller.getPageBySlug);
   router.get('/posts', controller.listPosts);
   router.get('/posts/:slug', controller.getPostBySlug);
-  router.post('/pages', ...guards, controller.writeNotReady);
-  router.put('/pages/:slug', ...guards, controller.writeNotReady);
-  router.post('/posts', ...guards, controller.writeNotReady);
-  router.put('/posts/:slug', ...guards, controller.writeNotReady);
+  router.post('/pages', ...guards, controller.createPage);
+  router.put('/pages/:slug', ...guards, controller.updatePage);
+  router.post('/posts', ...guards, controller.createPost);
+  router.put('/posts/:slug', ...guards, controller.updatePost);
 
   return router;
 }
