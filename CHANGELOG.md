@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `npm run dev`: Vite no longer starts until `GET /api/health` succeeds, avoiding a one-shot `ECONNREFUSED` on `/api/_meta/theme.css` when the client wins the startup race.
+
+### Thesis
+
+- Build phase plan amended (v1): insert **Phase 6 · Operator surface** (tenant `/admin`, content writes, intake email, Markdown); renumber first client → Phase 7 (`v0.8.0`), multi-tenant → Phase 8 (`v1.0.0`). See `docs/amendments/phase-plan-amendment-v1.md`.
+- `template-architecture-brief.html` v0.1 → v0.2: tenant admin in core Phase 6; sixth pack `admin`; platform `/__admin` stays Phase 8.
+
+### Docs
+
+- Added `docs/amendments/`, `docs/prompts/phase-6-operator-surface.html`; renamed first-client and multi-tenant prompts to phase 7/8.
+- Updated `phase-6-prompt-6.1-resolutions.md` (TG Square, Barry Stripe); added `customers/_template/onboarding/brief.md`.
+- Added `docs/phase-6-open-questions.md`, `docs/phase-6-prompt-6.1-resolutions.md`, `docs/phase-6-handoff.md`; renumbered `phase-7-open-questions.md`.
+- Updated `docs/README.html` to doc set v0.7.0 and phases 0–8 index.
+
 ## [0.6.0] — 2026-05-21
 
 Phase 5 (Visual system) closed. Four-layer token resolution, WCAG contrast validation, CSS variable emission, and token-backed UI across feature packs and app shell.
@@ -48,7 +64,7 @@ Phase 5 (Visual system) closed. Four-layer token resolution, WCAG contrast valid
 ### Docs
 
 - `docs/phase-5-prompt-5.1-resolutions.md`, `docs/phase-5-close-verification.md`
-- `docs/phase-6-open-questions.md` — P6-1 pick-list workflow
+- Phase plan 0–8; `docs/phase-6-open-questions.md` for operator surface; `docs/phase-7-open-questions.md` for first client (P7-1 pick-list)
 - `docs/contexts/repo-context.html` §05, `glossary.html` (visual-system terms)
 - Build docs family **v0.6.0** in `docs/README.html`
 

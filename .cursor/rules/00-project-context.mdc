@@ -28,7 +28,7 @@ You are working on **vertical-template**: a multi-tenant-ready MERN starter for 
 
 ## Phase awareness
 
-- The build-doc phases are 0–7 (see `docs/README.html`).
+- The build-doc phases are 0–8 (see `docs/README.html`). Phase 6 = operator surface; 7 = first client; 8 = multi-tenant.
 - "Phase 2" with no qualifier means **build-doc phase 2** (feature packs).
 - "Phase 2 of the concept brief" or "the template brief's phase-2 transition" — always disambiguate.
 

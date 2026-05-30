@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Context</span>
-      <span>Glossary · v0.6.0</span>
+      <span>Glossary · v0.7.0</span>
     </div>
     <h1 class="doc-title">Words that mean <em>specific things</em> here.</h1>
     <p class="doc-subtitle">Project-internal vocabulary. When Claude (or anyone) uses these terms in a PR or a prompt, they carry the definitions below — not the generic ones.</p>
@@ -52,7 +52,7 @@
       <div class="decision-row">
         <div class="key">Feature pack</div>
         <div class="val">
-          <p>A toggle-mounted module: API + UI when <code>SiteConfig.features.&lt;pack&gt; === true</code>, zero surface when false (404, not stub routes). Five packs: <code>catalog · content · intake · payments · auth</code>.</p>
+          <p>A toggle-mounted module: API + UI when <code>SiteConfig.features.&lt;pack&gt; === true</code>, zero surface when false (404, not stub routes). Six packs: <code>catalog · content · intake · payments · admin · auth</code> (<code>admin</code> requires <code>auth</code>; ships build-doc Phase 6).</p>
           <p><strong>Server shape</strong> (<code>server/src/features/&lt;pack&gt;/</code>): <code>index.ts</code> exports <code>packKey</code> + <code>register(app, siteConfig)</code>; data packs add <code>schemas/</code>, <code>service.ts</code>, <code>controller.ts</code>, <code>router.ts</code>, optional <code>seed.ts</code>. <strong>auth</strong> is JWT-only (no Mongoose layer). Boot gate: <code>registry.ts</code> dynamic-imports enabled packs only — see <code>_pack-pattern.md</code>.</p>
           <p><strong>Client shape</strong> (<code>client/src/features/&lt;pack&gt;/</code>): <code>index.ts</code> + optional <code>routes.tsx</code>, <code>components/</code>, <code>hooks/</code>. <code>client/src/features/registry.tsx</code> merges routes when the flag is on. No cross-pack imports; shared helpers live in <code>server/src/shared/</code> (e.g. <code>write-guards.ts</code>).</p>
         </div>
@@ -110,7 +110,7 @@
       <div class="decision-row">
         <div class="key">Pick</div>
         <div class="val">
-          <p><strong>L3</strong> — tenant choices from curated bundles (palette ID, type pairing, density preset). Lives in <code>theme/tenants/&lt;tenantId&gt;.pick.ts</code> as <code>DeepPartial&lt;ThemeTokens&gt;</code>. Demo stubs are empty until Phase 6 client builds populate them. Picks merge before overrides.</p>
+          <p><strong>L3</strong> — tenant choices from curated bundles (palette ID, type pairing, density preset). Lives in <code>theme/tenants/&lt;tenantId&gt;.pick.ts</code> as <code>DeepPartial&lt;ThemeTokens&gt;</code>. Demo stubs are empty until Phase 7 client builds populate them. Picks merge before overrides.</p>
         </div>
       </div>
 
@@ -184,9 +184,9 @@
 
     <p><strong>Concept-brief phases</strong> (1–5) describe go-to-market stages — <em>"pitch one-off builds personally,"</em> <em>"backdoor the B2B layer."</em> These are operator-business phases, not build phases.</p>
 
-    <p><strong>Template-brief phase-2</strong> refers specifically to the multi-tenant transition — the six-change jump documented in §06 of the template brief. This is what the build-docs call <strong>Phase 7</strong>.</p>
+    <p><strong>Template-brief phase-2</strong> refers specifically to the multi-tenant transition — the six-change jump documented in §06 of the template brief. This is what the build-docs call <strong>Phase 8</strong>.</p>
 
-    <p><strong>Build-doc phases</strong> (0–7) are the prompts in <code>docs/prompts/</code>. They are the order in which code lands in the template repo. They map loosely to the concept brief's phase 1–2.</p>
+    <p><strong>Build-doc phases</strong> (0–8) are the prompts in <code>docs/prompts/</code>. Phase 6 is operator surface (tenant admin); Phase 7 is first client; Phase 8 is multi-tenant. See <code>docs/amendments/phase-plan-amendment-v1.md</code>.</p>
 
     <div class="callout discipline">
       <span class="icon">→</span>
@@ -202,7 +202,7 @@
     <div class="decisions">
       <div class="decision-row">
         <div class="key">getSiteConfig(req)</div>
-        <div class="val"><p>Seam in <code>server/src/seams/get-site-config.ts</code>. Today returns <code>defaultSiteConfig</code>; phase 7 resolves per host/<code>Tenant</code>. Middleware sets <code>req.siteConfig</code>; routes may use either the seam or <code>req.siteConfig</code> after <code>attachSiteConfig</code>.</p></div>
+        <div class="val"><p>Seam in <code>server/src/seams/get-site-config.ts</code>. Today returns <code>defaultSiteConfig</code>; phase 8 resolves per host/<code>Tenant</code>. Middleware sets <code>req.siteConfig</code>; routes may use either the seam or <code>req.siteConfig</code> after <code>attachSiteConfig</code>.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">scoped(Model, req)</div>
@@ -210,7 +210,15 @@
       </div>
       <div class="decision-row">
         <div class="key">Pack registry</div>
-        <div class="val"><p><code>server/src/features/registry.ts</code> (server) and <code>client/src/features/registry.tsx</code> (client). The only toggle gate: iterate <code>catalog → content → intake → payments → auth</code>; if flag false, log <code>[feature:off]</code> once and skip import/register.</p></div>
+        <div class="val"><p><code>server/src/features/registry.ts</code> (server) and <code>client/src/features/registry.tsx</code> (client). The only toggle gate: iterate enabled packs (<code>catalog · content · intake · payments · admin · auth</code>); if flag false, log <code>[feature:off]</code> once and skip import/register.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Tenant admin</div>
+        <div class="val"><p>Business-owner CMS at <code>/admin/*</code> (<code>features.admin</code> pack, build-doc Phase 6). Edits pages, event posts, catalog, views intake submissions. Distinct from <strong>platform admin</strong>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key">Platform admin</div>
+        <div class="val"><p>GVS operator UI at <code>/__admin/*</code> (build-doc Phase 8). Manages tenants, hosts, fleet ops — not customer content.</p></div>
       </div>
       <div class="decision-row">
         <div class="key">tenantIdSchemaDefinition</div>
@@ -272,11 +280,14 @@
     <p>This is a working document. When a phase prompt introduces a new term that's specific to the project, that term lands here in the same PR. When a term changes meaning (or stops being used), it moves into §05 with a note explaining what replaced it.</p>
 
     <h4>Open questions — Phase 6</h4>
-    <p>See <code>docs/phase-6-open-questions.md</code> — lead: workflow when a client wants something the pick list doesn't offer (P6-1).</p>
+    <p>See <code>docs/phase-6-open-questions.md</code> — operator surface build (notifications, Markdown renderer).</p>
+
+    <h4>Open questions — Phase 7</h4>
+    <p>See <code>docs/phase-7-open-questions.md</code> — pick-list workflow (P7-1); first client (Terrible Gerald's).</p>
 
     <h4>Anticipated additions</h4>
     <div class="open-q">
-      <span class="q-label">Q · Phase 7</span>
+      <span class="q-label">Q · Phase 8</span>
       <p>New terms when multi-tenancy ships: <code>Tenant</code> (the model), <code>tenant-resolution middleware</code>, <code>per-tenant config fetch</code>.</p>
     </div>
     <div class="open-q">

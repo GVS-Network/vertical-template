@@ -15,7 +15,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">README</span>
-      <span>Build Documentation · v0.6.0</span>
+      <span>Build Documentation · v0.7.0</span>
     </div>
     <h1 class="doc-title">The <em>build documentation</em> family.</h1>
     <p class="doc-subtitle">An index of every doc that drives the Cursor + Claude build loop, the order they're read in, and the rules that keep them honest as the system evolves.</p>
@@ -110,7 +110,7 @@
       <a class="doc-card" href="prompts/phase-2-feature-packs.html">
         <span class="file">prompts/phase-2-feature-packs.html</span>
         <h5>Phase 2 · Feature Packs</h5>
-        <p>Five packs (catalog, content, intake, payments, auth). Toggle-mounted. Disabled = zero surface.</p>
+        <p>Feature packs (catalog, content, intake, payments; admin + auth in Phase 6). Toggle-mounted. Disabled = zero surface.</p>
       </a>
       <a class="doc-card" href="prompts/phase-3-payments.html">
         <span class="file">prompts/phase-3-payments.html</span>
@@ -127,15 +127,20 @@
         <h5>Phase 5 · Token Registry &amp; Resolver</h5>
         <p>Four-layer <code>resolveTokens()</code>, contrast validator, CSS-variable emission.</p>
       </a>
-      <a class="doc-card" href="prompts/phase-6-first-client.html">
-        <span class="file">prompts/phase-6-first-client.html</span>
-        <h5>Phase 6 · First Client Build</h5>
-        <p>Drive a real client engagement through the template. The brief's "stage 1" begins here.</p>
+      <a class="doc-card" href="prompts/phase-6-operator-surface.html">
+        <span class="file">prompts/phase-6-operator-surface.html</span>
+        <h5>Phase 6 · Operator Surface</h5>
+        <p>Tenant admin, content writes, intake email, Markdown rendering — core before first client.</p>
       </a>
-      <a class="doc-card" href="prompts/phase-7-multi-tenant.html">
-        <span class="file">prompts/phase-7-multi-tenant.html</span>
-        <h5>Phase 7 · Multi-Tenant Jump</h5>
-        <p>The six discrete changes. Tenant model, host middleware, getSiteConfig swap, SSL, client config, admin.</p>
+      <a class="doc-card" href="prompts/phase-7-first-client.html">
+        <span class="file">prompts/phase-7-first-client.html</span>
+        <h5>Phase 7 · First Client Build</h5>
+        <p>Drive a real client engagement through the template. Custom frontend + production cutover.</p>
+      </a>
+      <a class="doc-card" href="prompts/phase-8-multi-tenant.html">
+        <span class="file">prompts/phase-8-multi-tenant.html</span>
+        <h5>Phase 8 · Multi-Tenant Jump</h5>
+        <p>The six discrete changes. Tenant model, host middleware, getSiteConfig swap, SSL, platform admin.</p>
       </a>
     </div>
   </section>
@@ -168,8 +173,12 @@
 │       ├── phase-3-payments.html
 │       ├── phase-4-verticals.html
 │       ├── phase-5-visual-system.html
-│       ├── phase-6-first-client.html
-│       └── phase-7-multi-tenant.html
+│       ├── phase-6-operator-surface.html
+│       ├── phase-7-first-client.html
+│       └── phase-8-multi-tenant.html
+│   ├── amendments/
+│   │   ├── README.md
+│   │   └── phase-plan-amendment-v1.md
 │
 ├── <span class="accent">.cursorrules</span>                              <span class="dim">← legacy single-file, always-on</span>
 ├── <span class="accent">.cursor/</span>
@@ -289,7 +298,7 @@
   <section class="status-section">
     <span class="section-num">06 — Status</span>
     <h2>Where the build documentation stands</h2>
-    <p>v0.6.0 of the doc set — Phase 5 closed (2026-05-21). Template @ <code>v0.6.0</code>: four-layer token resolution (<code>theme/resolve.ts</code>), WCAG contrast validation, <code>GET /api/_meta/theme.css</code>, token-backed UI across feature packs and shell. Phase 6 (first client build) is next — see <code>docs/phase-6-open-questions.md</code> and <code>docs/prompts/phase-6-first-client.html</code>.</p>
+    <p>v0.7.0 of the doc set — Phase plan amended (2026-05-29): Phase 6 is <strong>operator surface</strong> (tenant admin, content writes, intake email). Phase 7 is first client; Phase 8 is multi-tenant. Template still @ <code>v0.6.0</code> until Phase 6 code ships and tags <code>v0.7.0</code>. See <code>docs/amendments/phase-plan-amendment-v1.md</code>, <code>docs/phase-6-open-questions.md</code>, <code>docs/prompts/phase-6-operator-surface.html</code>.</p>
 
     <h4>Things this README will need to add over time</h4>
     <div class="open-q">
@@ -302,7 +311,7 @@
     </div>
     <div class="open-q">
       <span class="q-label">Q · Per-client doc fork</span>
-      <p>Each client build inherits this docs/ folder. When client builds start having their own decisions worth recording, the doc family may split into <code>docs/platform/</code> (this) and <code>docs/build/</code> (per-tenant) — covered in phase-6.</p>
+      <p>Each client build inherits this docs/ folder. When client builds start having their own decisions worth recording, the doc family may split into <code>docs/platform/</code> (this) and <code>docs/build/</code> (per-tenant) — covered in phase-7.</p>
     </div>
   </section>
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phase 7 — Multi-Tenant · Vertical SaaS Build</title>
+<title>Phase 8 — Multi-Tenant · Vertical SaaS Build</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,10 +14,10 @@
 
   <header class="doc-header">
     <div class="doc-meta">
-      <span class="tag">PHASE 7</span>
-      <span>Multi-Tenant · v0.7.0 → v1.0.0</span>
+      <span class="tag">PHASE 8</span>
+      <span>Multi-Tenant · v0.8.0 → v1.0.0</span>
     </div>
-    <h1 class="doc-title">Phase 7 — <em>Multi-tenant</em>.</h1>
+    <h1 class="doc-title">Phase 8 — <em>Multi-tenant</em>.</h1>
     <p class="doc-subtitle">The six discrete changes that turn a single-tenant template into a multi-tenant platform. The template-architecture brief promised this would be six changes, not sixty — Phase 1's <code>tenantId</code> investment and Phase 5's tenant-keyed token resolution are what cash that promise. After this phase, one deploy serves many sites.</p>
   </header>
 
@@ -26,7 +26,7 @@
     <span class="section-num">01 — Prerequisites</span>
     <h2>Before you start this phase</h2>
     <ul>
-      <li>Phase 6 closed, tagged <code>v0.7.0</code>. A real client is live single-tenant.</li>
+      <li>Phase 7 closed, tagged <code>v0.8.0</code>. A real client is live single-tenant.</li>
       <li>The tenant-leakage test from Phase 4 still passes (different <code>BOUND_TENANT_ID</code>s show no cross-talk).</li>
       <li>You have read the template-architecture brief's "phase-2 jump" section (which is this phase under the build doc's numbering) and counted the six changes for yourself.</li>
       <li>You have a credentials story for SSL at scale — either a wildcard, a per-domain auto-issuer (e.g. Caddy/Let's Encrypt), or a managed front (e.g. Cloudflare). Decide before prompt 7.4.</li>
@@ -34,7 +34,7 @@
 
     <div class="callout risk">
       <span class="icon"></span>
-      <p><strong>The phase-6 client must not break.</strong> Their single-tenant deploy is in production. Phase 7's success criterion is "we collapsed N deploys into 1 and no customer noticed". Do not skip the migration verification at the end.</p>
+      <p><strong>The phase-7 client must not break.</strong> Their single-tenant deploy is in production. Phase 8's success criterion is "we collapsed N deploys into 1 and no customer noticed". Do not skip the migration verification at the end.</p>
     </div>
   </section>
 
@@ -100,25 +100,25 @@
   <!-- ===================== -->
   <section>
     <span class="section-num">04 — Prompts to run, in order</span>
-    <h2>The phase-7 prompt sequence</h2>
+    <h2>The phase-8 prompt sequence</h2>
 
-    <h3>Prompt 7.1 — Carry forward + audit Phase 6 surprises</h3>
+    <h3>Prompt 8.1 — Carry forward + audit Phase 7 surprises</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.1</span>
-Resolve OPEN_QUESTIONS from Phase 6. Pay special attention to the closing question: did the phase-6 client need anything that tenantId-on-every-model didn't buy?
+<span class="prompt-label">Prompt 8.1</span>
+Resolve OPEN_QUESTIONS from Phase 7. Pay special attention to the closing question: did the phase-7 client need anything that tenantId-on-every-model didn't buy?
 
-If YES — there is a missing tenantId scope somewhere — fix it FIRST, before any Phase 7 work. Phase 7 assumes every cross-tenant boundary is clean.
+If YES — there is a missing tenantId scope somewhere — fix it FIRST, before any Phase 8 work. Phase 8 assumes every cross-tenant boundary is clean.
 
 Audit:
-  1. Re-run the tenant-leakage test from Phase 4 with three tenants now (default, demo, phase-6 client codename).
+  1. Re-run the tenant-leakage test from Phase 4 with three tenants now (default, demo, phase-7 client codename).
   2. Check every webhook handler: does it correctly route to the right tenantId based on something other than req.hostname? (Webhooks don't carry our hostname.)
   3. Check every cron/background job (if any): is it iterating by tenantId, not assuming a single tenant?
 
 Report the audit. Do not start prompt 7.2 until clean.</div>
 
-    <h3>Prompt 7.2 — Change 1: Tenant model</h3>
+    <h3>Prompt 8.2 — Change 1: Tenant model</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.2</span>
+<span class="prompt-label">Prompt 8.2</span>
 Create the Tenant Mongoose model at server/models/tenant.ts.
 
 Schema:
@@ -136,11 +136,11 @@ Indexes:
 
 Migrate existing _tenants placeholder docs from Phase 4 into the real Tenant collection. Write a migration script at scripts/migrate/0001-tenants.ts. Idempotent.
 
-Commit: <span class="hl">"phase-7: change 1 — Tenant model + migration"</span>.</div>
+Commit: <span class="hl">"phase-8: change 1 — Tenant model + migration"</span>.</div>
 
-    <h3>Prompt 7.3 — Change 2: Host middleware</h3>
+    <h3>Prompt 8.3 — Change 2: Host middleware</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.3</span>
+<span class="prompt-label">Prompt 8.3</span>
 Create server/middleware/resolve-tenant.ts:
 
   - Read req.hostname.
@@ -159,11 +159,11 @@ Test:
   - Hit with an unknown host: clean 404.
   - Hit a suspended tenant: clean 404 (or 503 with a "suspended" page — decide and document).
 
-Commit: <span class="hl">"phase-7: change 2 — host middleware (resolve-tenant)"</span>.</div>
+Commit: <span class="hl">"phase-8: change 2 — host middleware (resolve-tenant)"</span>.</div>
 
-    <h3>Prompt 7.4 — Change 3: getSiteConfig swap (THE big one)</h3>
+    <h3>Prompt 8.4 — Change 3: getSiteConfig swap (THE big one)</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.4</span>
+<span class="prompt-label">Prompt 8.4</span>
 This is the change that pays off the Phase 1 seam investment.
 
 Open server/seams/get-site-config.ts. Change the body:
@@ -181,11 +181,11 @@ After the swap:
   3. Confirm each host renders its own tenant's config — branding, features, payment provider.
   4. Confirm req.siteConfig.tenantId === req.tenant._id everywhere.
 
-Commit: <span class="hl">"phase-7: change 3 — getSiteConfig reads req.tenant"</span>.</div>
+Commit: <span class="hl">"phase-8: change 3 — getSiteConfig reads req.tenant"</span>.</div>
 
-    <h3>Prompt 7.5 — Change 4: SSL strategy</h3>
+    <h3>Prompt 8.5 — Change 4: SSL strategy</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.5</span>
+<span class="prompt-label">Prompt 8.5</span>
 Per the SSL decision made in prereqs, implement and document.
 
 If wildcard cert (subdomain-only model):
@@ -202,11 +202,11 @@ If managed front (Cloudflare, Fastly, etc):
 
 Update scripts/doctor.ts: in production, fetch https://&lt;tenant.hosts[0]&gt; from the running app's perspective and verify a 200 with valid cert. Fail loud if not.
 
-Commit: <span class="hl">"phase-7: change 4 — SSL strategy (&lt;strategy-name&gt;)"</span>.</div>
+Commit: <span class="hl">"phase-8: change 4 — SSL strategy (&lt;strategy-name&gt;)"</span>.</div>
 
-    <h3>Prompt 7.6 — Change 5: Tenant admin UI</h3>
+    <h3>Prompt 8.6 — Change 5: Tenant admin UI</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.6</span>
+<span class="prompt-label">Prompt 8.6</span>
 Build an admin UI at /__admin/tenants. It is gated by Auth0 with a role check (only users with the "operator" role can access).
 
 Routes:
@@ -221,11 +221,11 @@ UI is intentionally minimal — this is for the operator, not customers. Plain t
 
 Critically: the admin UI itself should NOT be tenant-scoped — it lives outside the multi-tenant world (on a dedicated host like admin.&lt;our-domain&gt;.com) and reads tenants directly via Mongoose.
 
-Commit: <span class="hl">"phase-7: change 5 — tenant admin UI"</span>.</div>
+Commit: <span class="hl">"phase-8: change 5 — tenant admin UI"</span>.</div>
 
-    <h3>Prompt 7.7 — Change 6: Ops dashboard</h3>
+    <h3>Prompt 8.7 — Change 6: Ops dashboard</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.7</span>
+<span class="prompt-label">Prompt 8.7</span>
 Build a read-only dashboard at /__admin/ops. Same role gate as 7.6.
 
 What it shows (per tenant, last 24h + last 7d):
@@ -240,12 +240,12 @@ Data source: a lightweight events log we add to in the existing middleware (don'
 
 The point of this dashboard is the 9am-Monday check. Optimize for "operator opens it, in 30 seconds knows whether anything needs attention".
 
-Commit: <span class="hl">"phase-7: change 6 — ops dashboard"</span>.</div>
+Commit: <span class="hl">"phase-8: change 6 — ops dashboard"</span>.</div>
 
-    <h3>Prompt 7.8 — Migrate the Phase-6 client</h3>
+    <h3>Prompt 8.8 — Migrate the Phase-6 client</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.8</span>
-THE critical migration. The phase-6 client is currently on its own deploy. We need to move them to the multi-tenant deploy without breaking them.
+<span class="prompt-label">Prompt 8.8</span>
+THE critical migration. The phase-7 client is currently on its own deploy. We need to move them to the multi-tenant deploy without breaking them.
 
 Plan:
   1. On the multi-tenant deploy, create the client as a Tenant document (using the admin UI from 7.6 or a script). Copy the siteConfigOverrides, hosts (including www. variant), preset.
@@ -256,11 +256,11 @@ Plan:
 
 Run a small real-world transaction post-cutover to confirm payments still flow.
 
-Commit migration scripts: <span class="hl">"phase-7: migrate &lt;client&gt; to multi-tenant deploy"</span>.</div>
+Commit migration scripts: <span class="hl">"phase-8: migrate &lt;client&gt; to multi-tenant deploy"</span>.</div>
 
-    <h3>Prompt 7.9 — Stress test the platform</h3>
+    <h3>Prompt 8.9 — Stress test the platform</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.9</span>
+<span class="prompt-label">Prompt 8.9</span>
 Stand up three more synthetic tenants (one per remaining vertical) on the multi-tenant deploy, each with a fake hostname (use /etc/hosts or a subdomain).
 
 Verify:
@@ -272,20 +272,20 @@ Verify:
 
 Report any anomaly. Anomalies = fixes BEFORE closing the phase.
 
-Commit fixes individually as <span class="hl">"phase-7: stress test fix — &lt;what&gt;"</span>.</div>
+Commit fixes individually as <span class="hl">"phase-8: stress test fix — &lt;what&gt;"</span>.</div>
 
-    <h3>Prompt 7.10 — Close the phase + tag v1.0.0</h3>
+    <h3>Prompt 8.10 — Close the phase + tag v1.0.0</h3>
     <div class="prompt-block">
-<span class="prompt-label">Prompt 7.10</span>
+<span class="prompt-label">Prompt 8.10</span>
 Final doc update pass. This is the v1.0.0 cut — the moment the template stops being "in development" and becomes "the platform".
 
-  - CHANGELOG: a big Phase 7 / v1.0.0 entry. List all six changes, the migration of the phase-6 client, the stress-test outcomes.
+  - CHANGELOG: a big Phase 8 / v1.0.0 entry. List all six changes, the migration of the phase-7 client, the stress-test outcomes.
   - package.json: bump to 1.0.0.
   - README.html (build-docs/): update doc-meta to v1.0.0. Add a short paragraph at the top noting "the template now serves multiple tenants from one deploy".
   - repo-context.html §05: add server/models/tenant.ts, server/middleware/resolve-tenant.ts, scripts/migrate/, admin/, ops/.
   - glossary.html: every term should now have a Phase-7-aware definition (tenant is now a real entity, not a defaulted string).
   - rules: review every cursor rule. Anything that said "tenantId defaults to 'default'" is now <em>wrong by default</em> — update.
-  - briefs: any brief revision proposed in Phase 6 discoveries that survived review gets applied NOW, with a CHANGELOG note about which brief was edited and why.
+  - briefs: any brief revision proposed in Phase 7 discoveries that survived review gets applied NOW, with a CHANGELOG note about which brief was edited and why.
 
 Tag <span class="hl">v1.0.0</span>. Fresh-clone test. <strong>Champagne.</strong></div>
   </section>
@@ -293,10 +293,10 @@ Tag <span class="hl">v1.0.0</span>. Fresh-clone test. <strong>Champagne.</strong
   <!-- ===================== -->
   <section>
     <span class="section-num">05 — Acceptance criteria</span>
-    <h2>Phase 7 is done when…</h2>
+    <h2>Phase 8 is done when…</h2>
     <ul>
       <li>All six changes are implemented and committed individually.</li>
-      <li>The Phase-6 client is migrated and serving from the multi-tenant deploy with no customer-visible disruption.</li>
+      <li>The Phase-7 client is migrated and serving from the multi-tenant deploy with no customer-visible disruption.</li>
       <li>Three synthetic tenants on the multi-tenant deploy demonstrate full isolation (data, theme, payments, webhooks).</li>
       <li>The admin UI can create, edit, suspend tenants.</li>
       <li>The ops dashboard shows per-tenant health.</li>

@@ -1,48 +1,53 @@
-# Open questions for Phase 6 (First client)
+# Open questions for Phase 6 (Operator surface)
 
-**Status:** Phase 5 closed @ **v0.6.0** (2026-05-21).  
-**Prerequisite:** Visual system end-to-end — see [`phase-5-close-verification.md`](phase-5-close-verification.md)  
-**Phase prompt:** [`prompts/phase-6-first-client.html`](prompts/phase-6-first-client.html)
-
----
-
-## P6-1 — Pick list doesn't offer what the client wants
-
-**The question:** When a client wants something the curated pick list doesn't offer — a palette tone, a type pairing, a density — what's the workflow?
-
-| Option | When | Cost |
-|--------|------|------|
-| **A. New pick bundle** | Second client (or same vertical) would choose the same thing | Add named bundle to L3 registry (Type B); update foundation if new leaves needed |
-| **B. Leaf override** | One-off tweak inside an existing leaf (exact hex, one font swap) | `theme/tenants/<client>.override.ts` — validated, contrast-checked |
-| **C. Vertical token change** | Every tenant in that vertical should inherit it | Edit `theme/verticals/<key>.tokens.ts` + brief (Type B propagation) |
-| **D. Reject / defer** | Structural ask (new token category, fifth vertical, new pack) | Brief revision or "not what this template does" |
-
-**Recommendation for 6.1 discussion:** Default path is **B → A → C → D**. Override first for client-specific tweaks; promote to pick bundle on second use (visual brief register-before-second-use rule); vertical change only when the whole vertical should shift; brief moment for anything that adds leaves or categories.
+**Status:** Phase 5 closed @ **v0.6.0** (2026-05-29). Amendment v1 **accepted**.  
+**Prerequisite:** Visual system — [`phase-5-close-verification.md`](phase-5-close-verification.md)  
+**Phase prompt:** [`prompts/phase-6-operator-surface.html`](prompts/phase-6-operator-surface.html)  
+**Resolutions @ 6.1:** [`phase-6-prompt-6.1-resolutions.md`](phase-6-prompt-6.1-resolutions.md)
 
 ---
 
-## Carried forward from Phase 4 / 5
+## Resolved @ 6.1
+
+| ID | Topic | Outcome |
+|----|--------|---------|
+| **A1** | Notification provider | Resend |
+| **A2** | Event fields on Post | Structured schema extension |
+| **A3** | `features.admin` | Explicit boolean |
+| **A4** | Submissions inbox in MVP | Yes |
+| **P4-7** | Intake email | Implement in Phase 6 |
+
+---
+
+## Open during Phase 6 build
 
 | ID | Topic | Notes |
 |----|--------|--------|
-| **P4-4** | Catalog ↔ checkout | Wire `CheckoutButton` to seeded catalog products (not demo line items) |
-| **P4-7** | Intake email notifications | Deferred from 2.6 |
-| **P5-4** | `brand-stub.ts` vs `theme/verticals/*.tokens.ts` | Wire `brand-stub` to tenant override path when first real client ships |
+| **P6-2** | `NOTIFICATION_STRICT` | Log-and-succeed vs fail submission on email error — lock @ 6.4 |
+| **P6-3** | Markdown renderer | `marked` vs `react-markdown` — prefer smallest bundle with safe defaults @ 6.7 |
+| **P6-4** | Public GET draft leakage | Confirm list/detail endpoints filter `status: published` only @ 6.2 |
+
+---
+
+## Carried to Phase 7 (first client)
+
+| ID | Topic |
+|----|--------|
+| **P4-4** | Catalog ↔ checkout |
+| **P7-1** | Pick list doesn't offer what client wants (was P6-1 in old numbering) |
 
 ---
 
 ## Phase 6 scope reminders
 
-- **Single-tenant deploy** — client's own fork/branch, `tenantId='default'` on their DB; not phase 7 multi-tenant.
-- **Real client required** — must map to one of four verticals; no fifth vertical mid-build.
-- **Discoveries log** — `build-docs/discoveries/<client>-phase-6.md`; contradictions → brief revision proposals, not silent hacks.
-- **Live mode** — production doctor checks for live payment keys, reachable webhooks, backups.
+- **Platform work only** — no Terrible Gerald's custom frontend in this phase (that's Phase 7 Type C).
+- **Sixth feature pack** `admin` — toggle-mounted; zero surface when off.
+- **Tag target** `v0.7.0` at phase close.
 
 ---
 
 ## Resolved — do not re-litigate
 
-- Phase 5 opinionated brand per vertical — `phase-5-prompt-5.1-resolutions.md`
-- Phase 5 token build order — screen-printer → bar-restaurant → food-truck → farm-source
-- Dev theme load via `/api/_meta/theme.css` — not startup-only Vite injection
+- Phase plan renumber: 6 operator → 7 first client → 8 multi-tenant — `amendments/phase-plan-amendment-v1.md`
+- Opinionated brand per vertical — Phase 5.1
 - Dual payment provider per site — rejected @ v0.4.0

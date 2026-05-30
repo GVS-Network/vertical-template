@@ -11,7 +11,8 @@ Food trucks and pop-ups that need a simple web menu and a clear “where are you
 | Setting | Value |
 |---------|--------|
 | `payment.provider` | `square` |
-| Feature packs | catalog, content, intake, payments — **auth off** |
+| Feature packs | catalog, content, intake, payments — **auth off** in preset seed |
+| Self-service tenants | Enable `features.auth` + `features.admin` in site config (Phase 6) — required for owner-edited menu/events |
 | Catalog mode | Menu — `dailyAvailable` and `locationToday` on attributes |
 | Checkout | Window + Square POS; catering invoiced separately |
 

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 6 — Operator Surface · Vertical SaaS Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/doc-system.css">
+</head>
+<body>
+<article class="doc">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      <span class="tag">PHASE 6</span>
+      <span>Operator Surface · v0.6.0 → v0.7.0</span>
+    </div>
+    <h1 class="doc-title">Phase 6 — <em>Operator surface</em>.</h1>
+    <p class="doc-subtitle">Ship tenant-facing admin, content writes, intake email, and public Markdown rendering in core — before any first-client engagement. Replaces per-client Storyblok/Getform patterns with GVSN-native APIs and <code>/admin</code>. See <code>docs/amendments/phase-plan-amendment-v1.md</code>.</p>
+  </header>
+
+  <section>
+    <span class="section-num">01 — Prerequisites</span>
+    <h2>Before you start this phase</h2>
+    <ul>
+      <li>Phase 5 closed, tagged <code>v0.6.0</code>.</li>
+      <li>Amendment v1 accepted — phase map is 0–5 closed, <strong>this</strong> is 6, first client is 7, multi-tenant is 8.</li>
+      <li>Read <code>docs/phase-6-prompt-6.1-resolutions.md</code> after prompt 6.1 (defaults already locked for Resend, structured event fields, explicit <code>features.admin</code>).</li>
+    </ul>
+
+    <div class="callout discipline">
+      <span class="icon">→</span>
+      <p><strong>Two admin surfaces.</strong> <code>/admin/*</code> = tenant owner (this phase). <code>/__admin/*</code> = platform operator (Phase 8). Never merge routes or auth models.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="section-num">02 — Deliverables</span>
+    <h2>What this phase produces</h2>
+
+    <div class="decisions">
+      <div class="decision-row">
+        <div class="key"><strong>Content write API</strong></div>
+        <div class="val"><p>POST/PUT pages and posts; zod validation; auth via <code>writeGuards</code>; public GET returns <code>published</code> only.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Event posts</strong></div>
+        <div class="val"><p>Structured event fields on Post; public list via <code>?tag=event</code>.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Intake notifications</strong></div>
+        <div class="val"><p><code>providers/notifications/</code> + Resend; email to <code>siteConfig.contact.email</code> on submission.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>Submissions inbox API</strong></div>
+        <div class="val"><p>Auth-gated list + mark processed for tenant admins.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>features.admin pack</strong></div>
+        <div class="val"><p><code>/admin</code> UI: pages, events, products, submissions. Toggle-mounted; requires auth.</p></div>
+      </div>
+      <div class="decision-row">
+        <div class="key"><strong>MarkdownBody</strong></div>
+        <div class="val"><p>Public PageRenderer + PostDetail render stored Markdown.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="section-num">03 — Change taxonomy</span>
+    <h2>Type A vs C</h2>
+    <div class="change-types">
+      <div class="change-type A">
+        <span class="tag">Type A</span>
+        <h5>Core platform</h5>
+        <p>New <code>admin</code> pack, notification provider, content writes, Post schema extension, <code>features.admin</code> on SiteConfig — propagates to all builds via pull.</p>
+      </div>
+      <div class="change-type C">
+        <span class="tag">Type C</span>
+        <h5>Per-build later</h5>
+        <p>Terrible Gerald's custom public frontend stays Phase 7. No client-specific code in Phase 6.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="section-num">04 — Prompts to run, in order</span>
+    <h2>The phase-6 prompt sequence</h2>
+
+    <h3>Prompt 6.1 <span class="pill green">CLAUDE</span> — Resolutions</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.1</span>
+Confirm locked decisions in docs/phase-6-prompt-6.1-resolutions.md. Add any new OPEN_QUESTIONS to docs/phase-6-open-questions.md.
+
+Commit: <span class="hl">"phase-6: 6.1 resolutions"</span>.</div>
+
+    <h3>Prompt 6.2 <span class="pill green">CLAUDE</span> — Content write API</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.2</span>
+Replace content controller writeNotReady with real create/update for pages and posts.
+
+  - zod schemas for inbound bodies
+  - scoped writes via scoped(Model, req)
+  - public GET filters published only (audit list + detail)
+
+Add pack tests. Update server/src/features/content/README.md.
+
+Commit: <span class="hl">"phase-6: content write API"</span>.</div>
+
+    <h3>Prompt 6.3 <span class="pill green">CLAUDE</span> — Post event fields</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.3</span>
+Extend Post schema per 6.1: eventStart, eventEnd, eventLocation, links { map?, facebook? }.
+
+  - dual type files if any public shape changes
+  - zod for writes; optional fields
+  - seed note for demo-food-truck (no breaking change required)
+
+Commit: <span class="hl">"phase-6: post event metadata"</span>.</div>
+
+    <h3>Prompt 6.4 <span class="pill green">CLAUDE</span> — Intake notifications</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.4</span>
+Implement providers/notifications/ (interface + resend.ts). Hook createSubmission.
+
+  - env: NOTIFICATION_PROVIDER, RESEND_API_KEY, optional NOTIFICATION_STRICT
+  - document in stack-context + .env.example
+  - close P4-7 in phase-6-open-questions
+
+Commit: <span class="hl">"phase-6: intake email notifications"</span>.</div>
+
+    <h3>Prompt 6.5 <span class="pill green">CLAUDE</span> — Submissions list API</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.5</span>
+GET /api/intake/submissions (auth, paginated). PATCH mark processed.
+
+Commit: <span class="hl">"phase-6: intake submissions inbox API"</span>.</div>
+
+    <h3>Prompt 6.6 <span class="pill green">CLAUDE</span> — features.admin + SiteConfig</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.6</span>
+Add features.admin boolean (dual SiteConfig files, contract:check, defaults).
+
+  - server registry gate for admin router
+  - client AppRoutes lazy /admin when on
+  - require auth when admin on (doctor warning if admin without auth)
+
+Commit: <span class="hl">"phase-6: admin feature flag + registry"</span>.</div>
+
+    <h3>Prompt 6.7 <span class="pill green">CLAUDE</span> — MarkdownBody</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.7</span>
+Add client Markdown renderer; wire PageRenderer + PostDetail. Add dep to stack-context.
+
+Commit: <span class="hl">"phase-6: public markdown rendering"</span>.</div>
+
+    <h3>Prompt 6.8 <span class="pill green">CLAUDE</span> — Admin: pages</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.8</span>
+Admin UI — pages list + edit form (title, body markdown, hero, status). Uses content write API.
+
+Commit: <span class="hl">"phase-6: admin pages"</span>.</div>
+
+    <h3>Prompt 6.9 <span class="pill green">CLAUDE</span> — Admin: events</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.9</span>
+Admin UI — posts filtered to events; event field editors; tag event on save.
+
+Commit: <span class="hl">"phase-6: admin events"</span>.</div>
+
+    <h3>Prompt 6.10 <span class="pill green">CLAUDE</span> — Admin: products</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.10</span>
+Admin UI — catalog product list + edit (name, slug, price, description in attributes, status).
+
+Commit: <span class="hl">"phase-6: admin products"</span>.</div>
+
+    <h3>Prompt 6.11 <span class="pill green">CLAUDE</span> — Admin: submissions</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.11</span>
+Admin UI — submissions inbox; mark processed.
+
+Commit: <span class="hl">"phase-6: admin submissions inbox"</span>.</div>
+
+    <h3>Prompt 6.12 <span class="pill green">CLAUDE</span> — Doctor + preset docs</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.12</span>
+doctor.ts: auth+admin+notification env checks. verticals/food-truck/README.md: enable auth+admin for self-service tenants.
+
+Commit: <span class="hl">"phase-6: doctor admin checks"</span>.</div>
+
+    <h3>Prompt 6.13 <span class="pill green">CLAUDE</span> — Close phase</h3>
+    <div class="prompt-block">
+<span class="prompt-label">Prompt 6.13</span>
+  - docs/phase-6-close-verification.md
+  - CHANGELOG [Unreleased] → consolidate for tag
+  - package.json 0.7.0
+  - docs/README.html status
+  - phase-6-handoff.md status → complete
+  - OPEN_QUESTIONS for Phase 7
+
+Tag <span class="hl">v0.7.0</span>.</div>
+  </section>
+
+  <section>
+    <span class="section-num">05 — Acceptance criteria</span>
+    <h2>Phase 6 is done when…</h2>
+    <ul>
+      <li>Authenticated user can CRUD pages, event posts, and products via <code>/admin</code>.</li>
+      <li>Public site shows published Markdown; events list from API.</li>
+      <li>Intake form submission sends email to <code>contact.email</code> and appears in admin inbox.</li>
+      <li><code>features.admin: false</code> mounts zero admin routes.</li>
+      <li><code>contract:check</code>, <code>npm run build</code>, doctor pass.</li>
+      <li>Tagged <code>v0.7.0</code>.</li>
+    </ul>
+  </section>
+
+  <section class="status-section">
+    <span class="section-num">06 — Handoff to Phase 7</span>
+    <h2>First client build</h2>
+    <p>Phase 7 drives Terrible Gerald's (or next signed client): custom public frontend, real content, brand picks, deploy. Admin and notifications are already core — no Storyblok/Getform.</p>
+    <p>See <code>docs/prompts/phase-7-first-client.html</code> and <code>docs/phase-7-open-questions.md</code>.</p>
+  </section>
+
+</article>
+</body>
+</html>

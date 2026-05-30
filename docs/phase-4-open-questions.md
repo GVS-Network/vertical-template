@@ -27,7 +27,7 @@
 | ID | Topic | Status |
 |----|--------|--------|
 | **P4-3** | Square inventory sync trigger | **Resolved @ 5.1** — push on stock write; see `phase-5-prompt-5.1-resolutions.md` |
-| **P4-4** | Catalog ↔ checkout | **Deferred to Phase 6** @ 5.1 |
+| **P4-4** | Catalog ↔ checkout | **Deferred to Phase 7** @ 5.1 |
 | **P4-5** | Square POS read-sync | Out of scope |
 | **P4-7** | Intake email notifications | Deferred from 2.6 |
 

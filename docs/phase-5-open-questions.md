@@ -20,13 +20,13 @@
 
 | ID | Topic | Outcome |
 |----|--------|---------|
-| **P5-4** | `brand-stub.ts` vs L2 tokens | L2 in `theme/verticals/`; stub wired in Phase 6 |
+| **P5-4** | `brand-stub.ts` vs L2 tokens | L2 in `theme/verticals/`; stub wired in Phase 7 client build |
 | **P5-5** | CSS var delivery | Dev: `/api/_meta/theme.css` link; prod: inline `<style>` in SPA fallback |
 | **P5-6** | Pick registry shape | `tenantThemes[tenantId].pick` + `.override` |
 
 ---
 
-## Carried to Phase 6
+## Carried to Phase 7 (first client)
 
 See [`phase-6-open-questions.md`](phase-6-open-questions.md) — especially **P6-1** (pick-list workflow).
 

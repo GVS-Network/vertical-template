@@ -4,7 +4,7 @@
   "description": "MERN vertical SaaS template — multi-tenant-ready starter for small businesses",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n server,client -c magenta,cyan \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev": "concurrently -n server,client -c magenta,cyan \"npm run dev --prefix server\" \"sh -c 'until curl -sf http://127.0.0.1:3001/api/health >/dev/null; do sleep 0.25; done; exec npm run dev --prefix client'\"",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
     "prebuild": "npm run contract:check && npm run test:resolve-tokens",

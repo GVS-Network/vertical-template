@@ -59,7 +59,7 @@ Locked for Prompt 5.4 (one commit per vertical, same order as Phase 4 build):
 | ID | Topic | 5.1 resolution |
 |----|--------|----------------|
 | **P4-3** | Square inventory sync trigger | **Default: push on catalog stock write** when product `stock` is mutated server-side. Until write hooks exist: seed-only + optional manual `syncInventory` (existing provider API). No cron in template core. Document in payments pack README when hook lands. |
-| **P4-4** | Catalog ↔ checkout | **Deferred to Phase 6** (first client / commerce wiring). Demo `CheckoutButton` line items remain until then; does not block visual system. |
+| **P4-4** | Catalog ↔ checkout | **Deferred to Phase 7** (first client / commerce wiring). Demo `CheckoutButton` line items remain until then; does not block visual system. |
 | **P4-5** | Square POS read-sync | **Out of scope** — thesis-level; unchanged |
 | **P4-7** | Intake email | **Deferred** — unchanged from 2.6 |
 | **P4-6** | Dual provider | **Rejected** — do not re-litigate |

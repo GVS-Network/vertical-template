@@ -452,7 +452,7 @@
   <header class="doc-header">
     <div class="doc-meta">
       <span class="tag">Template Architecture</span>
-      <span>Companion to Concept Brief · v0.1</span>
+      <span>Companion to Concept Brief · v0.2</span>
     </div>
     <h1 class="doc-title">A <em>vertical-aware</em> MERN starter, multi-tenant-ready underneath.</h1>
     <p class="doc-subtitle">Decisions, seams, and discipline for the new template that turns the platform thesis into something a build can actually start from on Monday.</p>
@@ -559,7 +559,7 @@
           <span class="why">modular updates</span>
         </div>
         <div class="val">
-          <p>Five packs total — <code>catalog</code>, <code>content</code>, <code>intake</code>, <code>payments</code>, plus <code>auth</code> as middleware. Each has a folder on the server and client. The router file mounts them conditionally on <code>SiteConfig.features.&lt;id&gt;.enabled</code>. A disabled pack contributes zero API surface.</p>
+          <p>Six packs total — <code>catalog</code>, <code>content</code>, <code>intake</code>, <code>payments</code>, <code>admin</code>, plus <code>auth</code> as middleware. Each has a folder on the server and client. The router mounts them conditionally on <code>SiteConfig.features.&lt;id&gt;</code> (boolean flags). A disabled pack contributes zero API surface. <code>admin</code> requires <code>auth</code>.</p>
         </div>
       </div>
 
@@ -774,7 +774,7 @@
 
     <div class="callout note">
       <span class="icon">i</span>
-      <p><strong>No CMS UI yet.</strong> The content feature pack ships read/upsert endpoints. The admin UI for editing pages grows on each client build, then graduates back into core when patterns crystallize.</p>
+      <p><strong>Tenant admin ships in build-doc Phase 6.</strong> The <code>admin</code> feature pack provides <code>/admin</code> for business owners (pages, events/posts, catalog, submission inbox). Content write APIs ship in the same phase. <strong>Platform operator admin</strong> (<code>/__admin/tenants</code>, fleet ops) remains build-doc Phase 8 — not the same surface.</p>
     </div>
 
     <div class="callout note">
@@ -797,7 +797,7 @@
   <section class="status-section">
     <span class="section-num">08 — Status</span>
     <h2>What the template ships today</h2>
-    <p>A working scaffold: 4 vertical presets, 4 feature packs (plus auth), a contract-check script, a doctor script, an init-vertical script, complete docs (architecture, feature packs, verticals, multi-tenant roadmap, upgrade flow, per-vertical), and a payment-provider abstraction with Stripe and Square adapters wired up to the agency-app patterns.</p>
+    <p>A working scaffold: 4 vertical presets, 5 feature packs (plus auth; <code>admin</code> lands Phase 6), a contract-check script, a doctor script, an init-vertical script, complete docs (architecture, feature packs, verticals, multi-tenant roadmap, upgrade flow, per-vertical), and a payment-provider abstraction with Stripe and Square adapters wired up to the agency-app patterns.</p>
 
     <h4>Immediately ready to do</h4>
     <ul>

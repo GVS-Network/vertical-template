@@ -19,4 +19,4 @@
 
 ## Rendering note (client)
 
-`PageRenderer` and `PostDetail` display `body` as pre-wrapped text today. Swap in a Markdown component when the visual system is ready — no schema change required.
+`PageRenderer` and `PostDetail` display `body` as pre-wrapped text until build-doc **Phase 6** ships `MarkdownBody` + content write API. Write routes are scaffolded (501) until Phase 6 implements them.
