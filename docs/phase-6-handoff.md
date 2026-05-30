@@ -1,6 +1,6 @@
 # Phase 6 handoff — Operator surface
 
-**Status:** Not started (docs/amendment applied 2026-05-29).  
+**Status:** In progress — Prompt **6.1** confirmed (2026-05-30).  
 **Target tag:** `v0.7.0`  
 **Prompt guide:** [`prompts/phase-6-operator-surface.html`](prompts/phase-6-operator-surface.html)
 
@@ -23,7 +23,7 @@ Phase 7 adds: real tenant data, brand picks, **custom public frontend**, deploy,
 
 ## Start here
 
-1. Run prompt **6.1** — resolutions locked in [`phase-6-prompt-6.1-resolutions.md`](phase-6-prompt-6.1-resolutions.md).
+1. ~~Run prompt **6.1**~~ — done; resolutions in [`phase-6-prompt-6.1-resolutions.md`](phase-6-prompt-6.1-resolutions.md).
 2. Proceed **6.2 → 6.13** in order.
 
 ---
