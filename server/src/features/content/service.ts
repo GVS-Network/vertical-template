@@ -17,6 +17,10 @@ export type PostListFilter = {
   tag?: string;
 };
 
+export type PageListFilter = {
+  status?: ContentStatus;
+};
+
 function duplicateKeyError(err: unknown): boolean {
   return err instanceof MongoServerError && err.code === 11000;
 }
@@ -43,6 +47,34 @@ export async function getPageBySlug(
   const doc = (await pages.findOne({
     slug: slug.toLowerCase(),
     status: 'published',
+  })) as HydratedDocument<IPage> | null;
+  return doc ? doc.toObject() : null;
+}
+
+/** Auth-gated admin list — all statuses unless filtered (Phase 6.8). */
+export async function listPagesAdmin(
+  tenantId: string,
+  filter: PageListFilter = {}
+): Promise<IPage[]> {
+  const pages = scopedForTenant(Page, tenantId);
+  const query: Record<string, unknown> = {};
+  if (filter.status) {
+    query.status = filter.status;
+  }
+  const docs = (await pages
+    .find(query)
+    .sort({ title: 1 })) as HydratedDocument<IPage>[];
+  return docs.map((d) => d.toObject());
+}
+
+/** Auth-gated admin detail — any status (Phase 6.8). */
+export async function getPageBySlugAdmin(
+  tenantId: string,
+  slug: string
+): Promise<IPage | null> {
+  const pages = scopedForTenant(Page, tenantId);
+  const doc = (await pages.findOne({
+    slug: slug.toLowerCase(),
   })) as HydratedDocument<IPage> | null;
   return doc ? doc.toObject() : null;
 }

@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import type { SiteConfig } from '../../types/site-config';
 import { writeGuards } from '../../shared/write-guards';
+import * as controller from './controller';
 
 /**
- * Tenant admin API surface (Phase 6.6 stub). CRUD proxies land in 6.8+.
+ * Tenant admin API surface. Reads proxy content/catalog/intake; writes use those packs' POST/PUT routes.
  */
 export function createAdminRouter(siteConfig: SiteConfig): Router {
   const router = Router();
@@ -12,6 +13,9 @@ export function createAdminRouter(siteConfig: SiteConfig): Router {
   router.get('/status', ...guards, (_req, res) => {
     res.json({ status: 'success', data: { pack: 'admin' } });
   });
+
+  router.get('/pages', ...guards, controller.listPages);
+  router.get('/pages/:slug', ...guards, controller.getPage);
 
   return router;
 }
